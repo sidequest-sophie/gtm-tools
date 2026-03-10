@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared/shared.css" />
   <style>
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -237,6 +238,13 @@
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      overflow: hidden;
+    }
+
+    .content.tool-active {
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
     }
 
     .welcome-card {
@@ -406,12 +414,11 @@
           <span class="badge">Soon</span>
         </button>
 
-        <button class="nav-item" disabled>
+        <button class="nav-item active" data-tool-id="naming-strategy">
           <div class="icon">
             <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </div>
           <span class="label">Naming Strategy</span>
-          <span class="badge">Soon</span>
         </button>
 
         <button class="nav-item" disabled>
@@ -531,11 +538,123 @@
 
   </div>
 
+  <script src="shared/storage.js"></script>
+
   <script>
+    let currentActiveTool = null;
+    const welcomeContent = document.querySelector('.content').innerHTML;
+
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('open');
       document.getElementById('overlay').classList.toggle('open');
     }
+
+    /**
+     * Load a tool's HTML and inject it into the content area
+     */
+    async function loadTool(toolId) {
+      try {
+        const response = await fetch(`tools/${toolId}/${toolId}.html`);
+        if (!response.ok) {
+          throw new Error(`Failed to load tool: ${response.statusText}`);
+        }
+
+        const html = await response.text();
+        const contentDiv = document.querySelector('.content');
+
+        // Clear content and inject new tool HTML
+        contentDiv.innerHTML = html;
+        contentDiv.classList.add('tool-active');
+
+        // Execute any inline <script> tags (innerHTML doesn't auto-execute them)
+        contentDiv.querySelectorAll('script').forEach(oldScript => {
+          const newScript = document.createElement('script');
+          // Copy attributes
+          Array.from(oldScript.attributes).forEach(attr => {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+          newScript.textContent = oldScript.textContent;
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+
+        // Update topbar title
+        const toolName = getToolName(toolId);
+        document.querySelector('.topbar-title').textContent = toolName;
+
+        // Close sidebar on mobile
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('open');
+
+        // Store current active tool
+        currentActiveTool = toolId;
+
+        // Initialize tool if it has an init function
+        if (window[toCamelCase(toolId)] && window[toCamelCase(toolId)].init) {
+          window[toCamelCase(toolId)].init();
+        }
+      } catch (error) {
+        console.error('Error loading tool:', error);
+        document.querySelector('.content').innerHTML = '<div class="empty-state"><p>Error loading tool</p></div>';
+      }
+    }
+
+    /**
+     * Unload the current tool and show welcome screen
+     */
+    function showWelcome() {
+      const contentDiv = document.querySelector('.content');
+      contentDiv.innerHTML = welcomeContent;
+      contentDiv.classList.remove('tool-active');
+      document.querySelector('.topbar-title').textContent = 'GTM Tools';
+      currentActiveTool = null;
+    }
+
+    /**
+     * Get display name for a tool
+     */
+    function getToolName(toolId) {
+      const toolNames = {
+        'naming-strategy': 'Naming Strategy',
+        'branding': 'Branding',
+        'analyst-relations': 'Analyst Relations',
+        'roi-calculator': 'ROI Calculator',
+        'messaging-house': 'Messaging House',
+        'sales-enablement': 'Sales Enablement',
+      };
+
+      return toolNames[toolId] || toolId;
+    }
+
+    /**
+     * Convert kebab-case to camelCase
+     */
+    function toCamelCase(str) {
+      return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+    }
+
+    /**
+     * Setup navigation
+     */
+    function setupNavigation() {
+      const navItems = document.querySelectorAll('.nav-item');
+
+      navItems.forEach((item) => {
+        if (item.classList.contains('active')) {
+          item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const toolId = item.getAttribute('data-tool-id');
+            if (toolId) {
+              loadTool(toolId);
+            }
+          });
+        }
+      });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      setupNavigation();
+    });
   </script>
 
 </body>

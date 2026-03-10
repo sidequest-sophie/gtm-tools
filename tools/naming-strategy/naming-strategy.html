@@ -1,0 +1,2161 @@
+<!-- ────────────────────────────────────────────────────────────────────────────
+     STYLES
+     ──────────────────────────────────────────────────────────────────────────── -->
+
+<style>
+  /* Override parent .content styles to fill space */
+  .naming-strategy-tool {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    background: var(--white);
+  }
+
+  /* ── Tool Header ── */
+  .ns-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    gap: var(--spacing-lg);
+    flex-shrink: 0;
+  }
+
+  .ns-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+
+  .ns-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0;
+  }
+
+  .ns-client-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 0.5rem 1rem;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--navy);
+  }
+
+  .ns-client-selector:hover {
+    background: var(--gray-200);
+    border-color: var(--gray-300);
+  }
+
+  .ns-client-selector.empty {
+    color: var(--gray-500);
+  }
+
+  .ns-settings-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+  }
+
+  .ns-settings-btn:hover {
+    background: var(--gray-100);
+    color: var(--navy);
+  }
+
+  .ns-settings-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  /* ── Tab Bar ── */
+  .ns-tabs {
+    display: flex;
+    gap: 2rem;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 var(--spacing-xl);
+    background: var(--white);
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+
+  .ns-tab-btn {
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .ns-tab-btn:hover {
+    color: var(--navy);
+    border-bottom-color: var(--gray-300);
+  }
+
+  .ns-tab-btn.active {
+    color: var(--pink);
+    border-bottom-color: var(--pink);
+  }
+
+  /* ── Content Container ── */
+  .ns-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-xl);
+  }
+
+  .ns-tab-content {
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .ns-tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     TAB 1: EXAMPLES
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  .ns-examples {
+    max-width: 100%;
+  }
+
+  .ns-examples-header {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .ns-filter-bar {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+  }
+
+  .ns-filter-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    transition: all 0.2s ease;
+  }
+
+  .ns-filter-btn:hover {
+    border-color: var(--gray-400);
+    background: var(--gray-50);
+  }
+
+  .ns-filter-btn.active {
+    background: var(--pink);
+    color: var(--white);
+    border-color: var(--pink);
+  }
+
+  .ns-stats-bar {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    padding: 0.75rem var(--spacing-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .ns-matrix {
+    display: grid;
+    grid-template-columns: 120px repeat(4, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    background: var(--white);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+  }
+
+  .ns-cell-header {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--navy);
+    padding: var(--spacing-sm);
+    text-align: center;
+  }
+
+  .ns-cell-row-header {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--navy);
+    padding: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .ns-cell {
+    min-height: 120px;
+    padding: var(--spacing-md);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    position: relative;
+  }
+
+  .ns-cell-subtitle {
+    font-size: 0.7rem;
+    color: var(--gray-500);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .ns-cell-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .ns-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+  }
+
+  .ns-chip.companies {
+    background: rgba(16, 64, 96, 0.1);
+    border-color: rgba(16, 64, 96, 0.3);
+    color: var(--navy);
+  }
+
+  .ns-chip.products {
+    background: rgba(8, 145, 178, 0.1);
+    border-color: rgba(8, 145, 178, 0.3);
+    color: #0891b2;
+  }
+
+  .ns-chip.features {
+    background: rgba(217, 119, 6, 0.1);
+    border-color: rgba(217, 119, 6, 0.3);
+    color: #d97706;
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     TAB 2: NAMING AUDIT
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  .ns-audit {
+    max-width: 1200px;
+  }
+
+  .ns-audit-empty {
+    text-align: center;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    color: var(--gray-500);
+  }
+
+  .ns-audit-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .ns-category-section {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+  }
+
+  .ns-category-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-category-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    flex: 1;
+  }
+
+  .ns-category-badge {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .ns-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: var(--spacing-md);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-textarea::placeholder {
+    color: var(--gray-400);
+  }
+
+  .ns-add-btn {
+    background: var(--navy);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .ns-add-btn:hover {
+    background: var(--navy-dark);
+  }
+
+  .ns-lozenges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-lozenge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0.5rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: var(--white);
+    border: 2px solid;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ns-lozenge-delete {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .ns-lozenge-delete:hover {
+    opacity: 1;
+  }
+
+  .ns-lozenge[data-category="0"] {
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+
+  .ns-lozenge[data-category="1"] {
+    background: #0891b2;
+    border-color: #0891b2;
+  }
+
+  .ns-lozenge[data-category="2"] {
+    background: #d97706;
+    border-color: #d97706;
+  }
+
+  .ns-lozenge[data-category="3"] {
+    background: #e11d48;
+    border-color: #e11d48;
+  }
+
+  .ns-lozenge[data-category="4"] {
+    background: #7c3aed;
+    border-color: #7c3aed;
+  }
+
+  .ns-lozenge[data-category="5"] {
+    background: #059669;
+    border-color: #059669;
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     TAB 3: CONCEPT MAPPING
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  .ns-mapping {
+    max-width: 100%;
+  }
+
+  .ns-mapping-grid {
+    display: grid;
+    grid-template-columns: 120px repeat(4, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    background: var(--white);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+  }
+
+  .ns-mapping-cell {
+    min-height: 140px;
+    padding: var(--spacing-md);
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ns-mapping-cell:hover {
+    border-color: var(--pink);
+    background: rgba(208, 32, 144, 0.02);
+  }
+
+  .ns-mapping-cell-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .ns-mapping-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+    cursor: grab;
+  }
+
+  .ns-mapping-chip:active {
+    cursor: grabbing;
+  }
+
+  .ns-mapping-chip-delete {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.85rem;
+    opacity: 0.6;
+  }
+
+  .ns-mapping-chip-delete:hover {
+    opacity: 1;
+  }
+
+  .ns-unmapped-panel {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .ns-unmapped-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-unmapped-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .ns-unmapped-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: var(--white);
+    border: 2px solid;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .ns-unmapped-item:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .ns-warning-banner {
+    background: rgba(217, 119, 6, 0.1);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    color: #b45309;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .ns-warning-icon {
+    flex-shrink: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .ns-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+  }
+
+  .ns-stat-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+  }
+
+  .ns-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.25rem;
+  }
+
+  .ns-stat-label {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     TAB 4: PROBLEMS
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  .ns-problems {
+    max-width: 900px;
+  }
+
+  .ns-problems-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .ns-problems-summary {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .ns-add-problem-btn {
+    padding: 0.625rem 1.25rem;
+    background: var(--pink);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .ns-add-problem-btn:hover {
+    background: var(--pink-hover);
+  }
+
+  .ns-problems-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
+
+  .ns-problem-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+  }
+
+  .ns-problem-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-problem-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--navy);
+    flex: 1;
+  }
+
+  .ns-problem-severity {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .ns-problem-description {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-problem-items {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+  }
+
+  .ns-problem-items strong {
+    font-weight: 600;
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     SETTINGS PANEL
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  .ns-settings-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 50;
+  }
+
+  .ns-settings-overlay.open {
+    display: block;
+  }
+
+  .ns-settings-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 400px;
+    max-width: 90vw;
+    background: var(--white);
+    box-shadow: var(--shadow-lg);
+    z-index: 51;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ns-settings-panel.open {
+    transform: translateX(0);
+  }
+
+  .ns-settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--gray-200);
+    flex-shrink: 0;
+  }
+
+  .ns-settings-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .ns-settings-close {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+  }
+
+  .ns-settings-close:hover {
+    background: var(--gray-100);
+    color: var(--navy);
+  }
+
+  .ns-settings-close svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .ns-settings-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
+
+  .ns-settings-section {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .ns-settings-section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+  }
+
+  .ns-client-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-client-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+  }
+
+  .ns-client-item:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-300);
+  }
+
+  .ns-client-item.active {
+    background: rgba(208, 32, 144, 0.1);
+    border-color: var(--pink);
+    color: var(--pink);
+    font-weight: 600;
+  }
+
+  .ns-client-item-name {
+    flex: 1;
+  }
+
+  .ns-client-item-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+
+  .ns-client-item-action {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    opacity: 0;
+  }
+
+  .ns-client-item:hover .ns-client-item-action {
+    opacity: 1;
+  }
+
+  .ns-client-item-action:hover {
+    background: var(--gray-200);
+    color: var(--navy);
+  }
+
+  .ns-client-item-action svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .ns-new-client-form {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-new-client-input {
+    flex: 1;
+    padding: 0.5rem var(--spacing-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .ns-new-client-btn {
+    padding: 0.5rem 1rem;
+    background: var(--pink);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+  }
+
+  .ns-new-client-btn:hover {
+    background: var(--pink-hover);
+  }
+
+  .ns-categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .ns-category-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+  }
+
+  .ns-category-item-drag {
+    cursor: grab;
+    color: var(--gray-500);
+  }
+
+  .ns-category-item-name {
+    flex: 1;
+  }
+
+  .ns-category-item-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+
+  .ns-category-item-action {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+  }
+
+  .ns-category-item-action:hover {
+    background: var(--gray-200);
+    color: var(--navy);
+  }
+
+  .ns-category-item-action svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .ns-new-category-form {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+  }
+
+  .ns-new-category-input {
+    flex: 1;
+    padding: 0.5rem var(--spacing-sm);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .ns-new-category-btn {
+    padding: 0.5rem 1rem;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+  }
+
+  .ns-new-category-btn:hover {
+    background: var(--navy-dark);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     MODALS & DROPDOWNS
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  .ns-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 40;
+  }
+
+  .ns-modal-overlay.open {
+    display: block;
+  }
+
+  .ns-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 41;
+    max-width: 500px;
+    width: 90vw;
+  }
+
+  .ns-modal-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .ns-modal-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .ns-modal-body {
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
+
+  .ns-modal-footer {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid var(--gray-200);
+    justify-content: flex-end;
+  }
+
+  .ns-modal-btn {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .ns-modal-btn-primary {
+    background: var(--pink);
+    color: var(--white);
+  }
+
+  .ns-modal-btn-primary:hover {
+    background: var(--pink-hover);
+  }
+
+  .ns-modal-btn-secondary {
+    background: var(--gray-100);
+    color: var(--navy);
+    border: 1px solid var(--gray-200);
+  }
+
+  .ns-modal-btn-secondary:hover {
+    background: var(--gray-200);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     EMPTY STATES & HELPERS
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  .ns-empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    color: var(--gray-500);
+  }
+
+  .ns-empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+  }
+
+  .ns-empty-state-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .ns-empty-state-text {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .ns-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 30;
+    margin-top: var(--spacing-sm);
+    min-width: 200px;
+  }
+
+  .ns-dropdown-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.9rem;
+    color: var(--gray-700);
+    transition: all 0.2s ease;
+  }
+
+  .ns-dropdown-item:last-child {
+    border-bottom: none;
+  }
+
+  .ns-dropdown-item:hover {
+    background: var(--gray-50);
+    color: var(--navy);
+  }
+</style>
+
+<!-- ────────────────────────────────────────────────────────────────────────────
+     HTML MARKUP
+     ──────────────────────────────────────────────────────────────────────────── -->
+
+<div class="naming-strategy-tool">
+
+  <!-- Header -->
+  <div class="ns-header">
+    <div class="ns-header-left">
+      <h1 class="ns-title">Naming Strategy</h1>
+    </div>
+    <div class="ns-header-left">
+      <div class="ns-client-selector" id="nsClientSelector">
+        <span id="nsClientName">No Client Selected</span>
+      </div>
+    </div>
+    <button class="ns-settings-btn" id="nsSettingsToggle" title="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="ns-tabs">
+    <button class="ns-tab-btn active" data-tab="examples">Examples</button>
+    <button class="ns-tab-btn" data-tab="audit">Naming Audit</button>
+    <button class="ns-tab-btn" data-tab="mapping">Concept Mapping</button>
+    <button class="ns-tab-btn" data-tab="problems">Problems</button>
+  </div>
+
+  <!-- Content -->
+  <div class="ns-content">
+
+    <!-- TAB 1: Examples -->
+    <div class="ns-tab-content active" id="nsTabExamples">
+      <div class="ns-examples">
+        <div class="ns-examples-header">
+          <div class="ns-filter-bar">
+            <button class="ns-filter-btn active" data-filter="all">All</button>
+            <button class="ns-filter-btn" data-filter="companies">Companies</button>
+            <button class="ns-filter-btn" data-filter="products">Products</button>
+            <button class="ns-filter-btn" data-filter="features">Features</button>
+          </div>
+          <div class="ns-stats-bar">Showing <span id="nsStatsCount">12</span> brands</div>
+        </div>
+        <div class="ns-matrix" id="nsExamplesMatrix"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Naming Audit -->
+    <div class="ns-tab-content" id="nsTabAudit">
+      <div class="ns-audit" id="nsAuditContainer"></div>
+    </div>
+
+    <!-- TAB 3: Concept Mapping -->
+    <div class="ns-tab-content" id="nsTabMapping">
+      <div class="ns-mapping" id="nsMappingContainer"></div>
+    </div>
+
+    <!-- TAB 4: Problems -->
+    <div class="ns-tab-content" id="nsTabProblems">
+      <div class="ns-problems" id="nsProblemsContainer"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Settings Panel -->
+<div class="ns-settings-overlay" id="nsSettingsOverlay"></div>
+<div class="ns-settings-panel" id="nsSettingsPanel">
+  <div class="ns-settings-header">
+    <h2 class="ns-settings-title">Settings</h2>
+    <button class="ns-settings-close" id="nsSettingsClose">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="ns-settings-body">
+
+    <!-- Client Management -->
+    <div class="ns-settings-section">
+      <div class="ns-settings-section-title">Clients</div>
+      <div class="ns-client-list" id="nsClientsList"></div>
+      <div class="ns-new-client-form">
+        <input type="text" class="ns-new-client-input" id="nsNewClientInput" placeholder="New client name" />
+        <button class="ns-new-client-btn" id="nsNewClientBtn">Add</button>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="ns-settings-section">
+      <div class="ns-settings-section-title">Categories</div>
+      <div class="ns-categories-list" id="nsCategoriesList"></div>
+      <div class="ns-new-category-form">
+        <input type="text" class="ns-new-category-input" id="nsNewCategoryInput" placeholder="New category" />
+        <button class="ns-new-category-btn" id="nsNewCategoryBtn">Add</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="ns-modal-overlay" id="nsModalOverlay"></div>
+<div class="ns-modal" id="nsModal"></div>
+
+<!-- ────────────────────────────────────────────────────────────────────────────
+     JAVASCRIPT
+     ──────────────────────────────────────────────────────────────────────────── -->
+
+<script>
+// ────────────────────────────────────────────────────────────────────────────
+// NAMING STRATEGY TOOL - MAIN MODULE
+// ────────────────────────────────────────────────────────────────────────────
+
+window.namingStrategy = {
+  // State
+  currentFilter: 'all',
+  settingsOpen: false,
+  editingCategoryId: null,
+
+  // Example brand data for Tab 1
+  examplesData: {
+    abstract_jargon: {
+      subtitle: 'Abstract tech terms',
+      brands: [
+        { name: 'Palantir', type: 'companies' },
+        { name: 'Babel', type: 'companies' },
+        { name: 'Kafka', type: 'companies' }
+      ]
+    },
+    abstract_real: {
+      subtitle: 'Real-world objects',
+      brands: [
+        { name: 'Apple', type: 'companies' },
+        { name: 'Amazon', type: 'companies' },
+        { name: 'Shell', type: 'companies' }
+      ]
+    },
+    abstract_compound: {
+      subtitle: 'Combined words',
+      brands: [
+        { name: 'BlackBerry', type: 'companies' },
+        { name: 'Firefox', type: 'companies' },
+        { name: 'RedHat', type: 'companies' }
+      ]
+    },
+    abstract_coined: {
+      subtitle: 'Made-up words',
+      brands: [
+        { name: 'Google', type: 'companies' },
+        { name: 'Kodak', type: 'companies' },
+        { name: 'Xerox', type: 'companies' }
+      ]
+    },
+    suggestive_jargon: {
+      subtitle: 'Implies benefits',
+      brands: [
+        { name: 'Cloudflare', type: 'products' },
+        { name: 'Datadog', type: 'products' },
+        { name: 'Splunk', type: 'products' }
+      ]
+    },
+    suggestive_real: {
+      subtitle: 'Real + suggestive',
+      brands: [
+        { name: 'Safari', type: 'products' },
+        { name: 'Visa', type: 'companies' },
+        { name: 'Uber', type: 'companies' }
+      ]
+    },
+    suggestive_compound: {
+      subtitle: 'Compound + meaning',
+      brands: [
+        { name: 'YouTube', type: 'products' },
+        { name: 'LinkedIn', type: 'companies' },
+        { name: 'MacBook', type: 'features' }
+      ]
+    },
+    suggestive_coined: {
+      subtitle: 'Suggests benefit',
+      brands: [
+        { name: 'Spotify', type: 'companies' },
+        { name: 'Netflix', type: 'companies' },
+        { name: 'Pinterest', type: 'companies' }
+      ]
+    },
+    descriptive_jargon: {
+      subtitle: 'Tells you what it is',
+      brands: [
+        { name: 'Salesforce', type: 'products' },
+        { name: 'ServiceNow', type: 'products' },
+        { name: 'Workday', type: 'products' }
+      ]
+    },
+    descriptive_real: {
+      subtitle: 'Simple descriptions',
+      brands: [
+        { name: 'Word', type: 'features' },
+        { name: 'Teams', type: 'features' },
+        { name: 'Outlook', type: 'features' }
+      ]
+    },
+    descriptive_compound: {
+      subtitle: 'Describes + real word',
+      brands: [
+        { name: 'PayPal', type: 'companies' },
+        { name: 'PowerPoint', type: 'features' },
+        { name: 'FaceTime', type: 'features' }
+      ]
+    },
+    descriptive_coined: {
+      subtitle: 'Descriptive + new',
+      brands: [
+        { name: 'Accenture', type: 'companies' },
+        { name: 'Verizon', type: 'companies' },
+        { name: 'Cognizant', type: 'companies' }
+      ]
+    }
+  },
+
+  // Initialize the tool
+  init() {
+    console.log('Naming Strategy Tool initialized');
+    this.setupEventListeners();
+    this.renderAll();
+  },
+
+  // Setup all event listeners
+  setupEventListeners() {
+    // Tab navigation
+    document.querySelectorAll('.ns-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+    });
+
+    // Filter buttons (Examples tab)
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.addEventListener('click', (e) => this.setFilter(e.target.dataset.filter));
+    });
+
+    // Settings panel
+    document.getElementById('nsSettingsToggle').addEventListener('click', () => this.toggleSettings());
+    document.getElementById('nsSettingsClose').addEventListener('click', () => this.toggleSettings());
+    document.getElementById('nsSettingsOverlay').addEventListener('click', () => this.toggleSettings());
+
+    // Client selector
+    document.getElementById('nsClientSelector').addEventListener('click', () => this.toggleSettings());
+
+    // Client management
+    document.getElementById('nsNewClientBtn').addEventListener('click', () => this.addNewClient());
+    document.getElementById('nsNewClientInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') this.addNewClient();
+    });
+
+    // Category management
+    document.getElementById('nsNewCategoryBtn').addEventListener('click', () => this.addNewCategory());
+    document.getElementById('nsNewCategoryInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') this.addNewCategory();
+    });
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // TAB 1: EXAMPLES
+  // ────────────────────────────────────────────────────────────────────────────
+
+  renderExamplesTab() {
+    const matrix = document.getElementById('nsExamplesMatrix');
+    matrix.innerHTML = '';
+
+    // Column headers
+    const columnHeaders = ['', 'Industry Jargon', 'Real Word', 'Compound', 'Coined'];
+    const rowHeaders = ['Abstract', 'Suggestive', 'Descriptive'];
+    const cellKeys = [
+      ['', 'abstract_jargon', 'abstract_real', 'abstract_compound', 'abstract_coined'],
+      ['', 'suggestive_jargon', 'suggestive_real', 'suggestive_compound', 'suggestive_coined'],
+      ['', 'descriptive_jargon', 'descriptive_real', 'descriptive_compound', 'descriptive_coined']
+    ];
+
+    // Create headers
+    columnHeaders.forEach((header, idx) => {
+      const headerEl = document.createElement('div');
+      headerEl.className = idx === 0 ? 'ns-cell-row-header' : 'ns-cell-header';
+      headerEl.textContent = header;
+      matrix.appendChild(headerEl);
+    });
+
+    // Create cells
+    rowHeaders.forEach((rowHeader, rowIdx) => {
+      // Row header
+      const rowHeaderEl = document.createElement('div');
+      rowHeaderEl.className = 'ns-cell-row-header';
+      rowHeaderEl.textContent = rowHeader;
+      matrix.appendChild(rowHeaderEl);
+
+      // Cells
+      for (let colIdx = 1; colIdx < columnHeaders.length; colIdx++) {
+        const cellKey = cellKeys[rowIdx][colIdx];
+        const cellData = this.examplesData[cellKey];
+        const cell = document.createElement('div');
+        cell.className = 'ns-cell';
+
+        let html = `<div class="ns-cell-subtitle">${cellData.subtitle}</div><div class="ns-cell-chips">`;
+
+        cellData.brands.forEach(brand => {
+          if (this.currentFilter === 'all' || this.currentFilter === brand.type) {
+            html += `<div class="ns-chip ${brand.type}">${brand.name}</div>`;
+          }
+        });
+
+        html += '</div>';
+        cell.innerHTML = html;
+        matrix.appendChild(cell);
+      }
+    });
+
+    this.updateExamplesStats();
+  },
+
+  updateExamplesStats() {
+    let count = 0;
+    Object.values(this.examplesData).forEach(cell => {
+      if (this.currentFilter === 'all') {
+        count += cell.brands.length;
+      } else {
+        count += cell.brands.filter(b => b.type === this.currentFilter).length;
+      }
+    });
+    document.getElementById('nsStatsCount').textContent = count;
+  },
+
+  setFilter(filter) {
+    this.currentFilter = filter;
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === filter);
+    });
+    this.renderExamplesTab();
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // TAB 2: NAMING AUDIT
+  // ────────────────────────────────────────────────────────────────────────────
+
+  renderAuditTab() {
+    const client = Storage.getActiveClient();
+    const container = document.getElementById('nsAuditContainer');
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-empty-state"><div class="ns-empty-state-icon">📋</div><div class="ns-empty-state-title">No Client Selected</div><div class="ns-empty-state-text">Create or select a client in Settings to start your naming audit.</div></div>';
+      return;
+    }
+
+    let html = '<div class="ns-audit-sections">';
+
+    client.categories.forEach((category, catIdx) => {
+      const items = client.items[category] || [];
+      const colorClass = catIdx % 6;
+
+      html += `
+        <div class="ns-category-section">
+          <div class="ns-category-header">
+            <div class="ns-category-title">${category}</div>
+            <div class="ns-category-badge">${items.length}</div>
+          </div>
+          <textarea class="ns-textarea" placeholder="Paste your client's ${category} names here (comma or newline separated)" data-category="${category}"></textarea>
+          <button class="ns-add-btn" data-add-category="${category}">Add</button>
+          <div class="ns-lozenges" id="lozenges-${category}">`;
+
+      items.forEach(item => {
+        html += `<div class="ns-lozenge" data-category="${colorClass}" data-id="${item.id}" data-item="${item.name}">
+          ${item.name}
+          <button class="ns-lozenge-delete" data-delete="${item.id}">×</button>
+        </div>`;
+      });
+
+      html += `</div></div>`;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    // Add event listeners
+    container.querySelectorAll('[data-add-category]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const category = e.target.dataset.addCategory;
+        const textarea = e.target.previousElementSibling;
+        this.addAuditItems(category, textarea.value);
+        textarea.value = '';
+      });
+    });
+
+    container.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const itemId = e.target.dataset.delete;
+        const lozenge = e.target.closest('.ns-lozenge');
+        const category = lozenge.closest('.ns-category-section').querySelector('[data-category]').dataset.category;
+        Storage.deleteItemFromCategory(category, itemId);
+        this.renderAuditTab();
+      });
+    });
+  },
+
+  addAuditItems(category, input) {
+    if (!input.trim()) return;
+
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    // Parse comma or newline separated items
+    const items = input
+      .split(/[,\n]/)
+      .map(item => item.trim())
+      .filter(item => item.length > 0);
+
+    items.forEach(item => {
+      Storage.addItemToCategory(category, item, '');
+    });
+
+    this.renderAuditTab();
+    this.renderMappingTab();
+    this.renderProblemsTab();
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // TAB 3: CONCEPT MAPPING
+  // ────────────────────────────────────────────────────────────────────────────
+
+  renderMappingTab() {
+    const client = Storage.getActiveClient();
+    const container = document.getElementById('nsMappingContainer');
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-empty-state"><div class="ns-empty-state-icon">🗺️</div><div class="ns-empty-state-title">No Client Selected</div><div class="ns-empty-state-text">Create or select a client to map naming concepts.</div></div>';
+      return;
+    }
+
+    // Count total items and mapped items
+    let totalItems = 0;
+    let mappedItems = 0;
+    Object.values(client.items).forEach(categoryItems => {
+      categoryItems.forEach(item => {
+        totalItems++;
+        if (item.cell) mappedItems++;
+      });
+    });
+
+    let html = '';
+
+    // Warning banner if too clustered
+    if (totalItems > 0 && mappedItems > 0) {
+      const cellCounts = {};
+      Object.values(client.items).forEach(categoryItems => {
+        categoryItems.forEach(item => {
+          if (item.cell) {
+            cellCounts[item.cell] = (cellCounts[item.cell] || 0) + 1;
+          }
+        });
+      });
+      const cellArray = Object.values(cellCounts).sort((a, b) => b - a);
+      const topTwo = cellArray.slice(0, 2).reduce((a, b) => a + b, 0);
+      const clusteredPercent = Math.round((topTwo / mappedItems) * 100);
+
+      if (clusteredPercent > 50) {
+        html += `<div class="ns-warning-banner"><div class="ns-warning-icon">⚠️</div><div>${clusteredPercent}% of items are in just 2 cells. Consider diversifying naming strategy.</div></div>`;
+      }
+    }
+
+    // Grid
+    const columnHeaders = ['', 'Industry Jargon', 'Real Word', 'Compound', 'Coined'];
+    const rowHeaders = ['Abstract', 'Suggestive', 'Descriptive'];
+    const cellKeys = [
+      ['', 'abstract_jargon', 'abstract_real', 'abstract_compound', 'abstract_coined'],
+      ['', 'suggestive_jargon', 'suggestive_real', 'suggestive_compound', 'suggestive_coined'],
+      ['', 'descriptive_jargon', 'descriptive_real', 'descriptive_compound', 'descriptive_coined']
+    ];
+
+    html += '<div class="ns-mapping-grid">';
+
+    // Headers
+    columnHeaders.forEach((header, idx) => {
+      html += `<div class="${idx === 0 ? 'ns-cell-row-header' : 'ns-cell-header'}">${header}</div>`;
+    });
+
+    // Cells
+    rowHeaders.forEach((rowHeader, rowIdx) => {
+      html += `<div class="ns-cell-row-header">${rowHeader}</div>`;
+
+      for (let colIdx = 1; colIdx < columnHeaders.length; colIdx++) {
+        const cellKey = cellKeys[rowIdx][colIdx];
+        const itemsInCell = [];
+
+        Object.values(client.items).forEach(categoryItems => {
+          categoryItems.forEach(item => {
+            if (item.cell === cellKey) {
+              itemsInCell.push(item);
+            }
+          });
+        });
+
+        html += `<div class="ns-mapping-cell" data-cell="${cellKey}"><div class="ns-mapping-cell-chips">`;
+        itemsInCell.forEach((item, idx) => {
+          const colorClass = client.categories.indexOf(this.getItemCategory(client, item.id)) % 6;
+          html += `<div class="ns-mapping-chip" data-category="${colorClass}">${item.name}<button class="ns-mapping-chip-delete" data-unmap="${item.id}">×</button></div>`;
+        });
+        html += '</div></div>';
+      }
+    });
+
+    html += '</div>';
+
+    // Unmapped items
+    const unmappedItems = [];
+    Object.values(client.items).forEach(categoryItems => {
+      categoryItems.forEach(item => {
+        if (!item.cell) {
+          unmappedItems.push(item);
+        }
+      });
+    });
+
+    if (unmappedItems.length > 0) {
+      html += '<div class="ns-unmapped-panel"><div class="ns-unmapped-title">Unmapped Items (' + unmappedItems.length + ')</div><div class="ns-unmapped-items">';
+      unmappedItems.forEach(item => {
+        const colorClass = client.categories.indexOf(this.getItemCategory(client, item.id)) % 6;
+        html += `<div class="ns-unmapped-item" data-category="${colorClass}" data-id="${item.id}">${item.name}</div>`;
+      });
+      html += '</div></div>';
+    }
+
+    // Stats
+    if (totalItems > 0) {
+      html += '<div class="ns-stats-grid">';
+      html += `<div class="ns-stat-card"><div class="ns-stat-value">${totalItems}</div><div class="ns-stat-label">Total Items</div></div>`;
+      html += `<div class="ns-stat-card"><div class="ns-stat-value">${mappedItems}</div><div class="ns-stat-label">Mapped</div></div>`;
+      html += `<div class="ns-stat-card"><div class="ns-stat-value">${totalItems - mappedItems}</div><div class="ns-stat-label">Unmapped</div></div>`;
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+
+    // Event listeners
+    container.querySelectorAll('.ns-mapping-cell').forEach(cell => {
+      cell.addEventListener('click', (e) => {
+        if (e.target.closest('.ns-mapping-chip-delete')) {
+          const itemId = e.target.closest('.ns-mapping-chip-delete').dataset.unmap;
+          this.unmapItem(itemId);
+        }
+      });
+    });
+
+    container.querySelectorAll('.ns-unmapped-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const itemId = e.currentTarget.dataset.id;
+        this.showCellSelector(itemId);
+      });
+    });
+  },
+
+  showCellSelector(itemId) {
+    const client = Storage.getActiveClient();
+    const items = [];
+    Object.values(client.items).forEach(categoryItems => {
+      categoryItems.forEach(item => {
+        if (item.id === itemId) items.push(item);
+      });
+    });
+    const item = items[0];
+    if (!item) return;
+
+    const cells = [
+      { key: 'abstract_jargon', label: 'Abstract + Industry Jargon' },
+      { key: 'abstract_real', label: 'Abstract + Real Word' },
+      { key: 'abstract_compound', label: 'Abstract + Compound' },
+      { key: 'abstract_coined', label: 'Abstract + Coined' },
+      { key: 'suggestive_jargon', label: 'Suggestive + Industry Jargon' },
+      { key: 'suggestive_real', label: 'Suggestive + Real Word' },
+      { key: 'suggestive_compound', label: 'Suggestive + Compound' },
+      { key: 'suggestive_coined', label: 'Suggestive + Coined' },
+      { key: 'descriptive_jargon', label: 'Descriptive + Industry Jargon' },
+      { key: 'descriptive_real', label: 'Descriptive + Real Word' },
+      { key: 'descriptive_compound', label: 'Descriptive + Compound' },
+      { key: 'descriptive_coined', label: 'Descriptive + Coined' }
+    ];
+
+    let html = '<div class="ns-modal-header"><div class="ns-modal-title">Assign to Cell</div></div><div class="ns-modal-body">';
+    html += '<div style="display: grid; gap: 0.5rem;">';
+    cells.forEach(cell => {
+      html += `<button class="ns-modal-btn ns-modal-btn-secondary" data-assign="${cell.key}">${cell.label}</button>`;
+    });
+    html += '</div></div>';
+
+    const modal = document.getElementById('nsModal');
+    modal.innerHTML = html;
+    document.getElementById('nsModalOverlay').classList.add('open');
+
+    modal.querySelectorAll('[data-assign]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.assignItemToCell(itemId, e.target.dataset.assign);
+        document.getElementById('nsModalOverlay').classList.remove('open');
+      });
+    });
+  },
+
+  assignItemToCell(itemId, cellKey) {
+    const client = Storage.getActiveClient();
+    let found = false;
+    Object.values(client.items).forEach(categoryItems => {
+      categoryItems.forEach(item => {
+        if (item.id === itemId) {
+          item.cell = cellKey;
+          found = true;
+        }
+      });
+    });
+    if (found) {
+      Storage.updateClient(client.id, client);
+      this.renderMappingTab();
+      this.renderProblemsTab();
+    }
+  },
+
+  unmapItem(itemId) {
+    const client = Storage.getActiveClient();
+    Object.values(client.items).forEach(categoryItems => {
+      categoryItems.forEach(item => {
+        if (item.id === itemId) {
+          item.cell = '';
+        }
+      });
+    });
+    Storage.updateClient(client.id, client);
+    this.renderMappingTab();
+    this.renderProblemsTab();
+  },
+
+  getItemCategory(client, itemId) {
+    for (const category of client.categories) {
+      const item = client.items[category].find(i => i.id === itemId);
+      if (item) return category;
+    }
+    return '';
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // TAB 4: PROBLEMS
+  // ────────────────────────────────────────────────────────────────────────────
+
+  renderProblemsTab() {
+    const client = Storage.getActiveClient();
+    const container = document.getElementById('nsProblemsContainer');
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-empty-state"><div class="ns-empty-state-icon">⚠️</div><div class="ns-empty-state-title">No Client Selected</div></div>';
+      return;
+    }
+
+    const problems = this.detectProblems(client);
+    const userProblems = client.problems || [];
+
+    let html = `<div class="ns-problems-header">
+      <div class="ns-problems-summary">${problems.length + userProblems.length} problems found</div>
+      <button class="ns-add-problem-btn" id="nsAddProblemBtn">+ Add Problem</button>
+    </div>`;
+
+    html += '<div class="ns-problems-list">';
+
+    // Auto-detected problems
+    problems.forEach(problem => {
+      html += this.renderProblemCard(problem);
+    });
+
+    // User problems
+    userProblems.forEach(problem => {
+      html += this.renderProblemCard(problem, true);
+    });
+
+    if (problems.length === 0 && userProblems.length === 0) {
+      html += '<div class="ns-empty-state"><div class="ns-empty-state-icon">✓</div><div class="ns-empty-state-title">No problems detected</div></div>';
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    document.getElementById('nsAddProblemBtn')?.addEventListener('click', () => this.showAddProblemForm());
+  },
+
+  detectProblems(client) {
+    const problems = [];
+
+    // Count total and mapped items
+    let totalItems = 0;
+    let mappedItems = 0;
+    const allItems = [];
+
+    Object.values(client.items).forEach(categoryItems => {
+      categoryItems.forEach(item => {
+        totalItems++;
+        allItems.push(item);
+        if (item.cell) mappedItems++;
+      });
+    });
+
+    // Problem 1: Unmapped items
+    if (mappedItems < totalItems) {
+      problems.push({
+        title: 'Unmapped Items',
+        description: `${totalItems - mappedItems} item(s) have not been assigned to a naming cell.`,
+        severity: 'medium',
+        items: allItems.filter(i => !i.cell).map(i => i.name)
+      });
+    }
+
+    // Problem 2: Distribution (too clustered)
+    if (mappedItems > 0) {
+      const cellCounts = {};
+      allItems.forEach(item => {
+        if (item.cell) {
+          cellCounts[item.cell] = (cellCounts[item.cell] || 0) + 1;
+        }
+      });
+      const cellArray = Object.values(cellCounts).sort((a, b) => b - a);
+      const topTwo = cellArray.slice(0, 2).reduce((a, b) => a + b, 0);
+      const clusteredPercent = Math.round((topTwo / mappedItems) * 100);
+
+      if (clusteredPercent > 50) {
+        problems.push({
+          title: 'Clustering Risk',
+          description: `${clusteredPercent}% of mapped items are in just 2 cells. Diversify your naming strategy.`,
+          severity: 'high',
+          items: []
+        });
+      }
+    }
+
+    // Problem 3: Overloaded words (if we can detect them)
+    const nameFreq = {};
+    allItems.forEach(item => {
+      const words = item.name.toLowerCase().split(/[\s\-_]+/);
+      words.forEach(word => {
+        if (word.length > 3) {
+          nameFreq[word] = (nameFreq[word] || 0) + 1;
+        }
+      });
+    });
+
+    const overloadedWords = Object.entries(nameFreq).filter(([word, count]) => count > 2);
+    if (overloadedWords.length > 0) {
+      problems.push({
+        title: 'Repeated Words',
+        description: `The word "${overloadedWords[0][0]}" appears ${overloadedWords[0][1]} times across items.`,
+        severity: 'low',
+        items: allItems.filter(i => i.name.toLowerCase().includes(overloadedWords[0][0])).map(i => i.name)
+      });
+    }
+
+    return problems;
+  },
+
+  renderProblemCard(problem, isUser = false) {
+    const severityColor = {
+      high: 'badge-high',
+      medium: 'badge-medium',
+      low: 'badge-low'
+    };
+
+    let html = `<div class="ns-problem-card">
+      <div class="ns-problem-header">
+        <div class="ns-problem-title">${problem.title}</div>
+        <div class="ns-problem-severity ${severityColor[problem.severity] || 'badge-low'}">${problem.severity}</div>
+      </div>
+      <div class="ns-problem-description">${problem.description}</div>`;
+
+    if (problem.items && problem.items.length > 0) {
+      html += `<div class="ns-problem-items"><strong>Affected items:</strong> ${problem.items.slice(0, 3).join(', ')}${problem.items.length > 3 ? '...' : ''}</div>`;
+    }
+
+    if (isUser) {
+      html += `<div style="margin-top: 1rem;"><button class="ns-modal-btn-secondary" style="padding: 0.375rem 0.75rem; font-size: 0.8rem;" onclick="window.namingStrategy.deleteProblem('${problem.id}')">Delete</button></div>`;
+    }
+
+    html += '</div>';
+    return html;
+  },
+
+  showAddProblemForm() {
+    const modal = document.getElementById('nsModal');
+    modal.innerHTML = `
+      <div class="ns-modal-header"><div class="ns-modal-title">Add Problem</div></div>
+      <div class="ns-modal-body">
+        <input type="text" id="nsProblemTitle" placeholder="Problem title" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; margin-bottom: 1rem; font-family: inherit;" />
+        <textarea id="nsProblemDesc" placeholder="Describe the problem" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; margin-bottom: 1rem; font-family: inherit; min-height: 80px; resize: vertical;"></textarea>
+        <select id="nsProblemSeverity" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; font-family: inherit;">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div class="ns-modal-footer">
+        <button class="ns-modal-btn ns-modal-btn-secondary" onclick="document.getElementById('nsModalOverlay').classList.remove('open')">Cancel</button>
+        <button class="ns-modal-btn ns-modal-btn-primary" onclick="window.namingStrategy.saveProblem()">Save</button>
+      </div>
+    `;
+    document.getElementById('nsModalOverlay').classList.add('open');
+  },
+
+  saveProblem() {
+    const title = document.getElementById('nsProblemTitle').value;
+    const desc = document.getElementById('nsProblemDesc').value;
+    const severity = document.getElementById('nsProblemSeverity').value;
+
+    if (!title || !desc) return;
+
+    const client = Storage.getActiveClient();
+    const problem = {
+      id: Storage.uuid(),
+      title: title,
+      description: desc,
+      severity: severity,
+      items: []
+    };
+
+    if (!client.problems) client.problems = [];
+    client.problems.push(problem);
+    Storage.updateClient(client.id, client);
+
+    document.getElementById('nsModalOverlay').classList.remove('open');
+    this.renderProblemsTab();
+  },
+
+  deleteProblem(problemId) {
+    const client = Storage.getActiveClient();
+    client.problems = client.problems.filter(p => p.id !== problemId);
+    Storage.updateClient(client.id, client);
+    this.renderProblemsTab();
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // SETTINGS PANEL
+  // ────────────────────────────────────────────────────────────────────────────
+
+  toggleSettings() {
+    this.settingsOpen = !this.settingsOpen;
+    document.getElementById('nsSettingsPanel').classList.toggle('open');
+    document.getElementById('nsSettingsOverlay').classList.toggle('open');
+    if (this.settingsOpen) {
+      this.renderSettings();
+    }
+  },
+
+  renderSettings() {
+    this.renderClientsList();
+    this.renderCategoriesList();
+  },
+
+  renderClientsList() {
+    const clients = Storage.getClients();
+    const activeId = Storage.getActiveClientId();
+    const list = document.getElementById('nsClientsList');
+
+    list.innerHTML = clients.map(client => `
+      <div class="ns-client-item ${client.id === activeId ? 'active' : ''}" data-client-id="${client.id}">
+        <span class="ns-client-item-name">${client.name}</span>
+        <div class="ns-client-item-actions">
+          <button class="ns-client-item-action" data-rename="${client.id}" title="Rename">
+            <svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+          </button>
+          <button class="ns-client-item-action" data-delete="${client.id}" title="Delete">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h16zM10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.ns-client-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('[data-rename]') || e.target.closest('[data-delete]')) return;
+        const clientId = item.dataset.clientId;
+        Storage.setActiveClientId(clientId);
+        this.renderAll();
+      });
+    });
+
+    list.querySelectorAll('[data-rename]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const clientId = btn.dataset.rename;
+        const client = Storage.getClients().find(c => c.id === clientId);
+        if (!client) return;
+        const newName = prompt('Rename client:', client.name);
+        if (newName) {
+          Storage.updateClient(clientId, { name: newName });
+          this.renderClientsList();
+          this.renderAll();
+        }
+      });
+    });
+
+    list.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const clientId = btn.dataset.delete;
+        const client = Storage.getClients().find(c => c.id === clientId);
+        if (!client) return;
+        if (confirm(`Delete client "${client.name}"? This cannot be undone.`)) {
+          Storage.deleteClient(clientId);
+          this.renderAll();
+          this.renderClientsList();
+        }
+      });
+    });
+  },
+
+  addNewClient() {
+    const input = document.getElementById('nsNewClientInput');
+    const name = input.value.trim();
+    if (!name) return;
+
+    Storage.addClient(name, true);
+    input.value = '';
+    this.renderAll();
+    this.renderClientsList();
+  },
+
+  renderCategoriesList() {
+    const client = Storage.getActiveClient();
+    if (!client) {
+      document.getElementById('nsCategoriesList').innerHTML = '<div style="color: var(--gray-500); font-size: 0.9rem;">No client selected</div>';
+      return;
+    }
+
+    const list = document.getElementById('nsCategoriesList');
+    list.innerHTML = client.categories.map((cat, idx) => `
+      <div class="ns-category-item">
+        <div class="ns-category-item-drag">⋮⋮</div>
+        <div class="ns-category-item-name">${cat}</div>
+        <div class="ns-category-item-actions">
+          <button class="ns-category-item-action" data-edit="${idx}" title="Edit">
+            <svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+          </button>
+          <button class="ns-category-item-action" data-delete="${idx}" title="Delete">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h16zM10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.edit);
+        const oldName = client.categories[idx];
+        const newName = prompt('Rename category:', oldName);
+        if (newName && newName !== oldName) {
+          client.categories[idx] = newName;
+          if (client.items[oldName]) {
+            client.items[newName] = client.items[oldName];
+            delete client.items[oldName];
+          }
+          Storage.updateClient(client.id, client);
+          this.renderAll();
+          this.renderCategoriesList();
+        }
+      });
+    });
+
+    list.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.delete);
+        const catName = client.categories[idx];
+        const itemCount = (client.items[catName] || []).length;
+        if (itemCount > 0) {
+          if (!confirm(`This category has ${itemCount} item(s). Delete anyway?`)) return;
+        }
+        client.categories.splice(idx, 1);
+        delete client.items[catName];
+        Storage.updateClient(client.id, client);
+        this.renderAll();
+        this.renderCategoriesList();
+      });
+    });
+  },
+
+  addNewCategory() {
+    const input = document.getElementById('nsNewCategoryInput');
+    const name = input.value.trim();
+    if (!name) return;
+
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    if (client.categories.includes(name)) {
+      alert('Category already exists');
+      return;
+    }
+
+    client.categories.push(name);
+    client.items[name] = [];
+    Storage.updateClient(client.id, client);
+    input.value = '';
+    this.renderAll();
+    this.renderCategoriesList();
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // MAIN RENDERING & TAB SWITCHING
+  // ────────────────────────────────────────────────────────────────────────────
+
+  switchTab(tabName) {
+    document.querySelectorAll('.ns-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+
+    document.querySelectorAll('.ns-tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+
+    const tabMap = {
+      examples: 'nsTabExamples',
+      audit: 'nsTabAudit',
+      mapping: 'nsTabMapping',
+      problems: 'nsTabProblems'
+    };
+
+    document.getElementById(tabMap[tabName])?.classList.add('active');
+  },
+
+  renderAll() {
+    this.updateClientSelector();
+    this.renderExamplesTab();
+    this.renderAuditTab();
+    this.renderMappingTab();
+    this.renderProblemsTab();
+  },
+
+  updateClientSelector() {
+    const client = Storage.getActiveClient();
+    const selector = document.getElementById('nsClientSelector');
+    const name = document.getElementById('nsClientName');
+
+    if (client) {
+      name.textContent = client.name;
+      selector.classList.remove('empty');
+    } else {
+      name.textContent = 'No Client Selected';
+      selector.classList.add('empty');
+    }
+  }
+};
+
+</script>
