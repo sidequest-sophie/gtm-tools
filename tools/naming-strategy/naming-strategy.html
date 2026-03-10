@@ -1353,6 +1353,19 @@ window.namingStrategy = {
       btn.addEventListener('click', (e) => this.setFilter(e.target.dataset.filter));
     });
 
+    // Modal overlay click-to-dismiss
+    document.getElementById('nsModalOverlay').addEventListener('click', () => this.closeModal());
+
+    // Escape key to close modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('nsModalOverlay');
+        if (overlay && overlay.classList.contains('open')) {
+          this.closeModal();
+        }
+      }
+    });
+
     // Settings panel
     document.getElementById('nsSettingsToggle').addEventListener('click', () => this.toggleSettings());
     document.getElementById('nsSettingsClose').addEventListener('click', () => this.toggleSettings());
@@ -1696,7 +1709,7 @@ window.namingStrategy = {
       { key: 'descriptive_coined', label: 'Descriptive + Coined' }
     ];
 
-    let html = '<div class="ns-modal-header"><div class="ns-modal-title">Assign to Cell</div></div><div class="ns-modal-body">';
+    let html = '<div class="ns-modal-header" style="display:flex;justify-content:space-between;align-items:center;"><div class="ns-modal-title">Assign to Cell</div><button class="ns-modal-close" style="background:none;border:none;font-size:1.25rem;cursor:pointer;color:var(--gray-500);padding:0.25rem 0.5rem;" onclick="window.namingStrategy.closeModal()">&times;</button></div><div class="ns-modal-body">';
     html += '<div style="display: grid; gap: 0.5rem;">';
     cells.forEach(cell => {
       html += `<button class="ns-modal-btn ns-modal-btn-secondary" data-assign="${cell.key}">${cell.label}</button>`;
@@ -1710,9 +1723,14 @@ window.namingStrategy = {
     modal.querySelectorAll('[data-assign]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         this.assignItemToCell(itemId, e.target.dataset.assign);
-        document.getElementById('nsModalOverlay').classList.remove('open');
+        this.closeModal();
       });
     });
+  },
+
+  closeModal() {
+    document.getElementById('nsModalOverlay').classList.remove('open');
+    document.getElementById('nsModal').innerHTML = '';
   },
 
   assignItemToCell(itemId, cellKey) {
@@ -1910,7 +1928,7 @@ window.namingStrategy = {
         </select>
       </div>
       <div class="ns-modal-footer">
-        <button class="ns-modal-btn ns-modal-btn-secondary" onclick="document.getElementById('nsModalOverlay').classList.remove('open')">Cancel</button>
+        <button class="ns-modal-btn ns-modal-btn-secondary" onclick="window.namingStrategy.closeModal()">Cancel</button>
         <button class="ns-modal-btn ns-modal-btn-primary" onclick="window.namingStrategy.saveProblem()">Save</button>
       </div>
     `;
@@ -1937,7 +1955,7 @@ window.namingStrategy = {
     client.problems.push(problem);
     Storage.updateClient(client.id, client);
 
-    document.getElementById('nsModalOverlay').classList.remove('open');
+    this.closeModal();
     this.renderProblemsTab();
   },
 
