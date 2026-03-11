@@ -186,6 +186,39 @@
     border-color: var(--pink);
   }
 
+  .ns-industry-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    transition: all 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2rem;
+    min-width: 140px;
+  }
+
+  .ns-industry-select:hover {
+    border-color: var(--gray-400);
+    background-color: var(--gray-50);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+  }
+
+  .ns-industry-select:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 2px rgba(232, 31, 100, 0.1);
+  }
+
   .ns-stats-bar {
     font-size: 0.85rem;
     color: var(--gray-600);
@@ -1152,6 +1185,26 @@
             <button class="ns-filter-btn" data-filter="companies">Companies</button>
             <button class="ns-filter-btn" data-filter="products">Products</button>
             <button class="ns-filter-btn" data-filter="features">Features</button>
+            <select class="ns-industry-select" id="nsIndustryFilter">
+              <option value="all">All Industries</option>
+              <option value="Technology">Technology</option>
+              <option value="Finance">Finance</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Retail">Retail</option>
+              <option value="Automotive">Automotive</option>
+              <option value="Energy">Energy</option>
+              <option value="Telecoms">Telecoms</option>
+              <option value="Media">Media</option>
+              <option value="Food & Beverage">Food & Beverage</option>
+              <option value="Travel">Travel</option>
+              <option value="Professional Services">Professional Services</option>
+              <option value="Manufacturing">Manufacturing</option>
+              <option value="Real Estate">Real Estate</option>
+              <option value="Education">Education</option>
+              <option value="Sports">Sports</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Aerospace">Aerospace</option>
+            </select>
           </div>
           <div class="ns-stats-bar">Showing <span id="nsStatsCount">12</span> brands</div>
         </div>
@@ -1228,105 +1281,184 @@
 window.namingStrategy = {
   // State
   currentFilter: 'all',
+  currentIndustryFilter: 'all',
   settingsOpen: false,
   editingCategoryId: null,
 
   // Example brand data for Tab 1
   examplesData: {
     abstract_jargon: {
-      subtitle: 'Abstract tech terms',
+      subtitle: 'Industry terms, no product link',
       brands: [
-        { name: 'Palantir', type: 'companies' },
-        { name: 'Babel', type: 'companies' },
-        { name: 'Kafka', type: 'companies' }
+        { name: 'Agilent', type: 'companies', industry: 'Healthcare' },
+        { name: 'Qualcomm', type: 'companies', industry: 'Technology' },
+        { name: 'Gartner', type: 'companies', industry: 'Professional Services' },
+        { name: 'Nasdaq', type: 'companies', industry: 'Finance' },
+        { name: 'Mimecast', type: 'companies', industry: 'Technology' },
+        { name: 'HSBC', type: 'companies', industry: 'Finance' },
+        { name: 'Cisco', type: 'companies', industry: 'Technology' },
+        { name: 'Reuters', type: 'companies', industry: 'Media' }
       ]
     },
     abstract_real: {
-      subtitle: 'Real-world objects',
+      subtitle: 'Everyday words, no product link',
       brands: [
-        { name: 'Apple', type: 'companies' },
-        { name: 'Amazon', type: 'companies' },
-        { name: 'Shell', type: 'companies' }
+        { name: 'Apple', type: 'companies', industry: 'Technology' },
+        { name: 'Amazon', type: 'companies', industry: 'Retail' },
+        { name: 'Shell', type: 'companies', industry: 'Energy' },
+        { name: 'Caterpillar', type: 'companies', industry: 'Manufacturing' },
+        { name: 'Gap', type: 'companies', industry: 'Fashion' },
+        { name: 'Target', type: 'companies', industry: 'Retail' },
+        { name: 'Puma', type: 'companies', industry: 'Fashion' },
+        { name: 'Jaguar', type: 'companies', industry: 'Automotive' },
+        { name: 'Dove', type: 'products', industry: 'Retail' },
+        { name: 'Nest', type: 'products', industry: 'Technology' },
+        { name: 'Element', type: 'products', industry: 'Technology' },
+        { name: 'Slack', type: 'products', industry: 'Technology' }
       ]
     },
     abstract_compound: {
-      subtitle: 'Combined words',
+      subtitle: 'Combined words, no product link',
       brands: [
-        { name: 'BlackBerry', type: 'companies' },
-        { name: 'Firefox', type: 'companies' },
-        { name: 'RedHat', type: 'companies' }
+        { name: 'BlackBerry', type: 'companies', industry: 'Technology' },
+        { name: 'Firefox', type: 'products', industry: 'Technology' },
+        { name: 'RedHat', type: 'companies', industry: 'Technology' },
+        { name: 'BlueCross', type: 'companies', industry: 'Healthcare' },
+        { name: 'Starlink', type: 'products', industry: 'Telecoms' },
+        { name: 'Moonpig', type: 'companies', industry: 'Retail' },
+        { name: 'SilverLake', type: 'companies', industry: 'Finance' },
+        { name: 'Firestick', type: 'products', industry: 'Technology' }
       ]
     },
     abstract_coined: {
-      subtitle: 'Made-up words',
+      subtitle: 'Invented words, no meaning',
       brands: [
-        { name: 'Google', type: 'companies' },
-        { name: 'Kodak', type: 'companies' },
-        { name: 'Xerox', type: 'companies' }
+        { name: 'Google', type: 'companies', industry: 'Technology' },
+        { name: 'Kodak', type: 'companies', industry: 'Technology' },
+        { name: 'Xerox', type: 'companies', industry: 'Technology' },
+        { name: 'Rolex', type: 'companies', industry: 'Fashion' },
+        { name: 'Lego', type: 'companies', industry: 'Manufacturing' },
+        { name: 'Haagen-Dazs', type: 'companies', industry: 'Food & Beverage' },
+        { name: 'Skype', type: 'products', industry: 'Technology' },
+        { name: 'Zara', type: 'companies', industry: 'Fashion' },
+        { name: 'Adidas', type: 'companies', industry: 'Fashion' },
+        { name: 'Esso', type: 'companies', industry: 'Energy' }
       ]
     },
     suggestive_jargon: {
-      subtitle: 'Implies benefits',
+      subtitle: 'Industry terms hinting at benefit',
       brands: [
-        { name: 'Cloudflare', type: 'products' },
-        { name: 'Datadog', type: 'products' },
-        { name: 'Splunk', type: 'products' }
+        { name: 'Palantir', type: 'companies', industry: 'Technology' },
+        { name: 'Tableau', type: 'products', industry: 'Technology' },
+        { name: 'Babel', type: 'products', industry: 'Technology' },
+        { name: 'Kafka', type: 'products', industry: 'Technology' },
+        { name: 'Terraform', type: 'products', industry: 'Technology' },
+        { name: 'Ansible', type: 'products', industry: 'Technology' },
+        { name: 'Grafana', type: 'products', industry: 'Technology' },
+        { name: 'Sentry', type: 'products', industry: 'Technology' }
       ]
     },
     suggestive_real: {
-      subtitle: 'Real + suggestive',
+      subtitle: 'Real words that evoke qualities',
       brands: [
-        { name: 'Safari', type: 'products' },
-        { name: 'Visa', type: 'companies' },
-        { name: 'Uber', type: 'companies' }
+        { name: 'Safari', type: 'products', industry: 'Technology' },
+        { name: 'Visa', type: 'companies', industry: 'Finance' },
+        { name: 'Uber', type: 'companies', industry: 'Travel' },
+        { name: 'Oracle', type: 'companies', industry: 'Technology' },
+        { name: 'Sage', type: 'companies', industry: 'Technology' },
+        { name: 'Compass', type: 'companies', industry: 'Real Estate' },
+        { name: 'Pioneer', type: 'companies', industry: 'Technology' },
+        { name: 'Triumph', type: 'companies', industry: 'Automotive' },
+        { name: 'Zenith', type: 'companies', industry: 'Fashion' },
+        { name: 'Scope', type: 'features', industry: 'Healthcare' },
+        { name: 'Frontier', type: 'companies', industry: 'Telecoms' },
+        { name: 'Guardian', type: 'companies', industry: 'Media' }
       ]
     },
     suggestive_compound: {
-      subtitle: 'Compound + meaning',
+      subtitle: 'Combined words hinting at purpose',
       brands: [
-        { name: 'YouTube', type: 'products' },
-        { name: 'LinkedIn', type: 'companies' },
-        { name: 'MacBook', type: 'features' }
+        { name: 'YouTube', type: 'products', industry: 'Media' },
+        { name: 'LinkedIn', type: 'companies', industry: 'Technology' },
+        { name: 'Cloudflare', type: 'companies', industry: 'Technology' },
+        { name: 'Datadog', type: 'products', industry: 'Technology' },
+        { name: 'Netflix', type: 'companies', industry: 'Media' },
+        { name: 'Pinterest', type: 'companies', industry: 'Technology' },
+        { name: 'Airbnb', type: 'companies', industry: 'Travel' },
+        { name: 'WhatsApp', type: 'products', industry: 'Technology' },
+        { name: 'MailChimp', type: 'companies', industry: 'Technology' },
+        { name: 'Snapchat', type: 'products', industry: 'Technology' },
+        { name: 'TikTok', type: 'products', industry: 'Media' },
+        { name: 'DoorDash', type: 'companies', industry: 'Food & Beverage' }
       ]
     },
     suggestive_coined: {
-      subtitle: 'Suggests benefit',
+      subtitle: 'Invented words suggesting benefits',
       brands: [
-        { name: 'Spotify', type: 'companies' },
-        { name: 'Netflix', type: 'companies' },
-        { name: 'Pinterest', type: 'companies' }
+        { name: 'Spotify', type: 'companies', industry: 'Media' },
+        { name: 'Accenture', type: 'companies', industry: 'Professional Services' },
+        { name: 'Verizon', type: 'companies', industry: 'Telecoms' },
+        { name: 'Splunk', type: 'products', industry: 'Technology' },
+        { name: 'Hulu', type: 'companies', industry: 'Media' },
+        { name: 'Twilio', type: 'companies', industry: 'Technology' },
+        { name: 'Atlassian', type: 'companies', industry: 'Technology' },
+        { name: 'Zapier', type: 'products', industry: 'Technology' },
+        { name: 'Shopify', type: 'companies', industry: 'Retail' },
+        { name: 'Rivian', type: 'companies', industry: 'Automotive' }
       ]
     },
     descriptive_jargon: {
-      subtitle: 'Tells you what it is',
+      subtitle: 'Industry terms describing function',
       brands: [
-        { name: 'Salesforce', type: 'products' },
-        { name: 'ServiceNow', type: 'products' },
-        { name: 'Workday', type: 'products' }
+        { name: 'Salesforce', type: 'companies', industry: 'Technology' },
+        { name: 'ServiceNow', type: 'companies', industry: 'Technology' },
+        { name: 'Workday', type: 'companies', industry: 'Technology' },
+        { name: 'CrowdStrike', type: 'companies', industry: 'Technology' },
+        { name: 'HubSpot', type: 'companies', industry: 'Technology' },
+        { name: 'DocuSign', type: 'companies', industry: 'Technology' },
+        { name: 'Endpoint', type: 'features', industry: 'Technology' },
+        { name: 'BioNTech', type: 'companies', industry: 'Healthcare' }
       ]
     },
     descriptive_real: {
-      subtitle: 'Simple descriptions',
+      subtitle: 'Plain words saying what it does',
       brands: [
-        { name: 'Word', type: 'features' },
-        { name: 'Teams', type: 'features' },
-        { name: 'Outlook', type: 'features' }
+        { name: 'Word', type: 'features', industry: 'Technology' },
+        { name: 'Teams', type: 'features', industry: 'Technology' },
+        { name: 'Cognizant', type: 'companies', industry: 'Technology' },
+        { name: 'Booking.com', type: 'companies', industry: 'Travel' },
+        { name: 'Weather', type: 'features', industry: 'Technology' },
+        { name: 'Maps', type: 'features', industry: 'Technology' },
+        { name: 'Signal', type: 'products', industry: 'Technology' },
+        { name: 'General Motors', type: 'companies', industry: 'Automotive' }
       ]
     },
     descriptive_compound: {
-      subtitle: 'Describes + real word',
+      subtitle: 'Combined words describing function',
       brands: [
-        { name: 'PayPal', type: 'companies' },
-        { name: 'PowerPoint', type: 'features' },
-        { name: 'FaceTime', type: 'features' }
+        { name: 'PayPal', type: 'companies', industry: 'Finance' },
+        { name: 'PowerPoint', type: 'features', industry: 'Technology' },
+        { name: 'FaceTime', type: 'features', industry: 'Technology' },
+        { name: 'MacBook', type: 'products', industry: 'Technology' },
+        { name: 'TripAdvisor', type: 'companies', industry: 'Travel' },
+        { name: 'GameStop', type: 'companies', industry: 'Retail' },
+        { name: 'QuickBooks', type: 'products', industry: 'Finance' },
+        { name: 'SharePoint', type: 'features', industry: 'Technology' },
+        { name: 'AutoTrader', type: 'companies', industry: 'Automotive' },
+        { name: 'HomeBase', type: 'companies', industry: 'Retail' }
       ]
     },
     descriptive_coined: {
-      subtitle: 'Descriptive + new',
+      subtitle: 'Coined from descriptive roots',
       brands: [
-        { name: 'Accenture', type: 'companies' },
-        { name: 'Verizon', type: 'companies' },
-        { name: 'Cognizant', type: 'companies' }
+        { name: 'Deliveroo', type: 'companies', industry: 'Food & Beverage' },
+        { name: 'Techstars', type: 'companies', industry: 'Finance' },
+        { name: 'Informatica', type: 'companies', industry: 'Technology' },
+        { name: 'Compaq', type: 'companies', industry: 'Technology' },
+        { name: 'Lenovo', type: 'companies', industry: 'Technology' },
+        { name: 'Qualitrics', type: 'products', industry: 'Technology' },
+        { name: 'Duolingo', type: 'companies', industry: 'Education' },
+        { name: 'Investec', type: 'companies', industry: 'Finance' }
       ]
     }
   },
@@ -1349,6 +1481,9 @@ window.namingStrategy = {
     document.querySelectorAll('[data-filter]').forEach(btn => {
       btn.addEventListener('click', (e) => this.setFilter(e.target.dataset.filter));
     });
+
+    // Industry filter dropdown
+    document.getElementById('nsIndustryFilter').addEventListener('change', (e) => this.setIndustryFilter(e.target.value));
 
     // Modal overlay click-to-dismiss
     document.getElementById('nsModalOverlay').addEventListener('click', () => this.closeModal());
@@ -1427,7 +1562,9 @@ window.namingStrategy = {
         let html = `<div class="ns-cell-subtitle">${cellData.subtitle}</div><div class="ns-cell-chips">`;
 
         cellData.brands.forEach(brand => {
-          if (this.currentFilter === 'all' || this.currentFilter === brand.type) {
+          const typeMatch = this.currentFilter === 'all' || this.currentFilter === brand.type;
+          const industryMatch = this.currentIndustryFilter === 'all' || this.currentIndustryFilter === brand.industry;
+          if (typeMatch && industryMatch) {
             html += `<div class="ns-chip ${brand.type}">${brand.name}</div>`;
           }
         });
@@ -1444,11 +1581,11 @@ window.namingStrategy = {
   updateExamplesStats() {
     let count = 0;
     Object.values(this.examplesData).forEach(cell => {
-      if (this.currentFilter === 'all') {
-        count += cell.brands.length;
-      } else {
-        count += cell.brands.filter(b => b.type === this.currentFilter).length;
-      }
+      count += cell.brands.filter(b => {
+        const typeMatch = this.currentFilter === 'all' || this.currentFilter === b.type;
+        const industryMatch = this.currentIndustryFilter === 'all' || this.currentIndustryFilter === b.industry;
+        return typeMatch && industryMatch;
+      }).length;
     });
     document.getElementById('nsStatsCount').textContent = count;
   },
@@ -1458,6 +1595,11 @@ window.namingStrategy = {
     document.querySelectorAll('[data-filter]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.filter === filter);
     });
+    this.renderExamplesTab();
+  },
+
+  setIndustryFilter(industry) {
+    this.currentIndustryFilter = industry;
     this.renderExamplesTab();
   },
 
