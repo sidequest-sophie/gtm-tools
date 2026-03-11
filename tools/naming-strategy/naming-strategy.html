@@ -334,14 +334,14 @@
 
   .ns-textarea {
     width: 100%;
-    min-height: 100px;
-    padding: var(--spacing-md);
+    min-height: 56px;
+    padding: var(--spacing-sm) var(--spacing-md);
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 0.9rem;
     resize: vertical;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
   }
 
   .ns-textarea::placeholder {
@@ -368,21 +368,23 @@
   .ns-lozenges {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
+    gap: 6px;
+    margin-top: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
+    min-height: 90px;
   }
 
   .ns-lozenge {
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing-xs);
-    padding: 0.5rem 0.875rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    gap: 4px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
     font-weight: 500;
-    background: var(--white);
-    border: 2px solid;
-    color: var(--white);
+    background: #e8ecef;
+    border: 1px solid #d0d5da;
+    color: var(--grey-800, #2c3e4a);
     cursor: pointer;
     transition: all 0.2s ease;
   }
@@ -390,10 +392,10 @@
   .ns-lozenge-delete {
     background: none;
     border: none;
-    color: inherit;
+    color: var(--grey-600, #5a6a78);
     cursor: pointer;
     padding: 0;
-    font-size: 1rem;
+    font-size: 0.85rem;
     opacity: 0.7;
     transition: opacity 0.2s ease;
   }
@@ -403,33 +405,27 @@
   }
 
   .ns-lozenge[data-category="0"] {
-    background: var(--navy);
-    border-color: var(--navy);
+    border-left: 3px solid var(--navy);
   }
 
   .ns-lozenge[data-category="1"] {
-    background: #0891b2;
-    border-color: #0891b2;
+    border-left: 3px solid #0891b2;
   }
 
   .ns-lozenge[data-category="2"] {
-    background: #d97706;
-    border-color: #d97706;
+    border-left: 3px solid #d97706;
   }
 
   .ns-lozenge[data-category="3"] {
-    background: #e11d48;
-    border-color: #e11d48;
+    border-left: 3px solid #e11d48;
   }
 
   .ns-lozenge[data-category="4"] {
-    background: #7c3aed;
-    border-color: #7c3aed;
+    border-left: 3px solid #7c3aed;
   }
 
   .ns-lozenge[data-category="5"] {
-    background: #059669;
-    border-color: #059669;
+    border-left: 3px solid #059669;
   }
 
   /* ────────────────────────────────────────────────────────────────────────────
