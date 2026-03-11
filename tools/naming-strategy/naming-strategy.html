@@ -991,6 +991,69 @@
     padding: var(--spacing-sm);
   }
 
+  /* Toggle Switch */
+  .ns-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+  }
+  .ns-toggle-row.enabled {
+    background: rgba(208, 32, 144, 0.08);
+    border-color: var(--pink);
+  }
+  .ns-toggle-info { flex: 1; }
+  .ns-toggle-info strong { display: block; font-size: 0.85rem; color: var(--navy); margin-bottom: 2px; }
+  .ns-toggle-info span { font-size: 0.75rem; color: var(--gray-600); }
+  .ns-toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .ns-toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .ns-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--gray-300);
+    border-radius: 22px;
+    transition: 0.2s;
+  }
+  .ns-toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+  .ns-toggle-switch input:checked + .ns-toggle-slider {
+    background: var(--pink);
+  }
+  .ns-toggle-switch input:checked + .ns-toggle-slider::before {
+    transform: translateX(18px);
+  }
+  .ns-someday-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    margin-left: var(--spacing-xs);
+  }
+
   .ns-categories-list {
     display: flex;
     flex-direction: column;
@@ -1219,6 +1282,148 @@
     background: var(--gray-50);
     color: var(--navy);
   }
+
+  /* ── Proposed Names Tab ── */
+  .ns-proposed {
+    padding: var(--spacing-xl);
+  }
+  .ns-proposed-instruction {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+  }
+  .ns-proposed-grid {
+    display: grid;
+    grid-template-columns: 100px repeat(4, 1fr);
+    gap: 2px;
+    background: var(--gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: var(--spacing-xl);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .ns-pg-corner {
+    background: var(--navy);
+    padding: var(--spacing-sm);
+  }
+  .ns-pg-header {
+    background: var(--navy);
+    color: white;
+    padding: var(--spacing-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .ns-pg-row-header {
+    background: var(--navy);
+    color: white;
+    padding: var(--spacing-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .ns-pg-cell {
+    background: var(--white);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+  }
+  .ns-pg-cell:hover {
+    background: var(--gray-50);
+    color: var(--navy);
+  }
+  .ns-pg-cell.selected {
+    background: rgba(208, 32, 144, 0.12);
+    color: var(--pink);
+    font-weight: 600;
+    box-shadow: inset 0 0 0 2px var(--pink);
+  }
+
+  /* Rename Results Panel */
+  .ns-rename-panel {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .ns-rename-empty {
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 0.85rem;
+    padding: var(--spacing-xl);
+    font-style: italic;
+  }
+  .ns-rename-header {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+  }
+  .ns-rename-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 var(--spacing-xs) 0;
+  }
+  .ns-rename-header p {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+  .ns-rename-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+  }
+  .ns-rename-col-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--pink);
+    margin-bottom: var(--spacing-sm);
+  }
+  .ns-rename-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+    font-size: 0.8rem;
+  }
+  .ns-rename-current {
+    color: var(--gray-500);
+    flex: 1;
+    text-align: right;
+  }
+  .ns-rename-arrow {
+    color: var(--pink);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .ns-rename-new {
+    color: var(--navy);
+    font-weight: 600;
+    flex: 1;
+  }
+  .ns-rename-new.unchanged {
+    opacity: 0.4;
+    font-style: italic;
+    font-weight: 400;
+  }
 </style>
 
 <!-- ────────────────────────────────────────────────────────────────────────────
@@ -1248,6 +1453,7 @@
     <button class="ns-tab-btn" data-tab="audit">Naming Audit</button>
     <button class="ns-tab-btn" data-tab="mapping">Concept Mapping</button>
     <button class="ns-tab-btn" data-tab="problems">Problems</button>
+    <button class="ns-tab-btn" data-tab="proposed">Proposed Names</button>
   </div>
 
   <!-- Content -->
@@ -1304,6 +1510,11 @@
       <div class="ns-problems" id="nsProblemsContainer"></div>
     </div>
 
+    <!-- TAB 5: Proposed Names -->
+    <div class="ns-tab-content" id="nsTabProposed">
+      <div class="ns-proposed" id="nsProposedContainer"></div>
+    </div>
+
   </div>
 
 </div>
@@ -1333,6 +1544,12 @@
     <div class="ns-settings-section">
       <div class="ns-settings-section-title">Industry Filter</div>
       <div id="nsIndustryFilterSettings"></div>
+    </div>
+
+    <!-- PPTX Export -->
+    <div class="ns-settings-section">
+      <div class="ns-settings-section-title">Export Options</div>
+      <div id="nsPptxExportSettings"></div>
     </div>
 
     <!-- Categories -->
@@ -1794,6 +2011,44 @@ window.namingStrategy = {
         Storage.updateClient(client.id, { industryFilterValue: e.target.value });
         this.applyIndustryFilterMode();
         this.renderExamplesTab();
+      });
+    }
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
+  // SETTINGS: PPTX EXPORT TOGGLE
+  // ────────────────────────────────────────────────────────────────────────────
+
+  renderPptxExportSettings() {
+    const container = document.getElementById('nsPptxExportSettings');
+    const client = Storage.getActiveClient();
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-no-client-msg">Select a client to configure export options.</div>';
+      return;
+    }
+
+    const enabled = client.pptxExportEnabled || false;
+
+    container.innerHTML = `
+      <div class="ns-toggle-row ${enabled ? 'enabled' : ''}">
+        <div class="ns-toggle-info">
+          <strong>Export to PPTX <span class="ns-someday-badge">Some Day</span></strong>
+          <span>Generate a PowerPoint deck from naming analysis</span>
+        </div>
+        <label class="ns-toggle-switch">
+          <input type="checkbox" id="nsPptxToggle" ${enabled ? 'checked' : ''} />
+          <span class="ns-toggle-slider"></span>
+        </label>
+      </div>
+    `;
+
+    const toggle = document.getElementById('nsPptxToggle');
+    if (toggle) {
+      toggle.addEventListener('change', (e) => {
+        Storage.updateClient(client.id, { pptxExportEnabled: e.target.checked });
+        const row = e.target.closest('.ns-toggle-row');
+        row.classList.toggle('enabled', e.target.checked);
       });
     }
   },
@@ -2301,6 +2556,178 @@ window.namingStrategy = {
   },
 
   // ────────────────────────────────────────────────────────────────────────────
+  // TAB 5: PROPOSED NAMES
+  // ────────────────────────────────────────────────────────────────────────────
+
+  selectedProposedCell: null,
+
+  /**
+   * Generate proposed names for an item based on the naming convention cell.
+   * Uses rule-based transformations: the approach (abstract/suggestive/descriptive)
+   * determines how much the name reveals, and the construct (jargon/real/compound/coined)
+   * determines the word structure.
+   */
+  generateProposedName(itemName, category, approach, construct) {
+    const name = itemName.trim();
+    const lower = name.toLowerCase();
+
+    // Helper: syllable-ish fragments for coined names
+    const prefixes = ['Vex','Zyn','Kora','Nex','Lumo','Axi','Prax','Evo','Velo','Orbi','Quix','Stro','Bry','Cel','Dyn','Flux'];
+    const suffixes = ['ix','ara','on','ify','ent','ium','yx','io','ex','is','ia','or','us','al'];
+    const hashCode = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i); return Math.abs(h); };
+    const pick = (arr, seed) => arr[seed % arr.length];
+
+    // Helper: real words that evoke categories
+    const abstractRealWords = ['Prism','Nova','Echo','Drift','Pulse','Ember','Crest','Fable','Helix','Tide','Bloom','Quartz','Vapor','Ridge','Aura'];
+    const suggestiveRealWords = { 'Company': ['Catalyst','Beacon','Atlas','Compass','Forge'], 'Brands': ['Crown','Shield','Banner','Torch','Emblem'], 'Products': ['Edge','Spark','Core','Vault','Bridge'], 'Services': ['Guide','Harbor','Relay','Lifeline','Pathway'], 'Features': ['Lens','Signal','Toggle','Layer','Boost'], 'Content': ['Story','Voice','Canvas','Script','Chronicle'] };
+    const jargonByCategory = { 'Company': ['Corp','Entity','Holdings','Ventures','Group'], 'Brands': ['Mark','Label','Insignia','Identity','Badge'], 'Products': ['Module','Unit','Suite','Platform','Stack'], 'Services': ['Ops','Consult','Agency','Bureau','Practice'], 'Features': ['API','Widget','Plugin','Hook','Endpoint'], 'Content': ['Asset','Brief','Collateral','Deck','Digest'] };
+
+    const h = hashCode(name + category);
+    const cat = category || 'Products';
+
+    if (approach === 'abstract') {
+      if (construct === 'jargon') {
+        return pick(jargonByCategory[cat] || jargonByCategory['Products'], h) + ' ' + pick(['Alpha','Sigma','Delta','Omega','Theta','Kappa'], h + 1);
+      } else if (construct === 'real') {
+        return pick(abstractRealWords, h);
+      } else if (construct === 'compound') {
+        const parts = [['Black','Silver','Iron','Red','Blue','Star','Moon','Fire'],['Gate','Stone','Well','Mark','Peak','Bay','Ridge','Forge']];
+        return pick(parts[0], h) + pick(parts[1], h + 1);
+      } else {
+        return pick(prefixes, h) + pick(suffixes, h + 1);
+      }
+    }
+
+    if (approach === 'suggestive') {
+      if (construct === 'jargon') {
+        const jargon = pick(jargonByCategory[cat] || jargonByCategory['Products'], h);
+        return jargon + ' ' + name.split(' ')[0];
+      } else if (construct === 'real') {
+        const words = suggestiveRealWords[cat] || suggestiveRealWords['Products'];
+        return pick(words, h);
+      } else if (construct === 'compound') {
+        const first = name.split(/\s+/)[0];
+        const compoundParts = ['Hub','Flow','Link','Sync','Path','Ware','Shift','Lab'];
+        return first + pick(compoundParts, h);
+      } else {
+        const root = name.substring(0, Math.min(4, name.length));
+        return root.charAt(0).toUpperCase() + root.slice(1).toLowerCase() + pick(suffixes, h);
+      }
+    }
+
+    if (approach === 'descriptive') {
+      if (construct === 'jargon') {
+        const jargon = pick(jargonByCategory[cat] || jargonByCategory['Products'], h);
+        return name + ' ' + jargon;
+      } else if (construct === 'real') {
+        return name;
+      } else if (construct === 'compound') {
+        const first = name.split(/\s+/)[0];
+        const descParts = ['Tool','Box','Center','Base','Point','Works','Pro','Direct'];
+        return first + pick(descParts, h);
+      } else {
+        const root = name.split(/\s+/)[0].substring(0, Math.min(5, name.length));
+        return root.charAt(0).toUpperCase() + root.slice(1).toLowerCase() + pick(['ify','ly','eon','ist','ware'], h);
+      }
+    }
+
+    return name;
+  },
+
+  renderProposedTab() {
+    const container = document.getElementById('nsProposedContainer');
+    const client = Storage.getActiveClient();
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-empty-state"><div class="ns-empty-state-icon">✨</div><div class="ns-empty-state-text">Select or create a client to explore proposed names.</div></div>';
+      return;
+    }
+
+    const approaches = ['abstract', 'suggestive', 'descriptive'];
+    const constructs = ['jargon', 'real', 'compound', 'coined'];
+    const approachLabels = { abstract: 'Abstract', suggestive: 'Suggestive', descriptive: 'Descriptive' };
+    const constructLabels = { jargon: 'Industry Jargon', real: 'Real Word', compound: 'Compound', coined: 'Coined' };
+
+    let gridHtml = '<div class="ns-proposed-grid">';
+    gridHtml += '<div class="ns-pg-corner"></div>';
+    constructs.forEach(c => { gridHtml += `<div class="ns-pg-header">${constructLabels[c]}</div>`; });
+
+    approaches.forEach(a => {
+      gridHtml += `<div class="ns-pg-row-header">${approachLabels[a]}</div>`;
+      constructs.forEach(c => {
+        const key = a + '_' + c;
+        const isSelected = this.selectedProposedCell === key;
+        gridHtml += `<div class="ns-pg-cell ${isSelected ? 'selected' : ''}" data-cell="${key}">
+          <span>${approachLabels[a]} +<br>${constructLabels[c]}</span>
+        </div>`;
+      });
+    });
+    gridHtml += '</div>';
+
+    // Rename results panel
+    let resultsHtml = '';
+    if (this.selectedProposedCell) {
+      const [approach, construct] = this.selectedProposedCell.split('_');
+      resultsHtml = this.renderProposedResults(client, approach, construct, approachLabels, constructLabels);
+    } else {
+      resultsHtml = '<div class="ns-rename-empty">Click a cell above to explore how your items would be named in that convention</div>';
+    }
+
+    container.innerHTML = `
+      <p class="ns-proposed-instruction">Select a naming convention cell to see how <strong>${client.name}</strong>'s items would be renamed</p>
+      ${gridHtml}
+      <div class="ns-rename-panel" id="nsRenamePanel">${resultsHtml}</div>
+    `;
+
+    // Bind cell click events
+    container.querySelectorAll('.ns-pg-cell').forEach(cell => {
+      cell.addEventListener('click', (e) => {
+        const cellKey = e.currentTarget.dataset.cell;
+        this.selectedProposedCell = cellKey;
+        this.renderProposedTab();
+      });
+    });
+  },
+
+  renderProposedResults(client, approach, construct, approachLabels, constructLabels) {
+    const categories = client.categories || [];
+    const items = client.items || {};
+
+    // Check if client has any items
+    const hasItems = categories.some(cat => items[cat] && items[cat].length > 0);
+    if (!hasItems) {
+      return `<div class="ns-rename-empty">Add items to your client's categories to see proposed names.</div>`;
+    }
+
+    let html = `<div class="ns-rename-header">
+      <h3>${approachLabels[approach]} + ${constructLabels[construct]}</h3>
+      <p>How ${client.name}'s items would look with this naming convention</p>
+    </div>`;
+
+    html += '<div class="ns-rename-columns">';
+
+    categories.forEach(cat => {
+      const catItems = items[cat] || [];
+      if (catItems.length === 0) return;
+
+      html += `<div class="ns-rename-col"><div class="ns-rename-col-title">${cat}</div>`;
+      catItems.forEach(item => {
+        const proposed = this.generateProposedName(item.name, cat, approach, construct);
+        const unchanged = proposed === item.name;
+        html += `<div class="ns-rename-row">
+          <span class="ns-rename-current">${item.name}</span>
+          <span class="ns-rename-arrow">→</span>
+          <span class="ns-rename-new ${unchanged ? 'unchanged' : ''}">${proposed}</span>
+        </div>`;
+      });
+      html += '</div>';
+    });
+
+    html += '</div>';
+    return html;
+  },
+
+  // ────────────────────────────────────────────────────────────────────────────
   // SETTINGS PANEL
   // ────────────────────────────────────────────────────────────────────────────
 
@@ -2481,7 +2908,8 @@ window.namingStrategy = {
       examples: 'nsTabExamples',
       audit: 'nsTabAudit',
       mapping: 'nsTabMapping',
-      problems: 'nsTabProblems'
+      problems: 'nsTabProblems',
+      proposed: 'nsTabProposed'
     };
 
     document.getElementById(tabMap[tabName])?.classList.add('active');
@@ -2494,7 +2922,9 @@ window.namingStrategy = {
     this.renderAuditTab();
     this.renderMappingTab();
     this.renderProblemsTab();
+    this.renderProposedTab();
     this.renderIndustryFilterSettings();
+    this.renderPptxExportSettings();
   },
 
   updateClientSelector() {
