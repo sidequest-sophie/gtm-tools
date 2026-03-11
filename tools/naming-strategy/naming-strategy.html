@@ -1054,6 +1054,33 @@
     margin-left: var(--spacing-xs);
   }
 
+  .ns-admin-limit-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+  }
+
+  .ns-limit-input {
+    width: 70px;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--navy);
+    background: var(--white);
+  }
+
+  .ns-limit-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(208, 32, 144, 0.15);
+  }
+
   .ns-categories-list {
     display: flex;
     flex-direction: column;
@@ -1424,6 +1451,133 @@
     font-style: italic;
     font-weight: 400;
   }
+
+  /* ── Welcome Page ── */
+  .ns-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 3rem 2rem;
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .ns-welcome-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .ns-welcome-icon svg {
+    width: 36px;
+    height: 36px;
+    stroke: white;
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .ns-welcome h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+  }
+
+  .ns-welcome p {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .ns-welcome-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 2.5rem;
+  }
+
+  .ns-welcome-step {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1rem;
+    text-align: center;
+  }
+
+  .ns-welcome-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: white;
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .ns-welcome-step h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.25rem;
+  }
+
+  .ns-welcome-step span {
+    font-size: 0.78rem;
+    color: var(--gray-500);
+    line-height: 1.4;
+  }
+
+  .ns-welcome-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--pink);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .ns-welcome-cta:hover {
+    background: var(--pink-hover);
+  }
+
+  .ns-welcome-cta svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .ns-tool-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .ns-tool-body.hidden {
+    display: none;
+  }
 </style>
 
 <!-- ────────────────────────────────────────────────────────────────────────────
@@ -1446,6 +1600,47 @@
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
   </div>
+
+  <!-- Welcome Page (shown when no client selected) -->
+  <div class="ns-welcome" id="nsWelcome" style="display: none;">
+    <div class="ns-welcome-icon">
+      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </div>
+    <h2>Naming Strategy Tool</h2>
+    <p>
+      Audit your client's existing brand names, map them against a proven naming taxonomy,
+      spot clustering problems, and explore alternative naming conventions — all in one place.
+    </p>
+    <div class="ns-welcome-steps">
+      <div class="ns-welcome-step">
+        <div class="ns-welcome-step-num">1</div>
+        <h4>Create a Client</h4>
+        <span>Set up a workspace for each brand you're analysing</span>
+      </div>
+      <div class="ns-welcome-step">
+        <div class="ns-welcome-step-num">2</div>
+        <h4>Add Their Names</h4>
+        <span>Paste in companies, products, features, and services</span>
+      </div>
+      <div class="ns-welcome-step">
+        <div class="ns-welcome-step-num">3</div>
+        <h4>Map the Matrix</h4>
+        <span>Drag items onto the naming taxonomy grid</span>
+      </div>
+      <div class="ns-welcome-step">
+        <div class="ns-welcome-step-num">4</div>
+        <h4>Explore Alternatives</h4>
+        <span>See how names would look in different conventions</span>
+      </div>
+    </div>
+    <button class="ns-welcome-cta" id="nsWelcomeStart">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Get Started
+    </button>
+  </div>
+
+  <!-- Tool Body (tabs + content, hidden when welcome is showing) -->
+  <div class="ns-tool-body" id="nsToolBody">
 
   <!-- Tabs -->
   <div class="ns-tabs">
@@ -1517,6 +1712,8 @@
 
   </div>
 
+  </div><!-- /ns-tool-body -->
+
 </div>
 
 <!-- Settings Panel -->
@@ -1544,6 +1741,18 @@
     <div class="ns-settings-section">
       <div class="ns-settings-section-title">Industry Filter</div>
       <div id="nsIndustryFilterSettings"></div>
+    </div>
+
+    <!-- Grid Options -->
+    <div class="ns-settings-section">
+      <div class="ns-settings-section-title">Grid Options</div>
+      <div id="nsGridOptionsSettings"></div>
+    </div>
+
+    <!-- Admin Limits -->
+    <div class="ns-settings-section">
+      <div class="ns-settings-section-title">Admin Limits</div>
+      <div id="nsAdminLimitsSettings"></div>
     </div>
 
     <!-- PPTX Export -->
@@ -1767,7 +1976,24 @@ window.namingStrategy = {
   init() {
     console.log('Naming Strategy Tool initialized');
     this.setupEventListeners();
+    this.updateWelcomeVisibility();
     this.renderAll();
+  },
+
+  /**
+   * Show welcome page if no client selected, otherwise show tool body.
+   */
+  updateWelcomeVisibility() {
+    const client = Storage.getActiveClient();
+    const welcome = document.getElementById('nsWelcome');
+    const toolBody = document.getElementById('nsToolBody');
+    if (!client) {
+      welcome.style.display = 'flex';
+      toolBody.classList.add('hidden');
+    } else {
+      welcome.style.display = 'none';
+      toolBody.classList.remove('hidden');
+    }
   },
 
   // Setup all event listeners
@@ -1806,6 +2032,9 @@ window.namingStrategy = {
     // Client selector
     document.getElementById('nsClientSelector').addEventListener('click', () => this.toggleSettings());
 
+    // Welcome CTA — opens settings to create first client
+    document.getElementById('nsWelcomeStart').addEventListener('click', () => this.toggleSettings());
+
     // Client management
     document.getElementById('nsNewClientBtn').addEventListener('click', () => this.addNewClient());
     document.getElementById('nsNewClientInput').addEventListener('keypress', (e) => {
@@ -1826,15 +2055,22 @@ window.namingStrategy = {
   renderExamplesTab() {
     const matrix = document.getElementById('nsExamplesMatrix');
     matrix.innerHTML = '';
+    const jargonOn = this.isJargonEnabled();
 
     // Column headers
-    const columnHeaders = ['', 'Industry Jargon', 'Real Word', 'Compound', 'Coined'];
+    const allColumnHeaders = ['', 'Industry Jargon', 'Real Word', 'Compound', 'Coined'];
+    const columnHeaders = jargonOn ? allColumnHeaders : allColumnHeaders.filter(h => h !== 'Industry Jargon');
     const rowHeaders = ['Abstract', 'Suggestive', 'Descriptive'];
-    const cellKeys = [
+    const allCellKeys = [
       ['', 'abstract_jargon', 'abstract_real', 'abstract_compound', 'abstract_coined'],
       ['', 'suggestive_jargon', 'suggestive_real', 'suggestive_compound', 'suggestive_coined'],
       ['', 'descriptive_jargon', 'descriptive_real', 'descriptive_compound', 'descriptive_coined']
     ];
+    const cellKeys = jargonOn ? allCellKeys : allCellKeys.map(row => row.filter(k => !k.endsWith('_jargon')));
+
+    // Dynamic grid columns
+    const colCount = columnHeaders.length - 1; // minus row header
+    matrix.style.gridTemplateColumns = `120px repeat(${colCount}, 1fr)`;
 
     // Create headers
     columnHeaders.forEach((header, idx) => {
@@ -2019,6 +2255,87 @@ window.namingStrategy = {
   // SETTINGS: PPTX EXPORT TOGGLE
   // ────────────────────────────────────────────────────────────────────────────
 
+  /**
+   * Check if Industry Jargon column is enabled for the active client.
+   */
+  isJargonEnabled() {
+    const client = Storage.getActiveClient();
+    return client ? (client.industryJargonEnabled || false) : false;
+  },
+
+  /**
+   * Get the max company items limit for the active client (0 = unlimited).
+   */
+  getMaxCompanyItems() {
+    const client = Storage.getActiveClient();
+    return client ? (client.maxCompanyItems || 0) : 0;
+  },
+
+  renderGridOptionsSettings() {
+    const container = document.getElementById('nsGridOptionsSettings');
+    const client = Storage.getActiveClient();
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-no-client-msg">Select a client to configure grid options.</div>';
+      return;
+    }
+
+    const enabled = client.industryJargonEnabled || false;
+
+    container.innerHTML = `
+      <div class="ns-toggle-row ${enabled ? 'enabled' : ''}">
+        <div class="ns-toggle-info">
+          <strong>Show Industry Jargon Column</strong>
+          <span>Adds a fourth word-structure column for specialist terminology</span>
+        </div>
+        <label class="ns-toggle-switch">
+          <input type="checkbox" id="nsJargonToggle" ${enabled ? 'checked' : ''} />
+          <span class="ns-toggle-slider"></span>
+        </label>
+      </div>
+    `;
+
+    const toggle = document.getElementById('nsJargonToggle');
+    if (toggle) {
+      toggle.addEventListener('change', (e) => {
+        Storage.updateClient(client.id, { industryJargonEnabled: e.target.checked });
+        const row = e.target.closest('.ns-toggle-row');
+        row.classList.toggle('enabled', e.target.checked);
+        this.renderAll();
+      });
+    }
+  },
+
+  renderAdminLimitsSettings() {
+    const container = document.getElementById('nsAdminLimitsSettings');
+    const client = Storage.getActiveClient();
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-no-client-msg">Select a client to configure admin limits.</div>';
+      return;
+    }
+
+    const maxItems = client.maxCompanyItems || 0;
+
+    container.innerHTML = `
+      <div class="ns-admin-limit-row">
+        <div class="ns-toggle-info">
+          <strong>Max Items Per Client</strong>
+          <span>Limit how many company/brand names can be added (0 = unlimited)</span>
+        </div>
+        <input type="number" class="ns-limit-input" id="nsMaxItemsInput" value="${maxItems}" min="0" max="999" />
+      </div>
+    `;
+
+    const input = document.getElementById('nsMaxItemsInput');
+    if (input) {
+      input.addEventListener('change', (e) => {
+        const val = parseInt(e.target.value, 10) || 0;
+        Storage.updateClient(client.id, { maxCompanyItems: Math.max(0, val) });
+      });
+    }
+  },
+
   renderPptxExportSettings() {
     const container = document.getElementById('nsPptxExportSettings');
     const client = Storage.getActiveClient();
@@ -2122,11 +2439,33 @@ window.namingStrategy = {
     const client = Storage.getActiveClient();
     if (!client) return;
 
+    // Check max items limit
+    const maxItems = this.getMaxCompanyItems();
+    if (maxItems > 0) {
+      let currentTotal = 0;
+      Object.values(client.items).forEach(catItems => { currentTotal += catItems.length; });
+      if (currentTotal >= maxItems) {
+        alert(`This client is limited to ${maxItems} items. Remove some items before adding more.`);
+        return;
+      }
+    }
+
     // Parse comma or newline separated items
-    const items = input
+    let items = input
       .split(/[,\n]/)
       .map(item => item.trim())
       .filter(item => item.length > 0);
+
+    // Truncate if adding would exceed limit
+    if (maxItems > 0) {
+      let currentTotal = 0;
+      Object.values(client.items).forEach(catItems => { currentTotal += catItems.length; });
+      const remaining = maxItems - currentTotal;
+      if (items.length > remaining) {
+        items = items.slice(0, remaining);
+        alert(`Only ${remaining} item(s) added — client limit of ${maxItems} reached.`);
+      }
+    }
 
     items.forEach(item => {
       Storage.addItemToCategory(category, item, '');
@@ -2182,15 +2521,19 @@ window.namingStrategy = {
     }
 
     // Grid
-    const columnHeaders = ['', 'Industry Jargon', 'Real Word', 'Compound', 'Coined'];
+    const jargonOn = this.isJargonEnabled();
+    const allColumnHeaders = ['', 'Industry Jargon', 'Real Word', 'Compound', 'Coined'];
+    const columnHeaders = jargonOn ? allColumnHeaders : allColumnHeaders.filter(h => h !== 'Industry Jargon');
     const rowHeaders = ['Abstract', 'Suggestive', 'Descriptive'];
-    const cellKeys = [
+    const allCellKeys = [
       ['', 'abstract_jargon', 'abstract_real', 'abstract_compound', 'abstract_coined'],
       ['', 'suggestive_jargon', 'suggestive_real', 'suggestive_compound', 'suggestive_coined'],
       ['', 'descriptive_jargon', 'descriptive_real', 'descriptive_compound', 'descriptive_coined']
     ];
+    const cellKeys = jargonOn ? allCellKeys : allCellKeys.map(row => row.filter(k => !k.endsWith('_jargon')));
 
-    html += '<div class="ns-mapping-grid">';
+    const colCount = columnHeaders.length - 1;
+    html += `<div class="ns-mapping-grid" style="grid-template-columns: 120px repeat(${colCount}, 1fr)">`;
 
     // Headers
     columnHeaders.forEach((header, idx) => {
@@ -2644,11 +2987,19 @@ window.namingStrategy = {
     }
 
     const approaches = ['abstract', 'suggestive', 'descriptive'];
-    const constructs = ['jargon', 'real', 'compound', 'coined'];
+    const jargonOn = this.isJargonEnabled();
+
+    // Clear selected cell if it's a jargon cell and jargon is off
+    if (!jargonOn && this.selectedProposedCell && this.selectedProposedCell.endsWith('_jargon')) {
+      this.selectedProposedCell = null;
+    }
+    const allConstructs = ['jargon', 'real', 'compound', 'coined'];
+    const constructs = jargonOn ? allConstructs : allConstructs.filter(c => c !== 'jargon');
     const approachLabels = { abstract: 'Abstract', suggestive: 'Suggestive', descriptive: 'Descriptive' };
     const constructLabels = { jargon: 'Industry Jargon', real: 'Real Word', compound: 'Compound', coined: 'Coined' };
 
-    let gridHtml = '<div class="ns-proposed-grid">';
+    const colCount = constructs.length;
+    let gridHtml = `<div class="ns-proposed-grid" style="grid-template-columns: 100px repeat(${colCount}, 1fr)">`;
     gridHtml += '<div class="ns-pg-corner"></div>';
     constructs.forEach(c => { gridHtml += `<div class="ns-pg-header">${constructLabels[c]}</div>`; });
 
@@ -2916,6 +3267,7 @@ window.namingStrategy = {
   },
 
   renderAll() {
+    this.updateWelcomeVisibility();
     this.updateClientSelector();
     this.applyIndustryFilterMode();
     this.renderExamplesTab();
@@ -2924,6 +3276,8 @@ window.namingStrategy = {
     this.renderProblemsTab();
     this.renderProposedTab();
     this.renderIndustryFilterSettings();
+    this.renderGridOptionsSettings();
+    this.renderAdminLimitsSettings();
     this.renderPptxExportSettings();
   },
 

@@ -120,6 +120,8 @@ const Storage = {
       categories: ['Company', 'Brands', 'Products', 'Services', 'Features', 'Content'],
       items: {},
       problems: [],
+      industryJargonEnabled: false,  // Show Industry Jargon column in grids (off by default)
+      maxCompanyItems: 0,            // 0 = unlimited; admin cap on items per client
       industryFilterMode: 'user',   // 'user' | 'random' | 'fixed'
       industryFilterValue: '',       // used when mode is 'fixed'
       pptxExportEnabled: false,      // Some Day Maybe: enable PPTX export for this client
