@@ -120,6 +120,8 @@ const Storage = {
       categories: ['Company', 'Brands', 'Products', 'Services', 'Features', 'Content'],
       items: {},
       problems: [],
+      industryFilterMode: 'user',   // 'user' | 'random' | 'fixed'
+      industryFilterValue: '',       // used when mode is 'fixed'
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

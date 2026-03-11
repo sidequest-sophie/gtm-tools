@@ -914,6 +914,83 @@
     background: var(--pink-hover);
   }
 
+  /* Industry Filter Mode Settings */
+  .ns-filter-mode-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .ns-filter-mode-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+  }
+
+  .ns-filter-mode-option:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-300);
+  }
+
+  .ns-filter-mode-option.active {
+    background: rgba(208, 32, 144, 0.1);
+    border-color: var(--pink);
+  }
+
+  .ns-filter-mode-option input[type="radio"] {
+    accent-color: var(--pink);
+    margin: 0;
+  }
+
+  .ns-filter-mode-label {
+    flex: 1;
+  }
+
+  .ns-filter-mode-label strong {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+
+  .ns-filter-mode-label span {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+  }
+
+  .ns-fixed-industry-select {
+    margin-top: var(--spacing-sm);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    width: 100%;
+    display: none;
+  }
+
+  .ns-fixed-industry-select.visible {
+    display: block;
+  }
+
+  .ns-no-client-msg {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    font-style: italic;
+    padding: var(--spacing-sm);
+  }
+
   .ns-categories-list {
     display: flex;
     flex-direction: column;
@@ -1250,6 +1327,12 @@
         <input type="text" class="ns-new-client-input" id="nsNewClientInput" placeholder="New client name" />
         <button class="ns-new-client-btn" id="nsNewClientBtn">Add</button>
       </div>
+    </div>
+
+    <!-- Industry Filter Mode -->
+    <div class="ns-settings-section">
+      <div class="ns-settings-section-title">Industry Filter</div>
+      <div id="nsIndustryFilterSettings"></div>
     </div>
 
     <!-- Categories -->
@@ -1601,6 +1684,118 @@ window.namingStrategy = {
   setIndustryFilter(industry) {
     this.currentIndustryFilter = industry;
     this.renderExamplesTab();
+  },
+
+  /**
+   * Apply industry filter mode from client settings.
+   * Called on renderAll and when switching clients.
+   */
+  applyIndustryFilterMode() {
+    const client = Storage.getActiveClient();
+    const dropdown = document.getElementById('nsIndustryFilter');
+
+    if (!client) {
+      // No client — show dropdown, allow user to pick
+      dropdown.style.display = '';
+      return;
+    }
+
+    const mode = client.industryFilterMode || 'user';
+
+    if (mode === 'user') {
+      dropdown.style.display = '';
+      // Don't change the current filter — let user pick
+    } else if (mode === 'random') {
+      dropdown.style.display = 'none';
+      const industries = ['Technology','Finance','Healthcare','Retail','Automotive','Energy','Telecoms','Media','Food & Beverage','Travel','Professional Services','Manufacturing','Real Estate','Education','Sports','Fashion','Aerospace'];
+      const randomIndustry = industries[Math.floor(Math.random() * industries.length)];
+      this.currentIndustryFilter = randomIndustry;
+      dropdown.value = randomIndustry;
+    } else if (mode === 'fixed') {
+      dropdown.style.display = 'none';
+      const fixedIndustry = client.industryFilterValue || 'all';
+      this.currentIndustryFilter = fixedIndustry;
+      dropdown.value = fixedIndustry;
+    }
+  },
+
+  /**
+   * Render industry filter settings in the Settings panel
+   */
+  renderIndustryFilterSettings() {
+    const container = document.getElementById('nsIndustryFilterSettings');
+    const client = Storage.getActiveClient();
+
+    if (!client) {
+      container.innerHTML = '<div class="ns-no-client-msg">Select a client to configure industry filter.</div>';
+      return;
+    }
+
+    const mode = client.industryFilterMode || 'user';
+    const fixedValue = client.industryFilterValue || '';
+    const industries = ['Technology','Finance','Healthcare','Retail','Automotive','Energy','Telecoms','Media','Food & Beverage','Travel','Professional Services','Manufacturing','Real Estate','Education','Sports','Fashion','Aerospace'];
+
+    let optionsHtml = industries.map(ind => `<option value="${ind}" ${fixedValue === ind ? 'selected' : ''}>${ind}</option>`).join('');
+
+    container.innerHTML = `
+      <div class="ns-filter-mode-options">
+        <label class="ns-filter-mode-option ${mode === 'user' ? 'active' : ''}">
+          <input type="radio" name="industryFilterMode" value="user" ${mode === 'user' ? 'checked' : ''} />
+          <div class="ns-filter-mode-label">
+            <strong>User Selectable</strong>
+            <span>Client picks their own industry from dropdown</span>
+          </div>
+        </label>
+        <label class="ns-filter-mode-option ${mode === 'random' ? 'active' : ''}">
+          <input type="radio" name="industryFilterMode" value="random" ${mode === 'random' ? 'checked' : ''} />
+          <div class="ns-filter-mode-label">
+            <strong>Random Industry</strong>
+            <span>A different industry is shown each session</span>
+          </div>
+        </label>
+        <label class="ns-filter-mode-option ${mode === 'fixed' ? 'active' : ''}">
+          <input type="radio" name="industryFilterMode" value="fixed" ${mode === 'fixed' ? 'checked' : ''} />
+          <div class="ns-filter-mode-label">
+            <strong>Specified Industry</strong>
+            <span>You choose which industry to show</span>
+          </div>
+        </label>
+      </div>
+      <select class="ns-fixed-industry-select ${mode === 'fixed' ? 'visible' : ''}" id="nsFixedIndustrySelect">
+        <option value="">Choose industry…</option>
+        ${optionsHtml}
+      </select>
+    `;
+
+    // Bind radio change events
+    container.querySelectorAll('input[name="industryFilterMode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const newMode = e.target.value;
+        Storage.updateClient(client.id, { industryFilterMode: newMode });
+
+        // Show/hide fixed industry dropdown
+        const fixedSelect = document.getElementById('nsFixedIndustrySelect');
+        fixedSelect.classList.toggle('visible', newMode === 'fixed');
+
+        // Update active styling
+        container.querySelectorAll('.ns-filter-mode-option').forEach(opt => opt.classList.remove('active'));
+        e.target.closest('.ns-filter-mode-option').classList.add('active');
+
+        // Apply immediately
+        this.applyIndustryFilterMode();
+        this.renderExamplesTab();
+      });
+    });
+
+    // Bind fixed industry select
+    const fixedSelect = document.getElementById('nsFixedIndustrySelect');
+    if (fixedSelect) {
+      fixedSelect.addEventListener('change', (e) => {
+        Storage.updateClient(client.id, { industryFilterValue: e.target.value });
+        this.applyIndustryFilterMode();
+        this.renderExamplesTab();
+      });
+    }
   },
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -2294,10 +2489,12 @@ window.namingStrategy = {
 
   renderAll() {
     this.updateClientSelector();
+    this.applyIndustryFilterMode();
     this.renderExamplesTab();
     this.renderAuditTab();
     this.renderMappingTab();
     this.renderProblemsTab();
+    this.renderIndustryFilterSettings();
   },
 
   updateClientSelector() {
