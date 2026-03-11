@@ -1,0 +1,1075 @@
+<!-- Client Configuration — Category Leaders GTM Tools -->
+<style>
+  /* ── Client Config Layout ── */
+  .cc-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #f7f6f4;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ── Tab Navigation ── */
+  .cc-tabs {
+    display: flex;
+    gap: 0;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 2rem;
+    flex-shrink: 0;
+  }
+
+  .cc-tab {
+    padding: 0.85rem 1.5rem;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .cc-tab:hover {
+    color: #104060;
+  }
+
+  .cc-tab.active {
+    color: #104060;
+    font-weight: 600;
+    border-bottom-color: #d02090;
+  }
+
+  /* ── Content Area ── */
+  .cc-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+  }
+
+  .cc-panel {
+    display: none;
+    max-width: 780px;
+  }
+
+  .cc-panel.active {
+    display: block;
+  }
+
+  .cc-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #104060;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .cc-section-desc {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* ── No Client State ── */
+  .cc-no-client {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+  }
+
+  .cc-no-client-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(19,69,97,0.08), rgba(217,43,150,0.08));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+  }
+
+  .cc-no-client-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: #d02090;
+    fill: none;
+    stroke-width: 1.8;
+  }
+
+  .cc-no-client h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #104060;
+    margin-bottom: 0.5rem;
+  }
+
+  .cc-no-client p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  /* ── Form Elements ── */
+  .cc-form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .cc-form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .cc-form-input {
+    width: 100%;
+    max-width: 420px;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: #374151;
+    background: #fff;
+    transition: border-color 0.15s ease;
+  }
+
+  .cc-form-input:focus {
+    outline: none;
+    border-color: #d02090;
+    box-shadow: 0 0 0 3px rgba(208, 32, 144, 0.08);
+  }
+
+  .cc-form-input::placeholder {
+    color: #9ca3af;
+  }
+
+  .cc-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    max-width: 420px;
+  }
+
+  .cc-form-row .cc-form-input {
+    max-width: none;
+  }
+
+  .cc-divider {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 2rem 0;
+  }
+
+  /* ── Brand Ontology ── */
+  .cc-entity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cc-entity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: border-color 0.15s ease;
+  }
+
+  .cc-entity-item:hover {
+    border-color: #d1d5db;
+  }
+
+  .cc-entity-type {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(16, 64, 96, 0.08);
+    color: #104060;
+    white-space: nowrap;
+  }
+
+  .cc-entity-name {
+    flex: 1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .cc-entity-desc {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    flex: 1;
+    text-align: right;
+  }
+
+  .cc-entity-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .cc-icon-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    transition: all 0.15s ease;
+  }
+
+  .cc-icon-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .cc-icon-btn.danger:hover {
+    background: #fef2f2;
+    color: #dc2626;
+  }
+
+  .cc-icon-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  /* ── Add Entity Form ── */
+  .cc-add-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+    max-width: 660px;
+    flex-wrap: wrap;
+  }
+
+  .cc-add-row .cc-form-group {
+    margin-bottom: 0;
+  }
+
+  .cc-add-row .cc-form-input {
+    max-width: none;
+  }
+
+  .cc-add-row select.cc-form-input {
+    width: 140px;
+  }
+
+  .cc-btn {
+    padding: 0.6rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .cc-btn-pink {
+    background: #d02090;
+    color: #fff;
+  }
+
+  .cc-btn-pink:hover {
+    background: #b01c7a;
+  }
+
+  .cc-btn-outline {
+    background: transparent;
+    color: #374151;
+    border: 1px solid #d1d5db;
+  }
+
+  .cc-btn-outline:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  /* ── Category Management ── */
+  .cc-cat-section {
+    margin-bottom: 2rem;
+  }
+
+  .cc-cat-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .cc-cat-section-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #104060;
+  }
+
+  .cc-cat-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .cc-cat-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: #374151;
+    transition: all 0.15s ease;
+  }
+
+  .cc-cat-tag .cc-cat-path {
+    color: #9ca3af;
+    font-size: 0.7rem;
+  }
+
+  .cc-cat-tag .cc-cat-leaf {
+    font-weight: 600;
+    color: #104060;
+  }
+
+  .cc-cat-tag .cc-create-flag {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.1rem 0.35rem;
+    background: rgba(208, 32, 144, 0.1);
+    color: #d02090;
+    border-radius: 3px;
+    margin-left: 0.25rem;
+  }
+
+  .cc-cat-tag .cc-remove-tag {
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    margin-left: 0.15rem;
+  }
+
+  .cc-cat-tag .cc-remove-tag:hover {
+    color: #dc2626;
+    background: #fef2f2;
+  }
+
+  .cc-cat-tag .cc-remove-tag svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  /* ── Category Picker ── */
+  .cc-cat-picker {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem;
+    max-width: 660px;
+  }
+
+  .cc-cat-picker-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .cc-cat-picker-row select.cc-form-input {
+    max-width: 200px;
+  }
+
+  .cc-cat-picker-row .cc-form-group {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .cc-create-flag-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .cc-create-flag-toggle label {
+    font-size: 0.8rem;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .cc-create-flag-toggle input[type="checkbox"] {
+    accent-color: #d02090;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+
+  .cc-empty-cats {
+    text-align: center;
+    padding: 1.5rem;
+    color: #9ca3af;
+    font-size: 0.82rem;
+    font-style: italic;
+  }
+
+  /* ── Entity sub-heading in Category Management ── */
+  .cc-entity-subhead {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .cc-entity-subhead-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .cc-entity-subhead-type {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    background: rgba(16, 64, 96, 0.08);
+    color: #104060;
+  }
+</style>
+
+<div class="cc-container">
+
+  <!-- Tab Navigation -->
+  <div class="cc-tabs">
+    <button class="cc-tab active" data-tab="details">Company Details</button>
+    <button class="cc-tab" data-tab="ontology">Brand Ontology</button>
+    <button class="cc-tab" data-tab="categories">Category Management</button>
+  </div>
+
+  <!-- Body -->
+  <div class="cc-body">
+
+    <!-- No Client State -->
+    <div id="ccNoClient" class="cc-no-client" style="display:none;">
+      <div class="cc-no-client-icon">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h3>No client selected</h3>
+      <p>Select or create a client in the Naming Strategy tool first, then come back here to configure their details.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB 1: Company Details                      -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="cc-panel active" id="ccDetails">
+      <div class="cc-section-title">Company Information</div>
+      <div class="cc-section-desc">Top-level details about this client's company.</div>
+
+      <div class="cc-form-group">
+        <label class="cc-form-label">Company Name</label>
+        <input type="text" class="cc-form-input" id="ccCompanyName" placeholder="e.g. Acme Corp" />
+      </div>
+
+      <hr class="cc-divider" />
+
+      <div class="cc-section-title">Primary Contact</div>
+      <div class="cc-section-desc">The main point of contact for this client engagement.</div>
+
+      <div class="cc-form-group">
+        <label class="cc-form-label">Contact Name</label>
+        <input type="text" class="cc-form-input" id="ccContactName" placeholder="e.g. Jane Smith" />
+      </div>
+
+      <div class="cc-form-row">
+        <div class="cc-form-group">
+          <label class="cc-form-label">Email</label>
+          <input type="email" class="cc-form-input" id="ccContactEmail" placeholder="jane@acme.com" />
+        </div>
+        <div class="cc-form-group">
+          <label class="cc-form-label">Phone</label>
+          <input type="tel" class="cc-form-input" id="ccContactPhone" placeholder="+44 7700 900000" />
+        </div>
+      </div>
+
+      <div class="cc-form-group">
+        <label class="cc-form-label">Job Title / Role</label>
+        <input type="text" class="cc-form-input" id="ccContactRole" placeholder="e.g. VP of Marketing" />
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB 2: Brand Ontology                       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="cc-panel" id="ccOntology">
+      <div class="cc-section-title">Brand Ontology</div>
+      <div class="cc-section-desc">
+        Define the client's products, services, platforms, and other brand entities.
+        This data is shared across all tools.
+      </div>
+
+      <div id="ccEntityList" class="cc-entity-list"></div>
+
+      <div class="cc-add-row" id="ccAddEntityRow">
+        <div class="cc-form-group">
+          <label class="cc-form-label">Type</label>
+          <select class="cc-form-input" id="ccNewEntityType">
+            <option value="Product">Product</option>
+            <option value="Service">Service</option>
+            <option value="Platform">Platform</option>
+            <option value="Solution">Solution</option>
+            <option value="Module">Module</option>
+            <option value="Brand">Brand</option>
+          </select>
+        </div>
+        <div class="cc-form-group" style="flex:2;">
+          <label class="cc-form-label">Name</label>
+          <input type="text" class="cc-form-input" id="ccNewEntityName" placeholder="e.g. DataShield Pro" />
+        </div>
+        <div class="cc-form-group" style="flex:2;">
+          <label class="cc-form-label">Description (optional)</label>
+          <input type="text" class="cc-form-input" id="ccNewEntityDesc" placeholder="Brief description" />
+        </div>
+        <button class="cc-btn cc-btn-pink" id="ccAddEntityBtn">Add</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB 3: Category Management                  -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="cc-panel" id="ccCategories">
+      <div class="cc-section-title">Category Management</div>
+      <div class="cc-section-desc">
+        Map this client's company and individual products to market categories.
+        Use the three-level hierarchy: Industry → Sector → Category.
+        Flag any mapping as a "potential to create a category" opportunity.
+      </div>
+
+      <!-- Company-level categories -->
+      <div class="cc-cat-section" id="ccCompanyCats"></div>
+
+      <hr class="cc-divider" />
+
+      <!-- Product-level categories -->
+      <div id="ccProductCats"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/**
+ * Client Configuration Tool
+ */
+const clientConfig = {
+
+  // ── Default category taxonomy ──
+  taxonomy: {
+    'Technology': {
+      'Cybersecurity': ['SIEM', 'Endpoint Protection', 'Identity & Access Management', 'Cloud Security', 'Threat Intelligence', 'Security Analytics', 'Zero Trust', 'DevSecOps'],
+      'Martech': ['Marketing Attribution', 'Marketing Automation', 'Customer Data Platform', 'Content Management', 'Email Marketing', 'SEO Tools', 'Social Media Management', 'Personalisation'],
+      'Sales Tech': ['CRM', 'Sales Engagement', 'Revenue Intelligence', 'CPQ', 'Sales Enablement', 'Conversation Intelligence'],
+      'Data & Analytics': ['Business Intelligence', 'Data Integration', 'Data Governance', 'Master Data Management', 'Data Observability', 'Predictive Analytics'],
+      'Cloud Infrastructure': ['IaaS', 'PaaS', 'Containers & Orchestration', 'Serverless', 'Cloud Management', 'FinOps'],
+      'AI & Machine Learning': ['Generative AI', 'MLOps', 'Computer Vision', 'NLP', 'AI Agents', 'Predictive AI'],
+      'DevOps': ['CI/CD', 'Infrastructure as Code', 'Monitoring & Observability', 'Incident Management', 'Feature Management'],
+      'Collaboration': ['Team Messaging', 'Video Conferencing', 'Project Management', 'Knowledge Management', 'Digital Whiteboard'],
+    },
+    'Financial Services': {
+      'Fintech': ['Payment Processing', 'Digital Banking', 'Lending Platforms', 'Wealth Management', 'Insurance Tech', 'RegTech'],
+      'Capital Markets': ['Trading Platforms', 'Risk Management', 'Market Data', 'Post-Trade Processing'],
+    },
+    'Healthcare': {
+      'Health Tech': ['Electronic Health Records', 'Telemedicine', 'Clinical Decision Support', 'Medical Imaging', 'Patient Engagement'],
+      'Life Sciences': ['Drug Discovery', 'Clinical Trials', 'Pharmacovigilance', 'Regulatory Compliance'],
+    },
+    'Manufacturing': {
+      'Industrial Tech': ['IoT Platforms', 'Digital Twin', 'Predictive Maintenance', 'Supply Chain Management', 'Quality Management'],
+    },
+    'Media & Entertainment': {
+      'Content': ['Streaming Platforms', 'Content Distribution', 'Digital Publishing', 'Ad Tech'],
+    },
+    'Professional Services': {
+      'Consulting': ['Management Consulting', 'Technology Consulting', 'Strategy Consulting'],
+      'Legal Tech': ['Contract Management', 'E-Discovery', 'Legal Research', 'Compliance Management'],
+    },
+  },
+
+  activeTab: 'details',
+
+  init() {
+    this.setupTabs();
+    this.setupDetailsListeners();
+    this.setupOntologyListeners();
+    this.renderAll();
+  },
+
+  // ── Tab Switching ──
+  setupTabs() {
+    document.querySelectorAll('.cc-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.cc-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.cc-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const tabName = tab.getAttribute('data-tab');
+        this.activeTab = tabName;
+        const panelMap = { details: 'ccDetails', ontology: 'ccOntology', categories: 'ccCategories' };
+        document.getElementById(panelMap[tabName])?.classList.add('active');
+        this.renderAll();
+      });
+    });
+  },
+
+  // ── Details Tab — auto-save on input ──
+  setupDetailsListeners() {
+    const fields = [
+      { el: 'ccCompanyName', key: 'name' },
+      { el: 'ccContactName', key: 'companyDetails.contactName' },
+      { el: 'ccContactEmail', key: 'companyDetails.contactEmail' },
+      { el: 'ccContactPhone', key: 'companyDetails.contactPhone' },
+      { el: 'ccContactRole', key: 'companyDetails.contactRole' },
+    ];
+
+    let debounceTimer = null;
+
+    fields.forEach(({ el, key }) => {
+      const input = document.getElementById(el);
+      if (!input) return;
+      input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const client = Storage.getActiveClient();
+          if (!client) return;
+
+          if (key === 'name') {
+            Storage.updateClient(client.id, { name: input.value.trim() || 'New Client' });
+          } else {
+            const parts = key.split('.');
+            const details = client.companyDetails || {};
+            details[parts[1]] = input.value.trim();
+            Storage.updateClient(client.id, { companyDetails: details });
+          }
+        }, 400);
+      });
+    });
+  },
+
+  // ── Ontology Tab ──
+  setupOntologyListeners() {
+    document.getElementById('ccAddEntityBtn')?.addEventListener('click', () => this.addEntity());
+    document.getElementById('ccNewEntityName')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') this.addEntity();
+    });
+  },
+
+  addEntity() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const type = document.getElementById('ccNewEntityType').value;
+    const name = document.getElementById('ccNewEntityName').value.trim();
+    const desc = document.getElementById('ccNewEntityDesc').value.trim();
+
+    if (!name) return;
+
+    const entities = client.brandEntities || [];
+    entities.push({
+      id: Storage.uuid(),
+      type,
+      name,
+      description: desc,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    });
+
+    Storage.updateClient(client.id, { brandEntities: entities });
+
+    document.getElementById('ccNewEntityName').value = '';
+    document.getElementById('ccNewEntityDesc').value = '';
+    this.renderOntologyTab();
+    this.renderCategoriesTab();
+  },
+
+  deleteEntity(entityId) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const entities = (client.brandEntities || []).filter(e => e.id !== entityId);
+    // Also clean up product-level category mappings
+    const mappings = client.categoryMappings || { company: [], products: {} };
+    delete mappings.products[entityId];
+
+    Storage.updateClient(client.id, { brandEntities: entities, categoryMappings: mappings });
+    this.renderOntologyTab();
+    this.renderCategoriesTab();
+  },
+
+  // ── Category Management Helpers ──
+  addCategoryMapping(targetType, entityId) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const prefix = targetType === 'company' ? 'ccCompany' : `ccProd_${entityId}`;
+    const industryEl = document.getElementById(`${prefix}_industry`);
+    const sectorEl = document.getElementById(`${prefix}_sector`);
+    const categoryEl = document.getElementById(`${prefix}_category`);
+    const customEl = document.getElementById(`${prefix}_custom`);
+    const flagEl = document.getElementById(`${prefix}_flag`);
+
+    const industry = industryEl?.value || '';
+    const sector = sectorEl?.value || '';
+    const category = categoryEl?.value || '';
+    const customCat = customEl?.value.trim() || '';
+    const createFlag = flagEl?.checked || false;
+
+    if (!industry) return;
+
+    const path = [industry];
+    if (sector) path.push(sector);
+    if (category) path.push(category);
+    else if (customCat) path.push(customCat);
+
+    const mappings = client.categoryMappings || { company: [], products: {} };
+
+    const entry = {
+      id: Storage.uuid(),
+      taxonomyPath: path,
+      createFlag,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (targetType === 'company') {
+      mappings.company.push(entry);
+    } else {
+      if (!mappings.products[entityId]) mappings.products[entityId] = [];
+      mappings.products[entityId].push(entry);
+    }
+
+    Storage.updateClient(client.id, { categoryMappings: mappings });
+    this.renderCategoriesTab();
+  },
+
+  removeCategoryMapping(targetType, entityId, mappingId) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const mappings = client.categoryMappings || { company: [], products: {} };
+
+    if (targetType === 'company') {
+      mappings.company = mappings.company.filter(m => m.id !== mappingId);
+    } else {
+      if (mappings.products[entityId]) {
+        mappings.products[entityId] = mappings.products[entityId].filter(m => m.id !== mappingId);
+      }
+    }
+
+    Storage.updateClient(client.id, { categoryMappings: mappings });
+    this.renderCategoriesTab();
+  },
+
+  toggleCreateFlag(targetType, entityId, mappingId) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const mappings = client.categoryMappings || { company: [], products: {} };
+
+    let list;
+    if (targetType === 'company') {
+      list = mappings.company;
+    } else {
+      list = mappings.products[entityId] || [];
+    }
+
+    const item = list.find(m => m.id === mappingId);
+    if (item) item.createFlag = !item.createFlag;
+
+    Storage.updateClient(client.id, { categoryMappings: mappings });
+    this.renderCategoriesTab();
+  },
+
+  // ── Render Methods ──
+  renderAll() {
+    const client = Storage.getActiveClient();
+    const noClient = document.getElementById('ccNoClient');
+    const panels = document.querySelectorAll('.cc-panel');
+
+    if (!client) {
+      noClient.style.display = 'flex';
+      panels.forEach(p => p.style.display = 'none');
+      return;
+    }
+
+    noClient.style.display = 'none';
+    // Show active panel
+    panels.forEach(p => {
+      p.style.display = p.classList.contains('active') ? 'block' : 'none';
+    });
+
+    this.renderDetailsTab();
+    this.renderOntologyTab();
+    this.renderCategoriesTab();
+  },
+
+  renderDetailsTab() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const details = client.companyDetails || {};
+
+    // Only update if not focused (prevents caret jump)
+    const setIfNotFocused = (id, val) => {
+      const el = document.getElementById(id);
+      if (el && document.activeElement !== el) el.value = val || '';
+    };
+
+    setIfNotFocused('ccCompanyName', client.name);
+    setIfNotFocused('ccContactName', details.contactName);
+    setIfNotFocused('ccContactEmail', details.contactEmail);
+    setIfNotFocused('ccContactPhone', details.contactPhone);
+    setIfNotFocused('ccContactRole', details.contactRole);
+  },
+
+  renderOntologyTab() {
+    const client = Storage.getActiveClient();
+    const container = document.getElementById('ccEntityList');
+    if (!client || !container) return;
+
+    const entities = client.brandEntities || [];
+
+    if (entities.length === 0) {
+      container.innerHTML = '<div class="cc-empty-cats">No brand entities yet. Add products, services, or platforms below.</div>';
+      return;
+    }
+
+    container.innerHTML = entities.map(e => `
+      <div class="cc-entity-item">
+        <span class="cc-entity-type">${this.esc(e.type)}</span>
+        <span class="cc-entity-name">${this.esc(e.name)}</span>
+        <span class="cc-entity-desc">${this.esc(e.description || '')}</span>
+        <div class="cc-entity-actions">
+          <button class="cc-icon-btn danger" onclick="clientConfig.deleteEntity('${e.id}')" title="Remove">
+            <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderCategoriesTab() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const mappings = client.categoryMappings || { company: [], products: {} };
+    const entities = client.brandEntities || [];
+
+    // Company-level
+    const companyContainer = document.getElementById('ccCompanyCats');
+    if (companyContainer) {
+      companyContainer.innerHTML = `
+        <div class="cc-cat-section-header">
+          <div class="cc-cat-section-title">Company-Level Categories</div>
+        </div>
+        ${this.renderTagList(mappings.company, 'company', null)}
+        ${this.renderCategoryPicker('company', null)}
+      `;
+    }
+
+    // Product-level
+    const productContainer = document.getElementById('ccProductCats');
+    if (productContainer) {
+      if (entities.length === 0) {
+        productContainer.innerHTML = `
+          <div class="cc-section-title" style="margin-bottom:0.25rem;">Product-Level Categories</div>
+          <div class="cc-section-desc">Add brand entities in the Brand Ontology tab first, then map them to categories here.</div>
+        `;
+        return;
+      }
+
+      let html = '<div class="cc-section-title" style="margin-bottom:1rem;">Product-Level Categories</div>';
+
+      entities.forEach(entity => {
+        const productMappings = mappings.products[entity.id] || [];
+        html += `
+          <div class="cc-cat-section">
+            <div class="cc-entity-subhead">
+              <span class="cc-entity-subhead-type">${this.esc(entity.type)}</span>
+              <span class="cc-entity-subhead-name">${this.esc(entity.name)}</span>
+            </div>
+            ${this.renderTagList(productMappings, 'product', entity.id)}
+            ${this.renderCategoryPicker('product', entity.id)}
+          </div>
+        `;
+      });
+
+      productContainer.innerHTML = html;
+    }
+
+    this.setupCategoryPickerListeners();
+  },
+
+  renderTagList(mappings, targetType, entityId) {
+    if (!mappings || mappings.length === 0) {
+      return '<div class="cc-empty-cats">No categories mapped yet.</div>';
+    }
+
+    return `<div class="cc-cat-tag-list">${mappings.map(m => {
+      const path = m.taxonomyPath || [];
+      const leaf = path[path.length - 1] || '';
+      const parents = path.slice(0, -1).join(' → ');
+
+      return `
+        <div class="cc-cat-tag">
+          ${parents ? `<span class="cc-cat-path">${this.esc(parents)} →</span>` : ''}
+          <span class="cc-cat-leaf">${this.esc(leaf)}</span>
+          ${m.createFlag ? '<span class="cc-create-flag">Create Category</span>' : ''}
+          <button class="cc-remove-tag" onclick="clientConfig.removeCategoryMapping('${targetType}', ${entityId ? `'${entityId}'` : 'null'}, '${m.id}')" title="Remove">
+            <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      `;
+    }).join('')}</div>`;
+  },
+
+  renderCategoryPicker(targetType, entityId) {
+    const prefix = targetType === 'company' ? 'ccCompany' : `ccProd_${entityId}`;
+
+    return `
+      <div class="cc-cat-picker">
+        <div class="cc-cat-picker-row">
+          <div class="cc-form-group">
+            <label class="cc-form-label">Industry</label>
+            <select class="cc-form-input cc-industry-select" id="${prefix}_industry" data-prefix="${prefix}">
+              <option value="">Select…</option>
+              ${Object.keys(this.taxonomy).map(i => `<option value="${this.esc(i)}">${this.esc(i)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-form-label">Sector</label>
+            <select class="cc-form-input cc-sector-select" id="${prefix}_sector" data-prefix="${prefix}" disabled>
+              <option value="">Select industry first…</option>
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-form-label">Category</label>
+            <select class="cc-form-input" id="${prefix}_category" disabled>
+              <option value="">Select sector first…</option>
+            </select>
+          </div>
+        </div>
+        <div class="cc-cat-picker-row">
+          <div class="cc-form-group" style="flex:1;">
+            <label class="cc-form-label">Or Custom Category</label>
+            <input type="text" class="cc-form-input" id="${prefix}_custom" placeholder="Enter new category name" />
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+          <div class="cc-create-flag-toggle">
+            <input type="checkbox" id="${prefix}_flag" />
+            <label for="${prefix}_flag">Potential to create a new category here</label>
+          </div>
+          <button class="cc-btn cc-btn-pink" onclick="clientConfig.addCategoryMapping('${targetType}', ${entityId ? `'${entityId}'` : 'null'})">Add Mapping</button>
+        </div>
+      </div>
+    `;
+  },
+
+  setupCategoryPickerListeners() {
+    // Industry → Sector cascading
+    document.querySelectorAll('.cc-industry-select').forEach(select => {
+      select.addEventListener('change', (e) => {
+        const prefix = e.target.getAttribute('data-prefix');
+        const industry = e.target.value;
+        const sectorEl = document.getElementById(`${prefix}_sector`);
+        const catEl = document.getElementById(`${prefix}_category`);
+
+        if (!industry) {
+          sectorEl.innerHTML = '<option value="">Select industry first…</option>';
+          sectorEl.disabled = true;
+          catEl.innerHTML = '<option value="">Select sector first…</option>';
+          catEl.disabled = true;
+          return;
+        }
+
+        const sectors = this.taxonomy[industry] || {};
+        sectorEl.innerHTML = '<option value="">Select…</option>' +
+          Object.keys(sectors).map(s => `<option value="${this.esc(s)}">${this.esc(s)}</option>`).join('');
+        sectorEl.disabled = false;
+
+        catEl.innerHTML = '<option value="">Select sector first…</option>';
+        catEl.disabled = true;
+      });
+    });
+
+    // Sector → Category cascading
+    document.querySelectorAll('.cc-sector-select').forEach(select => {
+      select.addEventListener('change', (e) => {
+        const prefix = e.target.getAttribute('data-prefix');
+        const industryEl = document.getElementById(`${prefix}_industry`);
+        const catEl = document.getElementById(`${prefix}_category`);
+
+        const industry = industryEl?.value || '';
+        const sector = e.target.value;
+
+        if (!sector || !industry) {
+          catEl.innerHTML = '<option value="">Select sector first…</option>';
+          catEl.disabled = true;
+          return;
+        }
+
+        const cats = (this.taxonomy[industry] || {})[sector] || [];
+        catEl.innerHTML = '<option value="">Select…</option>' +
+          cats.map(c => `<option value="${this.esc(c)}">${this.esc(c)}</option>`).join('');
+        catEl.disabled = false;
+      });
+    });
+  },
+
+  // ── Utility ──
+  esc(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  },
+};
+</script>

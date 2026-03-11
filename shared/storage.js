@@ -125,6 +125,20 @@ const Storage = {
       industryFilterMode: 'user',   // 'user' | 'random' | 'fixed'
       industryFilterValue: '',       // used when mode is 'fixed'
       pptxExportEnabled: false,      // Some Day Maybe: enable PPTX export for this client
+      // Company details
+      companyDetails: {
+        contactName: '',
+        contactEmail: '',
+        contactPhone: '',
+        contactRole: '',
+      },
+      // Brand ontology — products, services, etc.
+      brandEntities: [],
+      // Category mappings — industry/sector/category at company + product level
+      categoryMappings: {
+        company: [],  // [{taxonomyPath: ['Tech','Cybersecurity','SIEM'], createFlag: false, ...}]
+        products: {}, // { entityId: [{taxonomyPath: [...], createFlag: false}] }
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
