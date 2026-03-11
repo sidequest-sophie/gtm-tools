@@ -1578,6 +1578,207 @@
   .ns-tool-body.hidden {
     display: none;
   }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     VISUAL POLISH: Transitions & Micro-interactions
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  /* Smooth tab content transitions */
+  .ns-tab-content {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .ns-tab-content.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Focus ring for all interactive elements */
+  .ns-tab-btn:focus-visible,
+  .ns-settings-btn:focus-visible,
+  .ns-client-selector:focus-visible,
+  .ns-settings-close:focus-visible {
+    outline: 2px solid var(--pink);
+    outline-offset: 2px;
+  }
+
+  /* Smooth hover on grid cells */
+  .ns-matrix-cell,
+  .ns-mapping-cell,
+  .ns-proposed-cell {
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  /* Audit items — subtle enter animation */
+  .ns-audit-item {
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .ns-audit-item:hover {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  /* Problem cards hover lift */
+  .ns-problem-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .ns-problem-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  /* Settings panel slide-in polish */
+  .ns-settings-overlay {
+    transition: opacity 0.25s ease;
+  }
+
+  .ns-settings-panel {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     RESPONSIVE: Tablet (768px)
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  @media (max-width: 768px) {
+    /* Header stacks */
+    .ns-header {
+      flex-wrap: wrap;
+      padding: var(--spacing-md) var(--spacing-lg);
+      gap: var(--spacing-sm);
+    }
+
+    .ns-header-left {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .ns-title {
+      font-size: 1.25rem;
+    }
+
+    /* Tabs scroll horizontally */
+    .ns-tabs {
+      gap: 1rem;
+      padding: 0 var(--spacing-lg);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .ns-tab-btn {
+      font-size: 0.8rem;
+      padding: 0.75rem 0;
+    }
+
+    /* Content area tighter padding */
+    .ns-content {
+      padding: var(--spacing-lg);
+    }
+
+    /* Grids become scrollable horizontally */
+    .ns-matrix,
+    .ns-mapping-grid,
+    .ns-proposed-grid {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      min-width: 0;
+    }
+
+    /* Row labels narrower */
+    .ns-matrix-row-label,
+    .ns-mapping-row-label {
+      font-size: 0.7rem;
+      min-width: 80px;
+    }
+
+    /* Matrix cells smaller text */
+    .ns-matrix-cell,
+    .ns-mapping-cell,
+    .ns-proposed-cell {
+      font-size: 0.75rem;
+      padding: var(--spacing-sm);
+      min-width: 100px;
+    }
+
+    /* Audit grid single column */
+    .ns-audit-sections {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Settings panel full width on tablet */
+    .ns-settings-panel {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* Welcome page */
+    .ns-welcome {
+      padding: var(--spacing-xl) var(--spacing-lg);
+    }
+
+    .ns-welcome-steps {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ────────────────────────────────────────────────────────────────────────────
+     RESPONSIVE: Mobile (480px)
+     ──────────────────────────────────────────────────────────────────────────── */
+
+  @media (max-width: 480px) {
+    .ns-header {
+      padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .ns-title {
+      font-size: 1.1rem;
+    }
+
+    .ns-client-selector {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+    }
+
+    .ns-tabs {
+      gap: 0.75rem;
+      padding: 0 var(--spacing-md);
+    }
+
+    .ns-tab-btn {
+      font-size: 0.75rem;
+    }
+
+    .ns-content {
+      padding: var(--spacing-md);
+    }
+
+    /* Welcome page single column steps */
+    .ns-welcome-steps {
+      grid-template-columns: 1fr;
+    }
+
+    .ns-welcome h2 {
+      font-size: 1.25rem;
+    }
+
+    /* Problem cards tighter on mobile */
+    .ns-problem-card {
+      padding: var(--spacing-md);
+    }
+
+    /* Proposed grid scroll */
+    .ns-proposed-grid {
+      min-width: 400px;
+    }
+
+    /* Settings panel uses full height */
+    .ns-settings-panel {
+      height: 100%;
+      border-radius: 0;
+    }
+  }
 </style>
 
 <!-- ────────────────────────────────────────────────────────────────────────────
