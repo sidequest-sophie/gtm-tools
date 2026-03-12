@@ -473,12 +473,18 @@ window.clientManagement = {
 
   managingClientId: null,
 
-  init() {
-    this.renderTable();
+  async init() {
+    await this.renderTable();
   },
 
   // ── Ensure client has status/toolAccess fields (backfill) ──
   ensureFields(client) {
+    // Normalise Supabase snake_case → camelCase for template use
+    if (client.tool_access && !client.toolAccess) client.toolAccess = client.tool_access;
+    if (client.company_details && !client.companyDetails) client.companyDetails = client.company_details;
+    if (client.brand_entities && !client.brandEntities) client.brandEntities = client.brand_entities;
+    if (client.category_mappings && !client.categoryMappings) client.categoryMappings = client.category_mappings;
+
     let updated = false;
     if (!client.status) {
       client.status = 'enabled';
@@ -496,7 +502,7 @@ window.clientManagement = {
         updated = true;
       }
     });
-    if (updated) {
+    if (updated && !Storage.isSupabase()) {
       Storage.updateClient(client.id, { status: client.status, toolAccess: client.toolAccess });
     }
     return client;
@@ -523,8 +529,8 @@ window.clientManagement = {
     this.renderTable();
   },
 
-  renderTable() {
-    const clients = Storage.getClients();
+  async renderTable() {
+    const clients = Storage.isSupabase() ? await Storage.getClientsAsync() : Storage.getClients();
 
     // Header
     const thead = document.getElementById('cmTableHead');
@@ -584,9 +590,16 @@ window.clientManagement = {
   // ═══════════════════════════════════════════════════
   // MANAGE VIEW (per-client)
   // ═══════════════════════════════════════════════════
-  showManage(clientId) {
-    const clients = Storage.getClients();
-    const client = clients.find(c => c.id === clientId);
+  async showManage(clientId) {
+    let client;
+    if (Storage.isSupabase()) {
+      client = await Storage.getActiveClientAsync.call(Storage);
+      // Actually fetch the specific client
+      try { client = await Auth.getClientById(clientId); } catch(e) { console.error(e); }
+    } else {
+      const clients = Storage.getClients();
+      client = clients.find(c => c.id === clientId);
+    }
     if (!client) return;
 
     this.ensureFields(client);
@@ -597,6 +610,7 @@ window.clientManagement = {
     document.getElementById('cmManageName').textContent = client.name;
 
     this.renderManage(client);
+    this.loadClientUsers(clientId);
   },
 
   renderManage(client) {
@@ -646,6 +660,23 @@ window.clientManagement = {
             <input type="checkbox" ${client.status === 'enabled' ? 'checked' : ''} onchange="clientManagement.toggleStatus('${client.id}', this.checked)" />
             <span class="cm-toggle-slider"></span>
           </label>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div class="cm-manage-card">
+        <div class="cm-manage-card-title">Users</div>
+        <div class="cm-manage-card-desc">People with access to this client account.</div>
+        <div id="cmUsersPanel">
+          <div style="font-size:0.82rem; color:#9ca3af; font-style:italic;">Loading users…</div>
+        </div>
+        <div style="margin-top:0.75rem; display:flex; gap:0.5rem; align-items:center;">
+          <input type="email" id="cmInviteEmail" placeholder="Email address" class="cm-invite-input" style="flex:1; padding:0.45rem 0.6rem; border:1px solid #e5e7eb; border-radius:6px; font-size:0.82rem; font-family:Inter,sans-serif;" />
+          <select id="cmInviteRole" style="padding:0.45rem 0.5rem; border:1px solid #e5e7eb; border-radius:6px; font-size:0.82rem; font-family:Inter,sans-serif;">
+            <option value="member">Member</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button onclick="clientManagement.inviteUser('${client.id}')" style="padding:0.45rem 0.75rem; background:#d02090; color:#fff; border:none; border-radius:6px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:Inter,sans-serif; white-space:nowrap;">Invite</button>
         </div>
       </div>
 
@@ -731,22 +762,117 @@ window.clientManagement = {
   },
 
   // ── Toggle Handlers ──
-  toggleStatus(clientId, enabled) {
-    Storage.updateClient(clientId, { status: enabled ? 'enabled' : 'disabled' });
-    // Refresh the manage view
-    const clients = Storage.getClients();
-    const client = clients.find(c => c.id === clientId);
-    if (client) this.renderManage(client);
+  async toggleStatus(clientId, enabled) {
+    if (Storage.isSupabase()) {
+      await Storage.updateClientAsync(clientId, { status: enabled ? 'enabled' : 'disabled' });
+      const client = await Auth.getClientById(clientId);
+      if (client) this.renderManage(client);
+    } else {
+      Storage.updateClient(clientId, { status: enabled ? 'enabled' : 'disabled' });
+      const clients = Storage.getClients();
+      const client = clients.find(c => c.id === clientId);
+      if (client) this.renderManage(client);
+    }
   },
 
-  toggleTool(clientId, toolId, enabled) {
-    const clients = Storage.getClients();
-    const client = clients.find(c => c.id === clientId);
-    if (!client) return;
+  async toggleTool(clientId, toolId, enabled) {
+    if (Storage.isSupabase()) {
+      const client = await Auth.getClientById(clientId);
+      if (!client) return;
+      const toolAccess = client.tool_access || client.toolAccess || {};
+      toolAccess[toolId] = enabled;
+      await Storage.updateClientAsync(clientId, { toolAccess });
+    } else {
+      const clients = Storage.getClients();
+      const client = clients.find(c => c.id === clientId);
+      if (!client) return;
+      const toolAccess = client.toolAccess || {};
+      toolAccess[toolId] = enabled;
+      Storage.updateClient(clientId, { toolAccess });
+    }
+  },
 
-    const toolAccess = client.toolAccess || {};
-    toolAccess[toolId] = enabled;
-    Storage.updateClient(clientId, { toolAccess });
+  // ── User Management ──
+
+  async loadClientUsers(clientId) {
+    const panel = document.getElementById('cmUsersPanel');
+    if (!Storage.isSupabase()) {
+      panel.innerHTML = '<div style="font-size:0.82rem; color:#9ca3af; font-style:italic;">User management requires sign-in. Using local storage.</div>';
+      return;
+    }
+    try {
+      const users = await Auth.getClientUsers(clientId);
+      this.renderUsersPanel(users);
+    } catch (err) {
+      console.error('loadClientUsers error:', err);
+      panel.innerHTML = '<div style="font-size:0.82rem; color:#dc2626;">Failed to load users.</div>';
+    }
+  },
+
+  renderUsersPanel(users) {
+    const panel = document.getElementById('cmUsersPanel');
+    if (!users || users.length === 0) {
+      panel.innerHTML = '<div style="font-size:0.82rem; color:#9ca3af; font-style:italic;">No users assigned yet.</div>';
+      return;
+    }
+
+    const roleBadge = (role) => {
+      const colours = { owner: '#104060', admin: '#d02090', member: '#059669' };
+      const bg = { owner: 'rgba(16,64,96,0.08)', admin: 'rgba(208,32,144,0.08)', member: 'rgba(5,150,105,0.08)' };
+      return `<span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; padding:0.15rem 0.45rem; border-radius:4px; background:${bg[role]||bg.member}; color:${colours[role]||colours.member};">${this.esc(role)}</span>`;
+    };
+
+    panel.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        ${users.map(u => {
+          const p = u.profile || {};
+          const name = p.display_name || p.email || 'Unknown';
+          const email = p.email || '';
+          const accepted = u.accepted_at ? 'Active' : 'Pending';
+          const statusColour = u.accepted_at ? '#059669' : '#f59e0b';
+          return `<div style="display:flex; align-items:center; justify-content:space-between; padding:0.45rem 0; border-bottom:1px solid #f3f4f6;">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <div style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, rgba(16,64,96,0.12), rgba(208,32,144,0.12)); display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:#104060;">${this.esc(name.charAt(0).toUpperCase())}</div>
+              <div>
+                <div style="font-size:0.85rem; font-weight:500; color:#374151;">${this.esc(name)}</div>
+                ${email ? `<div style="font-size:0.72rem; color:#9ca3af;">${this.esc(email)}</div>` : ''}
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              ${roleBadge(u.role)}
+              <span style="font-size:0.7rem; color:${statusColour}; font-weight:500;">${accepted}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  async inviteUser(clientId) {
+    const emailInput = document.getElementById('cmInviteEmail');
+    const roleSelect = document.getElementById('cmInviteRole');
+    const email = (emailInput.value || '').trim();
+    const role = roleSelect.value;
+
+    if (!email) {
+      emailInput.style.borderColor = '#dc2626';
+      return;
+    }
+    emailInput.style.borderColor = '#e5e7eb';
+
+    if (!Storage.isSupabase()) {
+      alert('User invitations require Supabase. Please sign in first.');
+      return;
+    }
+
+    try {
+      await Auth.inviteUser(clientId, email, role);
+      emailInput.value = '';
+      await this.loadClientUsers(clientId);
+    } catch (err) {
+      console.error('inviteUser error:', err);
+      alert('Invite failed: ' + (err.message || 'Unknown error'));
+    }
   },
 };
 </script>

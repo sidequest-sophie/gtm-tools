@@ -1,10 +1,39 @@
 /**
  * Storage Module
- * Wrapper for localStorage with namespace, JSON serialization, and domain-specific helpers
+ * Hybrid storage layer — uses Supabase when authenticated, localStorage as fallback.
+ * All client data methods work seamlessly with both backends.
  */
 
 const Storage = {
   _prefix: 'cl-tools-',
+  _mode: 'local', // 'local' | 'supabase'
+  _activeClientId: null,
+  _clientsCache: null,
+  _cacheTime: 0,
+  _cacheTTL: 5000, // 5s cache
+
+  /**
+   * Switch to Supabase mode (called after auth)
+   */
+  useSupabase() {
+    this._mode = 'supabase';
+    this._clientsCache = null;
+  },
+
+  /**
+   * Switch to localStorage mode (fallback)
+   */
+  useLocal() {
+    this._mode = 'local';
+    this._clientsCache = null;
+  },
+
+  /**
+   * Check if we're using Supabase
+   */
+  isSupabase() {
+    return this._mode === 'supabase' && typeof Auth !== 'undefined' && Auth.isAuthenticated();
+  },
 
   /**
    * Generate a UUID v4
@@ -17,9 +46,8 @@ const Storage = {
     });
   },
 
-  /**
-   * Get a value from localStorage
-   */
+  // ── Low-level localStorage helpers ──────────────────────
+
   get(key) {
     try {
       const item = localStorage.getItem(this._prefix + key);
@@ -30,9 +58,6 @@ const Storage = {
     }
   },
 
-  /**
-   * Set a value in localStorage
-   */
   set(key, value) {
     try {
       localStorage.setItem(this._prefix + key, JSON.stringify(value));
@@ -41,9 +66,6 @@ const Storage = {
     }
   },
 
-  /**
-   * Delete a value from localStorage
-   */
   delete(key) {
     try {
       localStorage.removeItem(this._prefix + key);
@@ -52,9 +74,6 @@ const Storage = {
     }
   },
 
-  /**
-   * Clear all namespaced items from localStorage
-   */
   clear() {
     try {
       const keysToRemove = [];
@@ -70,42 +89,95 @@ const Storage = {
     }
   },
 
+  // ── Client operations (hybrid) ──────────────────────────
+
   /**
-   * Get all clients from storage
+   * Get all clients
+   */
+  async getClientsAsync() {
+    if (this.isSupabase()) {
+      // Check cache
+      if (this._clientsCache && (Date.now() - this._cacheTime) < this._cacheTTL) {
+        return this._clientsCache;
+      }
+      try {
+        const profile = Auth.getProfile();
+        let clients;
+
+        if (profile?.role === 'superadmin') {
+          // Superadmin sees all clients
+          clients = await Auth.getAllClients();
+        } else {
+          // Regular users see their clients via join table
+          const memberships = await Auth.getUserClients();
+          clients = memberships.map(m => ({
+            ...m.client,
+            _memberRole: m.role,
+          }));
+        }
+
+        this._clientsCache = clients || [];
+        this._cacheTime = Date.now();
+        return this._clientsCache;
+      } catch (err) {
+        console.error('Storage.getClientsAsync Supabase error:', err);
+        return [];
+      }
+    }
+    // Fallback to localStorage
+    const clients = this.get('clients');
+    return Array.isArray(clients) ? clients : [];
+  },
+
+  /**
+   * Sync getter (localStorage only — used by legacy code)
    */
   getClients() {
     const clients = this.get('clients');
     return Array.isArray(clients) ? clients : [];
   },
 
-  /**
-   * Set clients in storage
-   */
   setClients(clients) {
     this.set('clients', clients);
   },
 
-  /**
-   * Get the ID of the currently active client
-   */
   getActiveClientId() {
+    if (this._activeClientId) return this._activeClientId;
     return this.get('active-client-id') || null;
   },
 
-  /**
-   * Set the ID of the currently active client
-   */
   setActiveClientId(id) {
+    this._activeClientId = id;
     this.set('active-client-id', id);
   },
 
   /**
-   * Get the active client object (convenience helper)
+   * Get the active client (async — works with Supabase)
+   */
+  async getActiveClientAsync() {
+    const activeId = this.getActiveClientId();
+    if (!activeId) return null;
+
+    if (this.isSupabase()) {
+      try {
+        return await Auth.getClientById(activeId);
+      } catch (err) {
+        console.error('Storage.getActiveClientAsync error:', err);
+        return null;
+      }
+    }
+
+    // Fallback to localStorage
+    const clients = this.getClients();
+    return clients.find((c) => c.id === activeId) || null;
+  },
+
+  /**
+   * Sync getter (localStorage only — legacy code)
    */
   getActiveClient() {
     const activeId = this.getActiveClientId();
     if (!activeId) return null;
-
     const clients = this.getClients();
     return clients.find((c) => c.id === activeId) || null;
   },
@@ -120,14 +192,13 @@ const Storage = {
       categories: ['Company', 'Brands', 'Products', 'Services', 'Features', 'Content'],
       items: {},
       problems: [],
-      industryJargonEnabled: false,  // Show Industry Jargon column in grids (off by default)
-      maxCompanyItems: 0,            // 0 = unlimited; admin cap on items per client
-      industryFilterMode: 'user',   // 'user' | 'random' | 'fixed'
-      industryFilterValue: '',       // used when mode is 'fixed'
-      pptxExportEnabled: false,      // Some Day Maybe: enable PPTX export for this client
-      // Company details
-      status: 'enabled',     // 'enabled' | 'disabled'  — admin toggle
-      toolAccess: {          // per-tool access flags (true = enabled)
+      industryJargonEnabled: false,
+      maxCompanyItems: 0,
+      industryFilterMode: 'user',
+      industryFilterValue: '',
+      pptxExportEnabled: false,
+      status: 'enabled',
+      toolAccess: {
         'naming-strategy': true,
         'branding-style': true,
         'messaging': true,
@@ -135,26 +206,23 @@ const Storage = {
         'sales-enablement': true,
         'roi-calculator': true,
       },
-      logo: '',              // base64 data URL for company logo
-      vertical: '',          // primary industry vertical
+      logo: '',
+      vertical: '',
       companyDetails: {
         contactName: '',
         contactEmail: '',
         contactPhone: '',
         contactRole: '',
       },
-      // Brand ontology — products, services, etc.
       brandEntities: [],
-      // Category mappings — industry/sector/category at company + product level
       categoryMappings: {
-        company: [],  // [{taxonomyPath: ['Tech','Cybersecurity','SIEM'], createFlag: false, ...}]
-        products: {}, // { entityId: [{taxonomyPath: [...], createFlag: false}] }
+        company: [],
+        products: {},
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    // Initialize items object with empty arrays for each category
     client.categories.forEach((category) => {
       client.items[category] = [];
     });
@@ -163,40 +231,88 @@ const Storage = {
   },
 
   /**
-   * Add a client and optionally set it as active
+   * Add a client (async-aware)
+   */
+  async addClientAsync(name = 'New Client', setActive = true) {
+    if (this.isSupabase()) {
+      try {
+        const client = await Auth.createClientWithOwner(name);
+        this._clientsCache = null; // bust cache
+        if (setActive) this.setActiveClientId(client.id);
+        return client;
+      } catch (err) {
+        console.error('Storage.addClientAsync error:', err);
+        return null;
+      }
+    }
+    // Fallback
+    return this.addClient(name, setActive);
+  },
+
+  /**
+   * Sync add (localStorage only)
    */
   addClient(name = 'New Client', setActive = true) {
     const client = this.createClient(name);
     const clients = this.getClients();
     clients.push(client);
     this.setClients(clients);
-
-    if (setActive) {
-      this.setActiveClientId(client.id);
-    }
-
+    if (setActive) this.setActiveClientId(client.id);
     return client;
   },
 
   /**
-   * Update an existing client
+   * Update client (async-aware)
+   */
+  async updateClientAsync(id, updates) {
+    if (this.isSupabase()) {
+      try {
+        // Map flat fields to Supabase column naming
+        const supaUpdates = {};
+        const fieldMap = {
+          name: 'name',
+          status: 'status',
+          logo: 'logo',
+          vertical: 'vertical',
+          companyDetails: 'company_details',
+          brandEntities: 'brand_entities',
+          categoryMappings: 'category_mappings',
+          categories: 'categories',
+          items: 'items',
+          problems: 'problems',
+          toolAccess: 'tool_access',
+          settings: 'settings',
+        };
+
+        for (const [jsKey, dbKey] of Object.entries(fieldMap)) {
+          if (updates.hasOwnProperty(jsKey)) {
+            supaUpdates[dbKey] = updates[jsKey];
+          }
+        }
+
+        const result = await Auth.updateClientRecord(id, supaUpdates);
+        this._clientsCache = null; // bust cache
+        return result;
+      } catch (err) {
+        console.error('Storage.updateClientAsync error:', err);
+        return null;
+      }
+    }
+    return this.updateClient(id, updates);
+  },
+
+  /**
+   * Sync update (localStorage only)
    */
   updateClient(id, updates) {
     const clients = this.getClients();
     const index = clients.findIndex((c) => c.id === id);
-
     if (index === -1) {
       console.warn('Client not found:', id);
       return null;
     }
-
     const client = clients[index];
-    clients[index] = {
-      ...client,
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
-
+    clients[index] = { ...client, ...updates, updatedAt: new Date().toISOString() };
     this.setClients(clients);
     return clients[index];
   },
@@ -208,85 +324,52 @@ const Storage = {
     const clients = this.getClients();
     const filtered = clients.filter((c) => c.id !== id);
     this.setClients(filtered);
-
-    // If the deleted client was active, clear the active selection
     if (this.getActiveClientId() === id) {
       this.setActiveClientId(null);
     }
   },
 
-  /**
-   * Get items for a specific category in the active client
-   */
+  // ── Item / Problem helpers (localStorage — migrated tools use these) ──
+
   getItemsForCategory(category) {
     const client = this.getActiveClient();
     if (!client) return [];
-
     return client.items[category] || [];
   },
 
-  /**
-   * Add an item to a category in the active client
-   */
   addItemToCategory(category, name, cell = '') {
     const client = this.getActiveClient();
     if (!client) return null;
 
-    const item = {
-      id: this.uuid(),
-      name: name,
-      cell: cell,
-    };
-
-    if (!client.items[category]) {
-      client.items[category] = [];
-    }
-
+    const item = { id: this.uuid(), name: name, cell: cell };
+    if (!client.items[category]) client.items[category] = [];
     client.items[category].push(item);
     this.updateClient(client.id, client);
-
     return item;
   },
 
-  /**
-   * Delete an item from a category in the active client
-   */
   deleteItemFromCategory(category, itemId) {
     const client = this.getActiveClient();
     if (!client) return;
-
     if (client.items[category]) {
       client.items[category] = client.items[category].filter((item) => item.id !== itemId);
       this.updateClient(client.id, client);
     }
   },
 
-  /**
-   * Add a problem to the active client
-   */
   addProblem(problem) {
     const client = this.getActiveClient();
     if (!client) return null;
 
-    const item = {
-      id: this.uuid(),
-      text: problem,
-      createdAt: new Date().toISOString(),
-    };
-
+    const item = { id: this.uuid(), text: problem, createdAt: new Date().toISOString() };
     client.problems.push(item);
     this.updateClient(client.id, client);
-
     return item;
   },
 
-  /**
-   * Delete a problem from the active client
-   */
   deleteProblem(problemId) {
     const client = this.getActiveClient();
     if (!client) return;
-
     client.problems = client.problems.filter((p) => p.id !== problemId);
     this.updateClient(client.id, client);
   },
