@@ -39,30 +39,6 @@
     margin: 0;
   }
 
-  .ns-client-selector {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: 0.5rem 1rem;
-    background: var(--gray-100);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--navy);
-  }
-
-  .ns-client-selector:hover {
-    background: var(--gray-200);
-    border-color: var(--gray-300);
-  }
-
-  .ns-client-selector.empty {
-    color: var(--gray-500);
-  }
-
   .ns-settings-btn {
     background: none;
     border: none;
@@ -365,47 +341,56 @@
     font-weight: 600;
   }
 
-  .ns-textarea {
-    width: 100%;
-    min-height: 56px;
-    padding: var(--spacing-sm) var(--spacing-md);
+  .ns-lozenges {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 6px;
+    margin-bottom: var(--spacing-sm);
+    min-height: 36px;
+  }
+
+  .ns-add-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: var(--spacing-xs, 0.25rem);
+  }
+
+  .ns-add-input {
+    flex: 1;
+    padding: 0.45rem 0.75rem;
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-md);
     font-family: inherit;
-    font-size: 0.9rem;
-    resize: vertical;
-    margin-bottom: var(--spacing-sm);
+    font-size: 0.85rem;
+    transition: border-color 0.15s ease;
   }
 
-  .ns-textarea::placeholder {
+  .ns-add-input:focus {
+    outline: none;
+    border-color: #d02090;
+    box-shadow: 0 0 0 3px rgba(208, 32, 144, 0.08);
+  }
+
+  .ns-add-input::placeholder {
     color: var(--gray-400);
   }
 
   .ns-add-btn {
     background: var(--navy);
     color: var(--white);
-    padding: 0.5rem 1rem;
+    padding: 0.45rem 1rem;
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
     transition: all 0.2s ease;
-    width: 100%;
+    white-space: nowrap;
   }
 
   .ns-add-btn:hover {
     background: var(--navy-dark);
-  }
-
-  .ns-lozenges {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    gap: 6px;
-    margin-top: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-    min-height: 90px;
   }
 
   .ns-lozenge {
@@ -1598,7 +1583,6 @@
   /* Focus ring for all interactive elements */
   .ns-tab-btn:focus-visible,
   .ns-settings-btn:focus-visible,
-  .ns-client-selector:focus-visible,
   .ns-settings-close:focus-visible {
     outline: 2px solid var(--pink);
     outline-offset: 2px;
@@ -1736,11 +1720,6 @@
       font-size: 1.1rem;
     }
 
-    .ns-client-selector {
-      font-size: 0.8rem;
-      padding: 0.4rem 0.75rem;
-    }
-
     .ns-tabs {
       gap: 0.75rem;
       padding: 0 var(--spacing-md);
@@ -1792,11 +1771,6 @@
     <div class="ns-header-left">
       <h1 class="ns-title">Naming Strategy</h1>
     </div>
-    <div class="ns-header-left">
-      <div class="ns-client-selector" id="nsClientSelector">
-        <span id="nsClientName">No Client Selected</span>
-      </div>
-    </div>
     <button class="ns-settings-btn" id="nsSettingsToggle" title="Settings">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
@@ -1846,7 +1820,7 @@
   <!-- Tabs -->
   <div class="ns-tabs">
     <button class="ns-tab-btn active" data-tab="examples">Examples</button>
-    <button class="ns-tab-btn" data-tab="audit">Naming Audit</button>
+    <button class="ns-tab-btn" data-tab="audit">Current Names</button>
     <button class="ns-tab-btn" data-tab="mapping">Concept Mapping</button>
     <button class="ns-tab-btn" data-tab="problems">Problems</button>
     <button class="ns-tab-btn" data-tab="proposed">Proposed Names</button>
@@ -2231,7 +2205,6 @@ window.namingStrategy = {
     document.getElementById('nsSettingsOverlay').addEventListener('click', () => this.toggleSettings());
 
     // Client selector
-    document.getElementById('nsClientSelector').addEventListener('click', () => this.toggleSettings());
 
     // Welcome CTA — opens settings to create first client
     document.getElementById('nsWelcomeStart').addEventListener('click', () => this.toggleSettings());
@@ -2580,7 +2553,7 @@ window.namingStrategy = {
     const container = document.getElementById('nsAuditContainer');
 
     if (!client) {
-      container.innerHTML = '<div class="ns-empty-state"><div class="ns-empty-state-icon">📋</div><div class="ns-empty-state-title">No Client Selected</div><div class="ns-empty-state-text">Create or select a client in Settings to start your naming audit.</div></div>';
+      container.innerHTML = '<div class="ns-empty-state"><div class="ns-empty-state-icon">📋</div><div class="ns-empty-state-title">No Client Selected</div><div class="ns-empty-state-text">Create or select a client in Settings to start adding current names.</div></div>';
       return;
     }
 
@@ -2596,8 +2569,6 @@ window.namingStrategy = {
             <div class="ns-category-title">${category}</div>
             <div class="ns-category-badge">${items.length}</div>
           </div>
-          <textarea class="ns-textarea" placeholder="Paste your client's ${category} names here (comma or newline separated)" data-category="${category}"></textarea>
-          <button class="ns-add-btn" data-add-category="${category}">Add</button>
           <div class="ns-lozenges" id="lozenges-${category}">`;
 
       items.forEach(item => {
@@ -2607,7 +2578,12 @@ window.namingStrategy = {
         </div>`;
       });
 
-      html += `</div></div>`;
+      html += `</div>
+          <div class="ns-add-row">
+            <input type="text" class="ns-add-input" placeholder="Add ${category} names (comma-separated)" data-category="${category}" />
+            <button class="ns-add-btn" data-add-category="${category}">Add</button>
+          </div>
+        </div>`;
     });
 
     html += '</div>';
@@ -2617,9 +2593,20 @@ window.namingStrategy = {
     container.querySelectorAll('[data-add-category]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const category = e.target.dataset.addCategory;
-        const textarea = e.target.previousElementSibling;
-        this.addAuditItems(category, textarea.value);
-        textarea.value = '';
+        const input = e.target.closest('.ns-add-row').querySelector('.ns-add-input');
+        this.addAuditItems(category, input.value);
+        input.value = '';
+      });
+    });
+
+    // Allow Enter key in add inputs
+    container.querySelectorAll('.ns-add-input').forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const category = input.dataset.category;
+          this.addAuditItems(category, input.value);
+          input.value = '';
+        }
       });
     });
 
@@ -3483,17 +3470,7 @@ window.namingStrategy = {
   },
 
   updateClientSelector() {
-    const client = Storage.getActiveClient();
-    const selector = document.getElementById('nsClientSelector');
-    const name = document.getElementById('nsClientName');
-
-    if (client) {
-      name.textContent = client.name;
-      selector.classList.remove('empty');
-    } else {
-      name.textContent = 'No Client Selected';
-      selector.classList.add('empty');
-    }
+    // Client name button removed — client is visible in sidebar footer
   }
 };
 
