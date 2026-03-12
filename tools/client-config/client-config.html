@@ -504,12 +504,52 @@
     <!-- TAB 1: Company Details                      -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="cc-panel active" id="ccDetails">
-      <div class="cc-section-title">Company Information</div>
-      <div class="cc-section-desc">Top-level details about this client's company.</div>
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.5rem;">
+        <div>
+          <div class="cc-section-title">Company Information</div>
+          <div class="cc-section-desc" style="margin-bottom:0;">Top-level details about this client's company.</div>
+        </div>
+        <button class="cc-btn cc-btn-outline" onclick="if(window.parent.openSetupModal) window.parent.openSetupModal(); else if(window.openSetupModal) openSetupModal();" style="white-space:nowrap; margin-top:0.15rem;">
+          <span style="font-size:0.9em;">&#9998;</span> Quick Edit
+        </button>
+      </div>
 
       <div class="cc-form-group">
         <label class="cc-form-label">Company Name</label>
         <input type="text" class="cc-form-input" id="ccCompanyName" placeholder="e.g. Acme Corp" />
+      </div>
+
+      <!-- Logo upload -->
+      <div class="cc-form-group">
+        <label class="cc-form-label">Company Logo</label>
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <div id="ccLogoPreview" style="width:48px; height:48px; border-radius:50%; background:#f3f4f6; border:2px dashed #d1d5db; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; flex-shrink:0;" onclick="document.getElementById('ccLogoFile').click();">
+            <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#9ca3af; fill:none; stroke-width:1.8;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <input type="file" id="ccLogoFile" accept="image/*" style="display:none;" />
+          <div style="font-size:0.78rem; color:#6b7280;">
+            Click to upload. PNG, JPG or SVG, max 200 KB.<br/>
+            <a id="ccRemoveLogo" style="color:#d02090; cursor:pointer; font-weight:600; display:none;">Remove logo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vertical -->
+      <div class="cc-form-group">
+        <label class="cc-form-label">Vertical / Industry</label>
+        <select class="cc-form-input" id="ccVertical" style="max-width:280px;">
+          <option value="">Select…</option>
+          <option value="Technology">Technology</option>
+          <option value="Financial Services">Financial Services</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Manufacturing">Manufacturing</option>
+          <option value="Media & Entertainment">Media &amp; Entertainment</option>
+          <option value="Professional Services">Professional Services</option>
+          <option value="Retail & E-Commerce">Retail &amp; E-Commerce</option>
+          <option value="Education">Education</option>
+          <option value="Government & Public Sector">Government &amp; Public Sector</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
 
       <hr class="cc-divider" />
@@ -642,6 +682,7 @@ const clientConfig = {
     this.setupTabs();
     this.setupDetailsListeners();
     this.setupOntologyListeners();
+    this.setupLogoUpload();
     this.renderAll();
   },
 
@@ -665,6 +706,7 @@ const clientConfig = {
   setupDetailsListeners() {
     const fields = [
       { el: 'ccCompanyName', key: 'name' },
+      { el: 'ccVertical', key: 'vertical' },
       { el: 'ccContactName', key: 'companyDetails.contactName' },
       { el: 'ccContactEmail', key: 'companyDetails.contactEmail' },
       { el: 'ccContactPhone', key: 'companyDetails.contactPhone' },
@@ -684,6 +726,9 @@ const clientConfig = {
 
           if (key === 'name') {
             Storage.updateClient(client.id, { name: input.value.trim() || 'New Client' });
+            if (typeof updateFooter === 'function') updateFooter();
+          } else if (key === 'vertical') {
+            Storage.updateClient(client.id, { vertical: input.value });
           } else {
             const parts = key.split('.');
             const details = client.companyDetails || {};
@@ -693,6 +738,58 @@ const clientConfig = {
         }, 400);
       });
     });
+  },
+
+  // ── Logo Upload ──
+  setupLogoUpload() {
+    const fileInput = document.getElementById('ccLogoFile');
+    const removeBtn = document.getElementById('ccRemoveLogo');
+
+    fileInput?.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 200 * 1024) {
+        alert('Logo must be under 200 KB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        const client = Storage.getActiveClient();
+        if (client) {
+          Storage.updateClient(client.id, { logo: dataUrl });
+          this.renderLogoPreview();
+          if (typeof updateFooter === 'function') updateFooter();
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeBtn?.addEventListener('click', () => {
+      const client = Storage.getActiveClient();
+      if (client) {
+        Storage.updateClient(client.id, { logo: '' });
+        this.renderLogoPreview();
+        if (typeof updateFooter === 'function') updateFooter();
+      }
+    });
+  },
+
+  renderLogoPreview() {
+    const client = Storage.getActiveClient();
+    const preview = document.getElementById('ccLogoPreview');
+    const removeBtn = document.getElementById('ccRemoveLogo');
+    if (!preview) return;
+
+    if (client && client.logo) {
+      preview.innerHTML = `<img src="${client.logo}" alt="" style="width:100%;height:100%;object-fit:cover;" />`;
+      preview.style.border = 'none';
+      if (removeBtn) removeBtn.style.display = 'inline';
+    } else {
+      preview.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke:#9ca3af; fill:none; stroke-width:1.8;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+      preview.style.border = '2px dashed #d1d5db';
+      if (removeBtn) removeBtn.style.display = 'none';
+    }
   },
 
   // ── Ontology Tab ──
@@ -864,10 +961,13 @@ const clientConfig = {
     };
 
     setIfNotFocused('ccCompanyName', client.name);
+    setIfNotFocused('ccVertical', client.vertical || '');
     setIfNotFocused('ccContactName', details.contactName);
     setIfNotFocused('ccContactEmail', details.contactEmail);
     setIfNotFocused('ccContactPhone', details.contactPhone);
     setIfNotFocused('ccContactRole', details.contactRole);
+
+    this.renderLogoPreview();
   },
 
   renderOntologyTab() {

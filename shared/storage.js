@@ -126,6 +126,8 @@ const Storage = {
       industryFilterValue: '',       // used when mode is 'fixed'
       pptxExportEnabled: false,      // Some Day Maybe: enable PPTX export for this client
       // Company details
+      logo: '',              // base64 data URL for company logo
+      vertical: '',          // primary industry vertical
       companyDetails: {
         contactName: '',
         contactEmail: '',
