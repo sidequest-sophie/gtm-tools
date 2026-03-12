@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="shared/shared.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -181,6 +182,277 @@
     .sidebar-admin .admin-item:hover {
       opacity: 1;
     }
+
+    /* ── Login Screen ── */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .login-screen.hidden { display: none; }
+
+    .login-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 420px;
+      margin: 1rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-logo img {
+      height: 36px;
+    }
+
+    .login-logo h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-top: 0.75rem;
+    }
+
+    .login-logo p {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    .login-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      background: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .login-btn:hover {
+      border-color: var(--gray-300);
+      background: var(--gray-50);
+    }
+
+    .login-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .login-btn-pink {
+      background: var(--pink);
+      color: var(--white);
+      border-color: var(--pink);
+      font-weight: 600;
+    }
+
+    .login-btn-pink:hover {
+      background: var(--pink-hover);
+      border-color: var(--pink-hover);
+    }
+
+    .login-btn-ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--pink);
+      font-size: 0.85rem;
+      padding: 0.5rem;
+    }
+
+    .login-btn-ghost:hover {
+      background: rgba(208,32,144,0.05);
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .login-input:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(208,32,144,0.1);
+    }
+
+    .login-field {
+      margin-bottom: 0.75rem;
+    }
+
+    .login-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      margin-bottom: 0.3rem;
+    }
+
+    .login-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.82rem;
+      color: #dc2626;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+
+    .login-error.show { display: block; }
+
+    .login-success {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.82rem;
+      color: #16a34a;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+
+    .login-success.show { display: block; }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--gray-400);
+    }
+
+    .login-footer a {
+      color: var(--pink);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .login-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1.25rem;
+      border-bottom: 2px solid var(--gray-100);
+    }
+
+    .login-tab {
+      flex: 1;
+      padding: 0.6rem;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--gray-400);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .login-tab.active {
+      color: var(--pink);
+      border-bottom-color: var(--pink);
+    }
+
+    .login-tab:hover:not(.active) {
+      color: var(--gray-600);
+    }
+
+    .login-panel { display: none; }
+    .login-panel.active { display: block; }
+
+    .login-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: loginSpin 0.6s linear infinite;
+    }
+
+    @keyframes loginSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Auth Loading Overlay ── */
+    .auth-loading {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .auth-loading.hidden { display: none; }
+
+    .auth-loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: loginSpin 0.8s linear infinite;
+    }
+
+    .auth-loading-text {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+    }
+
+    /* Hide admin items for non-admin users */
+    .sidebar-admin.hidden-role { display: none; }
 
     .sidebar-footer {
       padding: 0.5rem 0.75rem 0.75rem;
@@ -625,7 +897,140 @@
 </head>
 <body>
 
-  <div class="app">
+  <!-- Auth Loading Screen (shown while checking session) -->
+  <div class="auth-loading" id="authLoading">
+    <div class="auth-loading-spinner"></div>
+    <div class="auth-loading-text">Loading…</div>
+  </div>
+
+  <!-- Login Screen -->
+  <div class="login-screen hidden" id="loginScreen">
+    <div class="login-card">
+
+      <div class="login-logo">
+        <img src="logo.png" alt="Category Leaders" />
+        <h2>GTM Tools</h2>
+        <p>Sign in to your account</p>
+      </div>
+
+      <!-- Google Sign In -->
+      <button class="login-btn" id="googleSignIn">
+        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="login-divider">or</div>
+
+      <!-- Tabs: Magic Link / Email & Password -->
+      <div class="login-tabs">
+        <button class="login-tab active" data-tab="magic-link">Magic Link</button>
+        <button class="login-tab" data-tab="email-password">Email &amp; Password</button>
+      </div>
+
+      <!-- Error / Success messages -->
+      <div class="login-error" id="loginError"></div>
+      <div class="login-success" id="loginSuccess"></div>
+
+      <!-- Magic Link Panel -->
+      <div class="login-panel active" id="panel-magic-link">
+        <div class="login-field">
+          <label for="magicEmail">Email address</label>
+          <input type="email" class="login-input" id="magicEmail" placeholder="you@company.com" />
+        </div>
+        <button class="login-btn login-btn-pink" id="magicLinkBtn">
+          Send Magic Link
+        </button>
+      </div>
+
+      <!-- Email & Password Panel -->
+      <div class="login-panel" id="panel-email-password">
+        <div id="emailLoginView">
+          <div class="login-field">
+            <label for="emailInput">Email address</label>
+            <input type="email" class="login-input" id="emailInput" placeholder="you@company.com" />
+          </div>
+          <div class="login-field">
+            <label for="passwordInput">Password</label>
+            <input type="password" class="login-input" id="passwordInput" placeholder="Your password" />
+          </div>
+          <button class="login-btn login-btn-pink" id="emailSignInBtn">
+            Sign In
+          </button>
+          <div style="display:flex; justify-content:space-between; margin-top:0.5rem;">
+            <button class="login-btn-ghost" id="showRegister">Create account</button>
+            <button class="login-btn-ghost" id="showForgot">Forgot password?</button>
+          </div>
+        </div>
+
+        <!-- Registration sub-view -->
+        <div id="emailRegisterView" style="display:none;">
+          <div class="login-field">
+            <label for="regName">Full name</label>
+            <input type="text" class="login-input" id="regName" placeholder="Jane Smith" />
+          </div>
+          <div class="login-field">
+            <label for="regEmail">Email address</label>
+            <input type="email" class="login-input" id="regEmail" placeholder="you@company.com" />
+          </div>
+          <div class="login-field">
+            <label for="regPassword">Password</label>
+            <input type="password" class="login-input" id="regPassword" placeholder="Min 8 characters" />
+          </div>
+          <button class="login-btn login-btn-pink" id="emailSignUpBtn">
+            Create Account
+          </button>
+          <button class="login-btn-ghost" id="backToLogin" style="width:100%; margin-top:0.5rem;">
+            ← Back to sign in
+          </button>
+        </div>
+
+        <!-- Forgot password sub-view -->
+        <div id="emailForgotView" style="display:none;">
+          <div class="login-field">
+            <label for="forgotEmail">Email address</label>
+            <input type="email" class="login-input" id="forgotEmail" placeholder="you@company.com" />
+          </div>
+          <button class="login-btn login-btn-pink" id="forgotBtn">
+            Send Reset Link
+          </button>
+          <button class="login-btn-ghost" id="backToLoginFromForgot" style="width:100%; margin-top:0.5rem;">
+            ← Back to sign in
+          </button>
+        </div>
+      </div>
+
+      <div class="login-footer">
+        Powered by <a href="https://categoryleaders.co.uk" target="_blank">Category Leaders</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Password Reset Modal (shown after clicking reset link) -->
+  <div class="modal-overlay" id="resetModal" style="display:none; z-index:100000;">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h2>Set New Password</h2>
+        <p>Enter your new password below.</p>
+      </div>
+      <div class="modal-body">
+        <div class="login-error" id="resetError"></div>
+        <div class="modal-field">
+          <label for="newPassword">New password</label>
+          <input type="password" id="newPassword" class="login-input" placeholder="Min 8 characters" />
+        </div>
+        <div class="modal-field">
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" class="login-input" placeholder="Repeat password" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-pink" id="resetSaveBtn">Update Password</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" style="display:none;" id="appShell">
 
     <!-- Sidebar overlay (mobile) -->
     <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -711,6 +1116,12 @@
           <div class="chevron-icon">
             <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
           </div>
+        </button>
+        <button class="settings-btn" id="signOutBtn" onclick="handleSignOut()" style="margin-top:0.25rem; opacity:0.6; font-size:0.75rem;">
+          <div class="icon" style="width:16px;height:16px;margin-right:0.4rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </div>
+          <span style="color:rgba(255,255,255,0.7);">Sign Out</span>
         </button>
       </div>
 
@@ -869,10 +1280,11 @@
   </div>
 
   <script src="shared/storage.js"></script>
+  <script src="shared/auth.js"></script>
 
   <script>
     let currentActiveTool = null;
-    const welcomeContent = document.querySelector('.content').innerHTML;
+    let welcomeContent = '';
 
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('open');
@@ -1097,10 +1509,273 @@
       if (e.target === this) closeSetupModal();
     });
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
+    // ── Auth-aware bootstrap ──────────────────────────────
+
+    function showApp() {
+      document.getElementById('authLoading').classList.add('hidden');
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appShell').style.display = 'flex';
+
+      // Show/hide admin nav based on role
+      const adminNav = document.querySelector('.sidebar-admin');
+      if (adminNav) {
+        const profile = Auth.getProfile();
+        if (profile && (profile.role === 'superadmin' || profile.role === 'owner')) {
+          adminNav.classList.remove('hidden-role');
+        } else {
+          adminNav.classList.add('hidden-role');
+        }
+      }
+    }
+
+    function showLogin() {
+      document.getElementById('authLoading').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('appShell').style.display = 'none';
+    }
+
+    function showLoginError(msg) {
+      const el = document.getElementById('loginError');
+      el.textContent = msg;
+      el.classList.add('show');
+      document.getElementById('loginSuccess').classList.remove('show');
+    }
+
+    function showLoginSuccess(msg) {
+      const el = document.getElementById('loginSuccess');
+      el.textContent = msg;
+      el.classList.add('show');
+      document.getElementById('loginError').classList.remove('show');
+    }
+
+    function clearLoginMessages() {
+      document.getElementById('loginError').classList.remove('show');
+      document.getElementById('loginSuccess').classList.remove('show');
+    }
+
+    function setButtonLoading(btn, loading) {
+      if (loading) {
+        btn.dataset.origText = btn.textContent;
+        btn.innerHTML = '<span class="login-spinner"></span>';
+        btn.disabled = true;
+      } else {
+        btn.textContent = btn.dataset.origText || 'Submit';
+        btn.disabled = false;
+      }
+    }
+
+    // ── Login Screen Event Wiring ──
+
+    function setupLoginScreen() {
+      // Tab switching
+      document.querySelectorAll('.login-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+          clearLoginMessages();
+        });
+      });
+
+      // Google OAuth
+      document.getElementById('googleSignIn').addEventListener('click', async () => {
+        clearLoginMessages();
+        try {
+          await Auth.signInWithGoogle();
+        } catch (err) {
+          showLoginError(err.message || 'Google sign-in failed.');
+        }
+      });
+
+      // Magic Link
+      document.getElementById('magicLinkBtn').addEventListener('click', async () => {
+        const email = document.getElementById('magicEmail').value.trim();
+        if (!email) { showLoginError('Please enter your email address.'); return; }
+        clearLoginMessages();
+        const btn = document.getElementById('magicLinkBtn');
+        setButtonLoading(btn, true);
+        try {
+          await Auth.signInWithMagicLink(email);
+          showLoginSuccess('Check your inbox! We\'ve sent a magic link to ' + email);
+        } catch (err) {
+          showLoginError(err.message || 'Failed to send magic link.');
+        } finally {
+          setButtonLoading(btn, false);
+        }
+      });
+
+      // Email enter key triggers magic link
+      document.getElementById('magicEmail').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('magicLinkBtn').click();
+      });
+
+      // Email/Password Sign In
+      document.getElementById('emailSignInBtn').addEventListener('click', async () => {
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+        if (!email || !password) { showLoginError('Please enter email and password.'); return; }
+        clearLoginMessages();
+        const btn = document.getElementById('emailSignInBtn');
+        setButtonLoading(btn, true);
+        try {
+          await Auth.signInWithEmail(email, password);
+          // Auth state listener will handle the transition
+        } catch (err) {
+          showLoginError(err.message || 'Invalid email or password.');
+        } finally {
+          setButtonLoading(btn, false);
+        }
+      });
+
+      // Enter key on password field
+      document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('emailSignInBtn').click();
+      });
+
+      // Show Registration
+      document.getElementById('showRegister').addEventListener('click', () => {
+        document.getElementById('emailLoginView').style.display = 'none';
+        document.getElementById('emailRegisterView').style.display = 'block';
+        document.getElementById('emailForgotView').style.display = 'none';
+        clearLoginMessages();
+      });
+
+      // Back to Login from Register
+      document.getElementById('backToLogin').addEventListener('click', () => {
+        document.getElementById('emailLoginView').style.display = 'block';
+        document.getElementById('emailRegisterView').style.display = 'none';
+        clearLoginMessages();
+      });
+
+      // Show Forgot Password
+      document.getElementById('showForgot').addEventListener('click', () => {
+        document.getElementById('emailLoginView').style.display = 'none';
+        document.getElementById('emailForgotView').style.display = 'block';
+        clearLoginMessages();
+      });
+
+      // Back to Login from Forgot
+      document.getElementById('backToLoginFromForgot').addEventListener('click', () => {
+        document.getElementById('emailLoginView').style.display = 'block';
+        document.getElementById('emailForgotView').style.display = 'none';
+        clearLoginMessages();
+      });
+
+      // Sign Up
+      document.getElementById('emailSignUpBtn').addEventListener('click', async () => {
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        if (!name || !email || !password) { showLoginError('Please fill in all fields.'); return; }
+        if (password.length < 8) { showLoginError('Password must be at least 8 characters.'); return; }
+        clearLoginMessages();
+        const btn = document.getElementById('emailSignUpBtn');
+        setButtonLoading(btn, true);
+        try {
+          await Auth.signUp(email, password, name);
+          showLoginSuccess('Account created! Check your email to verify your address.');
+        } catch (err) {
+          showLoginError(err.message || 'Registration failed.');
+        } finally {
+          setButtonLoading(btn, false);
+        }
+      });
+
+      // Forgot Password
+      document.getElementById('forgotBtn').addEventListener('click', async () => {
+        const email = document.getElementById('forgotEmail').value.trim();
+        if (!email) { showLoginError('Please enter your email address.'); return; }
+        clearLoginMessages();
+        const btn = document.getElementById('forgotBtn');
+        setButtonLoading(btn, true);
+        try {
+          await Auth.resetPassword(email);
+          showLoginSuccess('Password reset link sent to ' + email);
+        } catch (err) {
+          showLoginError(err.message || 'Failed to send reset link.');
+        } finally {
+          setButtonLoading(btn, false);
+        }
+      });
+
+      // Password Reset Modal (shown when URL has ?reset=true or type=recovery)
+      document.getElementById('resetSaveBtn')?.addEventListener('click', async () => {
+        const pw = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+        const errEl = document.getElementById('resetError');
+
+        if (!pw || pw.length < 8) {
+          errEl.textContent = 'Password must be at least 8 characters.';
+          errEl.classList.add('show');
+          return;
+        }
+        if (pw !== confirm) {
+          errEl.textContent = 'Passwords do not match.';
+          errEl.classList.add('show');
+          return;
+        }
+
+        errEl.classList.remove('show');
+        try {
+          await Auth.updatePassword(pw);
+          document.getElementById('resetModal').style.display = 'none';
+          // User is now logged in with new password
+        } catch (err) {
+          errEl.textContent = err.message || 'Failed to update password.';
+          errEl.classList.add('show');
+        }
+      });
+    }
+
+    // ── Sign Out (called from footer/settings) ──
+
+    async function handleSignOut() {
+      try {
+        await Auth.signOut();
+        showLogin();
+      } catch (err) {
+        console.error('Sign out error:', err);
+      }
+    }
+
+    // ── Main Init ──────────────────────────────────────────
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      welcomeContent = document.querySelector('.content')?.innerHTML || '';
       setupNavigation();
-      updateFooter();
+      setupLoginScreen();
+
+      // Initialise Auth and wait for session check
+      await Auth.init();
+
+      // Listen for auth state changes
+      Auth.onAuthChange((event, session, profile) => {
+        console.log('[App] Auth event:', event, profile?.role);
+
+        if (event === 'PASSWORD_RECOVERY') {
+          // Show reset password modal
+          document.getElementById('resetModal').style.display = 'flex';
+          return;
+        }
+
+        if (session) {
+          showApp();
+          updateFooter();
+        } else {
+          showLogin();
+        }
+      });
+
+      // Wait for initial auth resolution
+      await Auth.waitForReady();
+
+      if (Auth.isAuthenticated()) {
+        showApp();
+        updateFooter();
+      } else {
+        showLogin();
+      }
     });
   </script>
 
