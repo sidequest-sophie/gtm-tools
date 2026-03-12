@@ -1,0 +1,752 @@
+<!-- Client Management — Category Leaders GTM Tools (Admin) -->
+<style>
+  /* ── Client Management Layout ── */
+  .cm-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #f7f6f4;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .cm-header {
+    padding: 1.5rem 2rem 1rem;
+    flex-shrink: 0;
+  }
+
+  .cm-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+  }
+
+  .cm-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #104060;
+    letter-spacing: -0.01em;
+  }
+
+  .cm-subtitle {
+    font-size: 0.82rem;
+    color: #6b7280;
+    line-height: 1.6;
+  }
+
+  .cm-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 5px;
+    background: rgba(208, 32, 144, 0.08);
+    color: #d02090;
+  }
+
+  /* ── Table ── */
+  .cm-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 2rem 2rem;
+  }
+
+  .cm-table-wrap {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .cm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .cm-table thead {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .cm-table th {
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    white-space: nowrap;
+  }
+
+  .cm-table th.cm-tool-col {
+    text-align: center;
+    max-width: 80px;
+  }
+
+  .cm-table th.cm-action-col {
+    text-align: center;
+    width: 60px;
+  }
+
+  .cm-table td {
+    padding: 0.7rem 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+  }
+
+  .cm-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .cm-table tr:hover {
+    background: #f9fafb;
+  }
+
+  .cm-client-name {
+    font-weight: 600;
+    color: #104060;
+  }
+
+  .cm-client-vertical {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.1rem;
+  }
+
+  /* ── Status Badge ── */
+  .cm-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 5px;
+  }
+
+  .cm-status.enabled {
+    background: rgba(5, 150, 105, 0.08);
+    color: #059669;
+  }
+
+  .cm-status.disabled {
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+  }
+
+  .cm-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ── Tool Access Icons ── */
+  .cm-tool-cell {
+    text-align: center;
+  }
+
+  .cm-check {
+    color: #059669;
+  }
+
+  .cm-cross {
+    color: #d1d5db;
+  }
+
+  .cm-check svg, .cm-cross svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+  }
+
+  /* ── Manage Button ── */
+  .cm-manage-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #9ca3af;
+    transition: all 0.15s ease;
+    margin: 0 auto;
+  }
+
+  .cm-manage-btn:hover {
+    background: #f3f4f6;
+    color: #104060;
+  }
+
+  .cm-manage-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+  }
+
+  /* ── Empty State ── */
+  .cm-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+  }
+
+  .cm-empty-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(16,64,96,0.08), rgba(208,32,144,0.08));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+  }
+
+  .cm-empty-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: #d02090;
+    fill: none;
+    stroke-width: 1.8;
+  }
+
+  /* ─────────────────────────────────────────────────────────── */
+  /* MANAGE PANEL (slides in to replace table)                   */
+  /* ─────────────────────────────────────────────────────────── */
+  .cm-manage {
+    display: none;
+  }
+
+  .cm-manage.active {
+    display: block;
+  }
+
+  .cm-manage-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cm-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .cm-back-btn:hover {
+    background: #f9fafb;
+    color: #104060;
+    border-color: #d1d5db;
+  }
+
+  .cm-back-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .cm-manage-client-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #104060;
+  }
+
+  .cm-manage-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 680px;
+  }
+
+  .cm-manage-card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #104060;
+    margin-bottom: 0.25rem;
+  }
+
+  .cm-manage-card-desc {
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  /* ── Toggle Row ── */
+  .cm-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .cm-toggle-row:last-child {
+    border-bottom: none;
+  }
+
+  .cm-toggle-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .cm-toggle-sublabel {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    margin-top: 0.1rem;
+  }
+
+  /* ── Toggle Switch ── */
+  .cm-toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  .cm-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .cm-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 22px;
+    transition: background 0.2s ease;
+  }
+
+  .cm-toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+  }
+
+  .cm-toggle input:checked + .cm-toggle-slider {
+    background: #059669;
+  }
+
+  .cm-toggle input:checked + .cm-toggle-slider::before {
+    transform: translateX(18px);
+  }
+
+  /* ── Info Grid ── */
+  .cm-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .cm-info-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 0.2rem;
+  }
+
+  .cm-info-value {
+    font-size: 0.85rem;
+    color: #374151;
+  }
+
+  .cm-info-value.empty {
+    color: #d1d5db;
+    font-style: italic;
+  }
+
+  /* ── Stats Row ── */
+  .cm-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .cm-stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cm-stat-num {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #104060;
+  }
+
+  .cm-stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+  }
+</style>
+
+<div class="cm-container">
+
+  <div class="cm-header">
+    <div class="cm-header-row">
+      <div class="cm-title">Client Management</div>
+      <div class="cm-badge">Admin</div>
+    </div>
+    <div class="cm-subtitle">Manage all client accounts, toggle access, and configure tool permissions.</div>
+  </div>
+
+  <div class="cm-body">
+
+    <!-- TABLE VIEW -->
+    <div id="cmTableView">
+      <div class="cm-table-wrap">
+        <table class="cm-table">
+          <thead id="cmTableHead"></thead>
+          <tbody id="cmTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MANAGE VIEW (per-client) -->
+    <div class="cm-manage" id="cmManageView">
+      <div class="cm-manage-header">
+        <button class="cm-back-btn" onclick="clientManagement.showTable()" title="Back to list">
+          <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="cm-manage-client-name" id="cmManageName"></div>
+      </div>
+      <div id="cmManageBody"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/**
+ * Client Management — Admin Tool
+ */
+window.clientManagement = {
+
+  // Tool definitions for the table header
+  tools: [
+    { id: 'naming-strategy', label: 'Naming' },
+    { id: 'branding-style', label: 'Branding' },
+    { id: 'messaging', label: 'Messaging' },
+    { id: 'analyst-relations', label: 'Analyst' },
+    { id: 'sales-enablement', label: 'Sales' },
+    { id: 'roi-calculator', label: 'ROI' },
+  ],
+
+  managingClientId: null,
+
+  init() {
+    this.renderTable();
+  },
+
+  // ── Ensure client has status/toolAccess fields (backfill) ──
+  ensureFields(client) {
+    let updated = false;
+    if (!client.status) {
+      client.status = 'enabled';
+      updated = true;
+    }
+    if (!client.toolAccess) {
+      client.toolAccess = {};
+      this.tools.forEach(t => { client.toolAccess[t.id] = true; });
+      updated = true;
+    }
+    // Ensure all tools exist in toolAccess
+    this.tools.forEach(t => {
+      if (client.toolAccess[t.id] === undefined) {
+        client.toolAccess[t.id] = true;
+        updated = true;
+      }
+    });
+    if (updated) {
+      Storage.updateClient(client.id, { status: client.status, toolAccess: client.toolAccess });
+    }
+    return client;
+  },
+
+  // ── SVG helpers ──
+  checkSvg: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+  crossSvg: '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  cogSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+
+  esc(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+  },
+
+  // ═══════════════════════════════════════════════════
+  // TABLE VIEW
+  // ═══════════════════════════════════════════════════
+  showTable() {
+    document.getElementById('cmTableView').style.display = 'block';
+    document.getElementById('cmManageView').classList.remove('active');
+    this.managingClientId = null;
+    this.renderTable();
+  },
+
+  renderTable() {
+    const clients = Storage.getClients();
+
+    // Header
+    const thead = document.getElementById('cmTableHead');
+    thead.innerHTML = `<tr>
+      <th>Client</th>
+      <th>Status</th>
+      ${this.tools.map(t => `<th class="cm-tool-col">${this.esc(t.label)}</th>`).join('')}
+      <th class="cm-action-col"></th>
+    </tr>`;
+
+    // Body
+    const tbody = document.getElementById('cmTableBody');
+
+    if (clients.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${3 + this.tools.length}">
+        <div class="cm-empty">
+          <div class="cm-empty-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div style="font-weight:600; color:#104060; margin-bottom:0.25rem;">No clients yet</div>
+          <div>Clients will appear here once created via the Naming Strategy tool.</div>
+        </div>
+      </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = clients.map(c => {
+      this.ensureFields(c);
+      const isEnabled = c.status === 'enabled';
+
+      return `<tr>
+        <td>
+          <div class="cm-client-name">${this.esc(c.name)}</div>
+          ${c.vertical ? `<div class="cm-client-vertical">${this.esc(c.vertical)}</div>` : ''}
+        </td>
+        <td>
+          <span class="cm-status ${isEnabled ? 'enabled' : 'disabled'}">
+            <span class="cm-status-dot"></span>
+            ${isEnabled ? 'Enabled' : 'Disabled'}
+          </span>
+        </td>
+        ${this.tools.map(t => {
+          const on = c.toolAccess[t.id] !== false;
+          return `<td class="cm-tool-cell">
+            <span class="${on ? 'cm-check' : 'cm-cross'}">${on ? this.checkSvg : this.crossSvg}</span>
+          </td>`;
+        }).join('')}
+        <td>
+          <button class="cm-manage-btn" onclick="clientManagement.showManage('${c.id}')" title="Manage">
+            ${this.cogSvg}
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+  },
+
+  // ═══════════════════════════════════════════════════
+  // MANAGE VIEW (per-client)
+  // ═══════════════════════════════════════════════════
+  showManage(clientId) {
+    const clients = Storage.getClients();
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return;
+
+    this.ensureFields(client);
+    this.managingClientId = clientId;
+
+    document.getElementById('cmTableView').style.display = 'none';
+    document.getElementById('cmManageView').classList.add('active');
+    document.getElementById('cmManageName').textContent = client.name;
+
+    this.renderManage(client);
+  },
+
+  renderManage(client) {
+    const details = client.companyDetails || {};
+    const entities = client.brandEntities || [];
+    const mappings = client.categoryMappings || { company: [], products: {} };
+
+    let totalItems = 0;
+    Object.values(client.items || {}).forEach(arr => { totalItems += arr.length; });
+
+    let totalMappings = (mappings.company || []).length;
+    Object.values(mappings.products || {}).forEach(arr => { totalMappings += arr.length; });
+
+    const body = document.getElementById('cmManageBody');
+    body.innerHTML = `
+
+      <!-- Stats -->
+      <div class="cm-stats">
+        <div class="cm-stat">
+          <div class="cm-stat-num">${totalItems}</div>
+          <div class="cm-stat-label">Names</div>
+        </div>
+        <div class="cm-stat">
+          <div class="cm-stat-num">${entities.length}</div>
+          <div class="cm-stat-label">Entities</div>
+        </div>
+        <div class="cm-stat">
+          <div class="cm-stat-num">${totalMappings}</div>
+          <div class="cm-stat-label">Category Mappings</div>
+        </div>
+        <div class="cm-stat">
+          <div class="cm-stat-num">${(client.problems || []).length}</div>
+          <div class="cm-stat-label">Problems</div>
+        </div>
+      </div>
+
+      <!-- Account Status -->
+      <div class="cm-manage-card">
+        <div class="cm-manage-card-title">Account Status</div>
+        <div class="cm-manage-card-desc">Enable or disable this client account.</div>
+        <div class="cm-toggle-row">
+          <div>
+            <div class="cm-toggle-label">Account Enabled</div>
+            <div class="cm-toggle-sublabel">Disabled accounts are hidden from the client selector</div>
+          </div>
+          <label class="cm-toggle">
+            <input type="checkbox" ${client.status === 'enabled' ? 'checked' : ''} onchange="clientManagement.toggleStatus('${client.id}', this.checked)" />
+            <span class="cm-toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Tool Access -->
+      <div class="cm-manage-card">
+        <div class="cm-manage-card-title">Tool Access</div>
+        <div class="cm-manage-card-desc">Control which tools this client can use.</div>
+        ${this.tools.map(t => `
+          <div class="cm-toggle-row">
+            <div class="cm-toggle-label">${this.esc(t.label)}</div>
+            <label class="cm-toggle">
+              <input type="checkbox" ${client.toolAccess[t.id] !== false ? 'checked' : ''}
+                onchange="clientManagement.toggleTool('${client.id}', '${t.id}', this.checked)" />
+              <span class="cm-toggle-slider"></span>
+            </label>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Company Details (read-only summary) -->
+      <div class="cm-manage-card">
+        <div class="cm-manage-card-title">Company Details</div>
+        <div class="cm-manage-card-desc">Summary of this client's company information. Edit via Client Configuration.</div>
+        <div class="cm-info-grid">
+          <div>
+            <div class="cm-info-label">Company Name</div>
+            <div class="cm-info-value ${!client.name ? 'empty' : ''}">${this.esc(client.name) || 'Not set'}</div>
+          </div>
+          <div>
+            <div class="cm-info-label">Vertical</div>
+            <div class="cm-info-value ${!client.vertical ? 'empty' : ''}">${this.esc(client.vertical) || 'Not set'}</div>
+          </div>
+          <div>
+            <div class="cm-info-label">Contact Name</div>
+            <div class="cm-info-value ${!details.contactName ? 'empty' : ''}">${this.esc(details.contactName) || 'Not set'}</div>
+          </div>
+          <div>
+            <div class="cm-info-label">Contact Email</div>
+            <div class="cm-info-value ${!details.contactEmail ? 'empty' : ''}">${this.esc(details.contactEmail) || 'Not set'}</div>
+          </div>
+          <div>
+            <div class="cm-info-label">Contact Phone</div>
+            <div class="cm-info-value ${!details.contactPhone ? 'empty' : ''}">${this.esc(details.contactPhone) || 'Not set'}</div>
+          </div>
+          <div>
+            <div class="cm-info-label">Contact Role</div>
+            <div class="cm-info-value ${!details.contactRole ? 'empty' : ''}">${this.esc(details.contactRole) || 'Not set'}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand Entities -->
+      <div class="cm-manage-card">
+        <div class="cm-manage-card-title">Brand Ontology</div>
+        <div class="cm-manage-card-desc">${entities.length} entit${entities.length === 1 ? 'y' : 'ies'} defined.</div>
+        ${entities.length > 0 ? `
+          <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+            ${entities.map(e => `
+              <span style="display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.55rem; background:rgba(16,64,96,0.06); border-radius:5px; font-size:0.78rem;">
+                <span style="font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:#6b7280;">${this.esc(e.type)}</span>
+                <span style="font-weight:500; color:#374151;">${this.esc(e.name)}</span>
+              </span>
+            `).join('')}
+          </div>
+        ` : '<div style="font-size:0.82rem; color:#9ca3af; font-style:italic;">No entities defined yet.</div>'}
+      </div>
+
+      <!-- Timestamps -->
+      <div class="cm-manage-card">
+        <div class="cm-manage-card-title">Metadata</div>
+        <div class="cm-info-grid" style="margin-top:0.5rem;">
+          <div>
+            <div class="cm-info-label">Created</div>
+            <div class="cm-info-value">${client.createdAt ? new Date(client.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : 'Unknown'}</div>
+          </div>
+          <div>
+            <div class="cm-info-label">Last Updated</div>
+            <div class="cm-info-value">${client.updatedAt ? new Date(client.updatedAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : 'Unknown'}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // ── Toggle Handlers ──
+  toggleStatus(clientId, enabled) {
+    Storage.updateClient(clientId, { status: enabled ? 'enabled' : 'disabled' });
+    // Refresh the manage view
+    const clients = Storage.getClients();
+    const client = clients.find(c => c.id === clientId);
+    if (client) this.renderManage(client);
+  },
+
+  toggleTool(clientId, toolId, enabled) {
+    const clients = Storage.getClients();
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return;
+
+    const toolAccess = client.toolAccess || {};
+    toolAccess[toolId] = enabled;
+    Storage.updateClient(clientId, { toolAccess });
+  },
+};
+</script>

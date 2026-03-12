@@ -168,6 +168,20 @@
     }
 
     /* ── Sidebar footer — Avatar & Name pattern ── */
+    .sidebar-admin {
+      padding: 0.25rem 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-admin .admin-item {
+      opacity: 0.7;
+      font-size: 0.8rem;
+    }
+
+    .sidebar-admin .admin-item:hover {
+      opacity: 1;
+    }
+
     .sidebar-footer {
       padding: 0.5rem 0.75rem 0.75rem;
       border-top: 1px solid rgba(255,255,255,0.08);
@@ -676,6 +690,15 @@
 
       </nav>
 
+      <div class="sidebar-admin">
+        <button class="nav-item admin-item enabled" data-tool-id="client-management">
+          <div class="icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span class="label">Client Management</span>
+        </button>
+      </div>
+
       <div class="sidebar-footer">
         <button class="settings-btn" id="clientFooterBtn" onclick="loadTool('client-config'); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('current'));">
           <div class="client-avatar" id="footerAvatar">
@@ -928,6 +951,7 @@
         'messaging': 'Messaging',
         'sales-enablement': 'Sales Enablement',
         'roi-calculator': 'ROI Calculator',
+        'client-management': 'Client Management',
       };
 
       return toolNames[toolId] || toolId;

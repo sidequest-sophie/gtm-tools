@@ -126,6 +126,15 @@ const Storage = {
       industryFilterValue: '',       // used when mode is 'fixed'
       pptxExportEnabled: false,      // Some Day Maybe: enable PPTX export for this client
       // Company details
+      status: 'enabled',     // 'enabled' | 'disabled'  — admin toggle
+      toolAccess: {          // per-tool access flags (true = enabled)
+        'naming-strategy': true,
+        'branding-style': true,
+        'messaging': true,
+        'analyst-relations': true,
+        'sales-enablement': true,
+        'roi-calculator': true,
+      },
       logo: '',              // base64 data URL for company logo
       vertical: '',          // primary industry vertical
       companyDetails: {
