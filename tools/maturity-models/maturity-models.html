@@ -140,9 +140,11 @@
 
     <div class="mm-tabs" id="mm-tabs">
       <button class="mm-tab active" data-tab="setup" onclick="mmSwitchTab('setup')">Setup</button>
-      <button class="mm-tab" data-tab="dimensions" onclick="mmSwitchTab('dimensions')">Dimensions & Questions</button>
+      <button class="mm-tab" data-tab="scoring" onclick="mmSwitchTab('scoring')">Scoring Areas</button>
+      <button class="mm-tab" data-tab="criteria" onclick="mmSwitchTab('criteria')">Criteria</button>
+      <button class="mm-tab" data-tab="results" onclick="mmSwitchTab('results')">Results</button>
       <button class="mm-tab" data-tab="branding" onclick="mmSwitchTab('branding')">Branding</button>
-      <button class="mm-tab" data-tab="access" onclick="mmSwitchTab('access')">Access & CTA</button>
+      <button class="mm-tab" data-tab="publishing" onclick="mmSwitchTab('publishing')">Publishing</button>
       <button class="mm-tab" data-tab="leads" onclick="mmSwitchTab('leads')">Leads</button>
     </div>
 
@@ -153,87 +155,72 @@
           <label class="mm-label">Assessment Title</label>
           <input class="mm-input" id="mm-title" placeholder="e.g. Security ROI Assessment" oninput="mmDirty()">
         </div>
-        <div class="mm-row">
-          <div class="mm-field">
-            <label class="mm-label">URL Slug</label>
-            <input class="mm-input" id="mm-slug" placeholder="e.g. security-roi" oninput="mmDirty()">
-            <div class="mm-hint" id="mm-slug-preview">tools.categoryleaders.co.uk/maturity/—</div>
-          </div>
-          <div class="mm-field">
-            <label class="mm-label">Status</label>
-            <select class="mm-select" id="mm-status" onchange="mmDirty()">
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-        </div>
         <div class="mm-field">
           <label class="mm-label">Description</label>
           <textarea class="mm-textarea" id="mm-description" placeholder="Shown on the welcome screen" oninput="mmDirty()"></textarea>
         </div>
-
-        <div style="padding-top: 1rem; border-top: 1px solid var(--gray-200);">
-          <div class="mm-field">
-            <label class="mm-label" style="margin-bottom:0.5rem;">Vendor Alignment</label>
-            <div class="mm-hint" style="margin-bottom:0.75rem;">Control how much each layer of the assessment leans toward the vendor's capabilities vs industry-independent best practice. These sliders will guide AI content generation.</div>
-
-            <div style="display:flex;flex-direction:column;gap:0.75rem;">
-              <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
-                  <span style="font-size:0.8rem;font-weight:500;color:var(--gray-700);">Scoring Areas</span>
-                  <span id="mm-va-dim-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:0.5rem;">
-                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry</span>
-                  <input type="range" id="mm-va-dimensions" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-dim-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
-                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor</span>
-                </div>
-              </div>
-
-              <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
-                  <span style="font-size:0.8rem;font-weight:500;color:var(--gray-700);">Questions &amp; Criteria</span>
-                  <span id="mm-va-q-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:0.5rem;">
-                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry</span>
-                  <input type="range" id="mm-va-questions" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-q-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
-                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor</span>
-                </div>
-              </div>
-
-              <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
-                  <span style="font-size:0.8rem;font-weight:500;color:var(--gray-700);">Recommendations</span>
-                  <span id="mm-va-rec-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:0.5rem;">
-                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry</span>
-                  <input type="range" id="mm-va-recommendations" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-rec-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
-                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mm-field">
-            <label class="mm-label">Client Context</label>
-            <textarea class="mm-textarea" id="mm-client-context" placeholder="Describe what this client does, their products, target buyers, and key differentiators. Used to inform vendor-aligned content generation." oninput="mmDirty()" style="min-height:80px;"></textarea>
-          </div>
+        <div class="mm-field" style="padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+          <label class="mm-label">Client Context</label>
+          <textarea class="mm-textarea" id="mm-client-context" placeholder="Describe what this client does, their products, target buyers, and key differentiators. Used to inform vendor-aligned content generation." oninput="mmDirty()" style="min-height:80px;"></textarea>
         </div>
-
         <div class="mm-field" style="padding-top: 1rem; border-top: 1px solid var(--gray-200);">
           <button class="mm-btn mm-btn-danger mm-btn-sm" onclick="mmDeleteModel()">Delete this model</button>
         </div>
       </div>
 
-      <!-- TAB: Dimensions & Questions -->
-      <div class="mm-tab-panel mm-editor" id="tab-dimensions">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <p style="font-size:0.8rem; color:var(--gray-500);">Define the dimensions and questions for your assessment.</p>
-          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmAddDimension()">+ Add Dimension</button>
+      <!-- TAB: Scoring Areas -->
+      <div class="mm-tab-panel mm-editor" id="tab-scoring">
+        <div class="mm-field" style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--gray-200);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <label class="mm-label" style="margin:0;">Vendor Alignment</label>
+            <span id="mm-va-dim-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);">50%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:4px;">
+            <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry frameworks</span>
+            <input type="range" id="mm-va-dimensions" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-dim-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
+            <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor capabilities</span>
+          </div>
+          <div class="mm-hint">How much should the evaluation categories reflect the vendor's product pillars vs industry-standard frameworks?</div>
         </div>
-        <div class="mm-dim-list" id="mm-dim-list"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <p style="font-size:0.8rem; color:var(--gray-500);">Define the 4–10 scoring areas for this assessment.</p>
+          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmAddDimension()">+ Add Scoring Area</button>
+        </div>
+        <div class="mm-dim-list" id="mm-scoring-list"></div>
+      </div>
+
+      <!-- TAB: Criteria -->
+      <div class="mm-tab-panel mm-editor" id="tab-criteria">
+        <div class="mm-field" style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--gray-200);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <label class="mm-label" style="margin:0;">Vendor Alignment</label>
+            <span id="mm-va-q-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);">50%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:4px;">
+            <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry best practice</span>
+            <input type="range" id="mm-va-questions" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-q-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
+            <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor strengths</span>
+          </div>
+          <div class="mm-hint">How much should questions test for things the vendor solves well vs generic industry practices?</div>
+        </div>
+        <div class="mm-dim-list" id="mm-criteria-list"></div>
+      </div>
+
+      <!-- TAB: Results -->
+      <div class="mm-tab-panel mm-editor" id="tab-results">
+        <div class="mm-field" style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--gray-200);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+            <label class="mm-label" style="margin:0;">Vendor Alignment</label>
+            <span id="mm-va-rec-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);">50%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:4px;">
+            <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Neutral guidance</span>
+            <input type="range" id="mm-va-recommendations" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-rec-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
+            <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor solution</span>
+          </div>
+          <div class="mm-hint">How much should recommendations point toward the vendor's solution vs vendor-agnostic advice?</div>
+        </div>
+        <div class="mm-dim-list" id="mm-results-list"></div>
       </div>
 
       <!-- TAB: Branding -->
@@ -265,9 +252,24 @@
         </div>
       </div>
 
-      <!-- TAB: Access & CTA -->
-      <div class="mm-tab-panel mm-editor" id="tab-access">
-        <div class="mm-field">
+      <!-- TAB: Publishing -->
+      <div class="mm-tab-panel mm-editor" id="tab-publishing">
+        <div class="mm-row">
+          <div class="mm-field">
+            <label class="mm-label">URL Slug</label>
+            <input class="mm-input" id="mm-slug" placeholder="e.g. security-roi" oninput="mmDirty(); mmUpdateSlugPreview()">
+            <div class="mm-hint" id="mm-slug-preview">tools.categoryleaders.co.uk/maturity/—</div>
+          </div>
+          <div class="mm-field">
+            <label class="mm-label">Status</label>
+            <select class="mm-select" id="mm-status" onchange="mmDirty()">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+        </div>
+        <div class="mm-field" style="padding-top:1rem; border-top:1px solid var(--gray-200);">
           <label class="mm-label">Who can access the assessment?</label>
           <select class="mm-select" id="mm-access-mode" onchange="mmToggleEmailList(); mmDirty()">
             <option value="anyone">Anyone with the link</option>
@@ -596,23 +598,27 @@ async function mmDeleteModel() {
 //  DIMENSIONS
 // =============================================
 function mmRenderDimensions() {
-  const container = document.getElementById('mm-dim-list');
+  mmRenderScoringAreas();
+  mmRenderCriteria();
+  mmRenderResultsTab();
+}
+
+function mmRenderScoringAreas() {
+  const container = document.getElementById('mm-scoring-list');
+  if (!container) return;
   if (!MM.dimensions.length) {
-    container.innerHTML = '<div class="mm-empty"><p>No dimensions yet. Add one to get started.</p></div>';
+    container.innerHTML = '<div class="mm-empty"><p>No scoring areas yet. Add one to get started.</p></div>';
     return;
   }
-
-  container.innerHTML = MM.dimensions.map((dim, di) => {
-    const qs = MM.questions[dim.id] || [];
-    return `
+  container.innerHTML = MM.dimensions.map((dim, di) => `
     <div class="mm-dim-card" data-dim-id="${dim.id}">
-      <div class="mm-dim-header" onclick="mmToggleDim('${dim.id}')">
+      <div class="mm-dim-header" onclick="mmToggleDim('sa-${dim.id}')">
         <span class="mm-dim-icon">${dim.icon || '📊'}</span>
-        <span class="mm-dim-name">${escHtml(dim.name) || 'Unnamed Dimension'}</span>
-        <span class="mm-dim-meta">${qs.length} question${qs.length !== 1 ? 's' : ''}</span>
-        <span class="mm-dim-toggle" id="mm-dim-toggle-${dim.id}">›</span>
+        <span class="mm-dim-name">${escHtml(dim.name) || 'Unnamed Area'}</span>
+        <span class="mm-dim-meta">${(MM.questions[dim.id]||[]).length} question${(MM.questions[dim.id]||[]).length !== 1 ? 's' : ''}</span>
+        <span class="mm-dim-toggle" id="mm-dim-toggle-sa-${dim.id}">›</span>
       </div>
-      <div class="mm-dim-body" id="mm-dim-body-${dim.id}">
+      <div class="mm-dim-body" id="mm-dim-body-sa-${dim.id}">
         <div class="mm-row">
           <div class="mm-field">
             <label class="mm-label">Name</label>
@@ -637,10 +643,65 @@ function mmRenderDimensions() {
           <label class="mm-label">Description</label>
           <input class="mm-input" value="${escAttr(dim.description)}" onchange="mmUpdateDim('${dim.id}','description',this.value)">
         </div>
-        <div style="border:1px solid var(--gray-200);border-radius:8px;padding:0.75rem;margin-top:0.25rem;">
+        <div class="mm-dim-actions">
+          ${di > 0 ? `<button class="mm-btn mm-btn-ghost mm-btn-sm" onclick="mmMoveDim('${dim.id}',-1)">↑ Move up</button>` : ''}
+          ${di < MM.dimensions.length - 1 ? `<button class="mm-btn mm-btn-ghost mm-btn-sm" onclick="mmMoveDim('${dim.id}',1)">↓ Move down</button>` : ''}
+          <button class="mm-btn mm-btn-danger mm-btn-sm" onclick="mmDeleteDim('${dim.id}')">Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function mmRenderCriteria() {
+  const container = document.getElementById('mm-criteria-list');
+  if (!container) return;
+  if (!MM.dimensions.length) {
+    container.innerHTML = '<div class="mm-empty"><p>Add scoring areas first, then define questions here.</p></div>';
+    return;
+  }
+  container.innerHTML = MM.dimensions.map((dim) => {
+    const qs = MM.questions[dim.id] || [];
+    return `
+    <div class="mm-dim-card" data-dim-id="${dim.id}">
+      <div class="mm-dim-header" onclick="mmToggleDim('cr-${dim.id}')">
+        <span class="mm-dim-icon">${dim.icon || '📊'}</span>
+        <span class="mm-dim-name">${escHtml(dim.name) || 'Unnamed Area'}</span>
+        <span class="mm-dim-meta">${qs.length} question${qs.length !== 1 ? 's' : ''}</span>
+        <span class="mm-dim-toggle" id="mm-dim-toggle-cr-${dim.id}">›</span>
+      </div>
+      <div class="mm-dim-body" id="mm-dim-body-cr-${dim.id}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span class="mm-label" style="margin:0;">Questions</span>
+          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmAddQuestion('${dim.id}')">+ Add Question</button>
+        </div>
+        <div class="mm-q-list" id="mm-q-list-${dim.id}">
+          ${qs.map((q, qi) => mmRenderQuestion(q, qi)).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mmRenderResultsTab() {
+  const container = document.getElementById('mm-results-list');
+  if (!container) return;
+  if (!MM.dimensions.length) {
+    container.innerHTML = '<div class="mm-empty"><p>Add scoring areas first, then define recommendations here.</p></div>';
+    return;
+  }
+  container.innerHTML = MM.dimensions.map((dim) => `
+    <div class="mm-dim-card" data-dim-id="${dim.id}">
+      <div class="mm-dim-header" onclick="mmToggleDim('re-${dim.id}')">
+        <span class="mm-dim-icon">${dim.icon || '📊'}</span>
+        <span class="mm-dim-name">${escHtml(dim.name) || 'Unnamed Area'}</span>
+        <span class="mm-dim-toggle" id="mm-dim-toggle-re-${dim.id}">›</span>
+      </div>
+      <div class="mm-dim-body" id="mm-dim-body-re-${dim.id}">
+        <div style="border:1px solid var(--gray-200);border-radius:8px;padding:0.75rem;">
           <div style="font-size:0.75rem;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Recommendations by Score Band</div>
 
-          <details style="margin-bottom:0.5rem;">
+          <details style="margin-bottom:0.5rem;" open>
             <summary style="cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--error);padding:4px 0;">Low Score (1–2)</summary>
             <div style="padding:0.5rem 0 0.25rem;">
               <div class="mm-field" style="margin-bottom:0.5rem;">
@@ -682,23 +743,9 @@ function mmRenderDimensions() {
             </div>
           </details>
         </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;">
-          <span class="mm-label" style="margin:0;">Questions</span>
-          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmAddQuestion('${dim.id}')">+ Add Question</button>
-        </div>
-        <div class="mm-q-list" id="mm-q-list-${dim.id}">
-          ${qs.map((q, qi) => mmRenderQuestion(q, qi)).join('')}
-        </div>
-
-        <div class="mm-dim-actions">
-          ${di > 0 ? `<button class="mm-btn mm-btn-ghost mm-btn-sm" onclick="mmMoveDim('${dim.id}',-1)">↑ Move up</button>` : ''}
-          ${di < MM.dimensions.length - 1 ? `<button class="mm-btn mm-btn-ghost mm-btn-sm" onclick="mmMoveDim('${dim.id}',1)">↓ Move down</button>` : ''}
-          <button class="mm-btn mm-btn-danger mm-btn-sm" onclick="mmDeleteDim('${dim.id}')">Delete</button>
-        </div>
       </div>
-    </div>`;
-  }).join('');
+    </div>
+  `).join('');
 }
 
 function mmRenderQuestion(q, qi) {
@@ -1020,6 +1067,10 @@ function mmSwitchTab(tabName) {
   document.querySelectorAll('.mm-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
   document.querySelectorAll('.mm-tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabName));
   if (tabName === 'leads') mmRefreshLeads();
+  if (tabName === 'scoring') mmRenderScoringAreas();
+  if (tabName === 'criteria') mmRenderCriteria();
+  if (tabName === 'results') mmRenderResultsTab();
+  if (tabName === 'publishing') mmUpdateSlugPreview();
 }
 
 function mmToggleEmailList() {
