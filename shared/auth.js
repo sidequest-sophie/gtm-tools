@@ -33,6 +33,8 @@ const Auth = {
       });
     }
 
+    // Simple in-memory lock to avoid Web Locks contention between tabs
+    const locks = {};
     this._client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         flowType: 'implicit',
@@ -40,8 +42,16 @@ const Auth = {
         persistSession: true,
         autoRefreshToken: true,
         lock: async (name, acquireTimeout, fn) => {
-          // Bypass Web Locks to avoid contention between tabs
-          return await fn();
+          if (locks[name]) {
+            // Already locked — wait for it
+            return await locks[name];
+          }
+          locks[name] = fn();
+          try {
+            return await locks[name];
+          } finally {
+            delete locks[name];
+          }
         },
       },
     });
