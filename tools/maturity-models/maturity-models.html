@@ -157,7 +157,7 @@
           <div class="mm-field">
             <label class="mm-label">URL Slug</label>
             <input class="mm-input" id="mm-slug" placeholder="e.g. security-roi" oninput="mmDirty()">
-            <div class="mm-hint" id="mm-slug-preview">reports.categoryleaders.co.uk/maturity/—</div>
+            <div class="mm-hint" id="mm-slug-preview">tools.categoryleaders.co.uk/maturity/—</div>
           </div>
           <div class="mm-field">
             <label class="mm-label">Status</label>
@@ -884,7 +884,7 @@ function mmUpdatePublishBar() {
   const slug = m.slug || document.getElementById('mm-slug').value.trim();
 
   if (m.status === 'published') {
-    const url = `reports.categoryleaders.co.uk/maturity/${slug}`;
+    const url = `tools.categoryleaders.co.uk/maturity/${slug}`;
     status.innerHTML = `<strong>Published</strong> — <span class="mm-url-display">${url}</span>`;
     btn.textContent = 'Unpublish';
     btn.className = 'mm-btn mm-btn-danger mm-btn-sm';
@@ -922,7 +922,7 @@ function mmToggleEmailList() {
 
 function mmUpdateSlugPreview() {
   const slug = document.getElementById('mm-slug').value.trim() || '—';
-  document.getElementById('mm-slug-preview').textContent = `reports.categoryleaders.co.uk/maturity/${slug}`;
+  document.getElementById('mm-slug-preview').textContent = `tools.categoryleaders.co.uk/maturity/${slug}`;
 }
 
 document.getElementById('mm-slug').addEventListener('input', mmUpdateSlugPreview);
