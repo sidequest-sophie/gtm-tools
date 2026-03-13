@@ -508,12 +508,13 @@ function mmPopulateEditor() {
   document.getElementById('mm-va-rec-val').textContent = Math.round(vaRec.value * 100) + '%';
   document.getElementById('mm-client-context').value = m.client_context || '';
 
-  // Branding
+  // Branding — default company name & logo from client config
   const brand = m.brand || {};
-  document.getElementById('mm-brand-company').value = brand.companyName || '';
+  const activeClient = Storage.getActiveClient();
+  document.getElementById('mm-brand-company').value = brand.companyName || activeClient?.name || '';
   document.getElementById('mm-brand-color').value = brand.accentColor || '#6366f1';
   document.getElementById('mm-brand-color-hex').value = brand.accentColor || '#6366f1';
-  document.getElementById('mm-brand-logo').value = brand.logoUrl || '';
+  document.getElementById('mm-brand-logo').value = brand.logoUrl || activeClient?.logo || '';
   document.getElementById('mm-brand-wl').checked = !!brand.whiteLabel;
 
   // Access
