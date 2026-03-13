@@ -128,8 +128,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .results-cta{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);margin-top:32px}
 .results-cta p{color:var(--text-muted);font-size:14px;margin-bottom:16px}
 
-.powered-by{text-align:center;font-size:11px;color:var(--text-muted);padding:24px 0 8px;border-top:1px solid var(--border);margin-top:16px}
-.powered-by a{color:var(--accent);text-decoration:none;font-weight:600}
+.powered-by{text-align:center;font-size:11px;color:var(--text-muted);padding:24px 0 8px;border-top:1px solid var(--border);margin-top:16px;display:flex;align-items:center;justify-content:center;gap:6px}
+.powered-by a{color:var(--accent);text-decoration:none;font-weight:600;display:inline-flex;align-items:center}
+.powered-by img{height:18px;vertical-align:middle}
 .powered-by.hidden{display:none}
 
 /* ── Lead gate overlay ── */
@@ -191,7 +192,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="btn btn-primary" onclick="startAssessment()">Start your assessment →</button>
       <span style="font-size:13px;color:var(--text-muted)">No account needed · Results shown instantly</span>
     </div>
-    <div class="powered-by" id="pw-welcome">Powered by <a href="https://categoryleaders.co.uk">Category Leaders</a></div>
+    <div class="powered-by" id="pw-welcome">Powered by <a href="https://categoryleaders.co.uk"><img src="../logo.png" alt="Category Leaders"></a></div>
   </div>
 </div>
 
@@ -263,7 +264,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
     </div>
 
-    <div class="powered-by" id="pw-results">Powered by <a href="https://categoryleaders.co.uk">Category Leaders</a></div>
+    <div class="powered-by" id="pw-results">Powered by <a href="https://categoryleaders.co.uk"><img src="../logo.png" alt="Category Leaders"></a></div>
   </div>
 </div>
 
