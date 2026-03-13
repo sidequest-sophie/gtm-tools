@@ -714,8 +714,8 @@ function renderFullResults(scores) {
     }
   });
 
-  // Recommendations — tiered by score band, blended by vendor_alignment
-  const va = MODEL.vendor_alignment != null ? MODEL.vendor_alignment : 0.5;
+  // Recommendations — tiered by score band, blended by va_recommendations
+  const va = MODEL.va_recommendations != null ? MODEL.va_recommendations : 0.5;
   const recCards = [];
   DIMS.forEach((d, i) => {
     const sc = scores[i];

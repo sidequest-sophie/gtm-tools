@@ -175,18 +175,50 @@
 
         <div style="padding-top: 1rem; border-top: 1px solid var(--gray-200);">
           <div class="mm-field">
-            <label class="mm-label">Recommendation Alignment</label>
-            <div style="display:flex;align-items:center;gap:0.75rem;margin-top:4px;">
-              <span style="font-size:0.75rem;color:var(--gray-500);white-space:nowrap;">Industry best practice</span>
-              <input type="range" id="mm-vendor-alignment" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
-              <span style="font-size:0.75rem;color:var(--gray-500);white-space:nowrap;">Vendor aligned</span>
-              <span id="mm-va-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
+            <label class="mm-label" style="margin-bottom:0.5rem;">Vendor Alignment</label>
+            <div class="mm-hint" style="margin-bottom:0.75rem;">Control how much each layer of the assessment leans toward the vendor's capabilities vs industry-independent best practice. These sliders will guide AI content generation.</div>
+
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                  <span style="font-size:0.8rem;font-weight:500;color:var(--gray-700);">Scoring Areas</span>
+                  <span id="mm-va-dim-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry</span>
+                  <input type="range" id="mm-va-dimensions" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-dim-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
+                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor</span>
+                </div>
+              </div>
+
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                  <span style="font-size:0.8rem;font-weight:500;color:var(--gray-700);">Questions &amp; Criteria</span>
+                  <span id="mm-va-q-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry</span>
+                  <input type="range" id="mm-va-questions" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-q-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
+                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor</span>
+                </div>
+              </div>
+
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                  <span style="font-size:0.8rem;font-weight:500;color:var(--gray-700);">Recommendations</span>
+                  <span id="mm-va-rec-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Industry</span>
+                  <input type="range" id="mm-va-recommendations" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-rec-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
+                  <span style="font-size:0.65rem;color:var(--gray-400);white-space:nowrap;">Vendor</span>
+                </div>
+              </div>
             </div>
-            <div class="mm-hint">Controls how recommendations blend between industry-standard guidance and vendor-specific positioning. Even at 100%, recommendations stay credible.</div>
           </div>
           <div class="mm-field">
             <label class="mm-label">Client Context</label>
-            <textarea class="mm-textarea" id="mm-client-context" placeholder="Describe what this client does, their products, target buyers, and key differentiators. Used to inform vendor-aligned recommendations." oninput="mmDirty()" style="min-height:80px;"></textarea>
+            <textarea class="mm-textarea" id="mm-client-context" placeholder="Describe what this client does, their products, target buyers, and key differentiators. Used to inform vendor-aligned content generation." oninput="mmDirty()" style="min-height:80px;"></textarea>
           </div>
         </div>
 
@@ -454,10 +486,16 @@ function mmPopulateEditor() {
   document.getElementById('mm-status').value = m.status;
   document.getElementById('mm-description').value = m.description || '';
 
-  // Vendor alignment & client context
-  const vaSlider = document.getElementById('mm-vendor-alignment');
-  vaSlider.value = m.vendor_alignment != null ? m.vendor_alignment : 0.5;
-  document.getElementById('mm-va-val').textContent = Math.round(vaSlider.value * 100) + '%';
+  // Vendor alignment sliders & client context
+  const vaDim = document.getElementById('mm-va-dimensions');
+  vaDim.value = m.va_dimensions != null ? m.va_dimensions : 0.5;
+  document.getElementById('mm-va-dim-val').textContent = Math.round(vaDim.value * 100) + '%';
+  const vaQ = document.getElementById('mm-va-questions');
+  vaQ.value = m.va_questions != null ? m.va_questions : 0.5;
+  document.getElementById('mm-va-q-val').textContent = Math.round(vaQ.value * 100) + '%';
+  const vaRec = document.getElementById('mm-va-recommendations');
+  vaRec.value = m.va_recommendations != null ? m.va_recommendations : 0.5;
+  document.getElementById('mm-va-rec-val').textContent = Math.round(vaRec.value * 100) + '%';
   document.getElementById('mm-client-context').value = m.client_context || '';
 
   // Branding
@@ -513,7 +551,9 @@ async function mmSaveModel() {
     lead_gate: document.getElementById('mm-lead-gate').value,
     cta_text: document.getElementById('mm-cta-text').value.trim(),
     cta_url: document.getElementById('mm-cta-url').value.trim(),
-    vendor_alignment: parseFloat(document.getElementById('mm-vendor-alignment').value),
+    va_dimensions: parseFloat(document.getElementById('mm-va-dimensions').value),
+    va_questions: parseFloat(document.getElementById('mm-va-questions').value),
+    va_recommendations: parseFloat(document.getElementById('mm-va-recommendations').value),
     client_context: document.getElementById('mm-client-context').value.trim(),
   };
 
