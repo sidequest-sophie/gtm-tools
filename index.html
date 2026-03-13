@@ -52,6 +52,8 @@
       padding: 0;
       z-index: 100;
       transition: transform 0.3s ease;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     .sidebar-header {
@@ -126,36 +128,35 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 7px;
-      background: rgba(255,255,255,0.06);
+      width: 20px;
+      height: 20px;
+      background: transparent;
       flex-shrink: 0;
     }
 
     .nav-item.enabled .icon {
-      background: rgba(217, 43, 150, 0.12);
       color: var(--pink);
     }
 
     .nav-item.current .icon {
-      background: rgba(217, 43, 150, 0.2);
       color: var(--pink);
     }
 
     .nav-item .icon svg {
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       stroke: currentColor;
       fill: none;
       stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
-    /* Two-tone icons for enabled nav items: .wh = white, .pk = pink */
-    .nav-item.enabled .icon svg .wh { stroke: rgba(255,255,255,0.85); }
+    /* All-pink icons for enabled/current; drop two-tone in favour of clarity */
+    .nav-item.enabled .icon svg .wh { stroke: var(--pink); }
     .nav-item.enabled .icon svg .pk { stroke: var(--pink); }
-    .nav-item.current .icon svg .wh { stroke: #fff; }
-    .nav-item.current .icon svg .pk { stroke: var(--pink); }
+    .nav-item.current .icon svg .wh { stroke: #ff3eaf; }
+    .nav-item.current .icon svg .pk { stroke: #ff3eaf; }
 
     .nav-item .label { flex: 1; }
 
