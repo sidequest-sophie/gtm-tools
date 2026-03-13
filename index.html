@@ -151,6 +151,12 @@
       stroke-width: 1.8;
     }
 
+    /* Two-tone icons for enabled nav items: .wh = white, .pk = pink */
+    .nav-item.enabled .icon svg .wh { stroke: rgba(255,255,255,0.85); }
+    .nav-item.enabled .icon svg .pk { stroke: var(--pink); }
+    .nav-item.current .icon svg .wh { stroke: #fff; }
+    .nav-item.current .icon svg .pk { stroke: var(--pink); }
+
     .nav-item .label { flex: 1; }
 
     .nav-item .badge {
@@ -876,6 +882,12 @@
     .tool-card.live .tool-icon svg {
       stroke: var(--pink);
     }
+    .tool-card.live .tool-icon svg .wh {
+      stroke: var(--dark);
+    }
+    .tool-card.live .tool-icon svg .pk {
+      stroke: var(--pink);
+    }
     .tool-card.live .tool-name {
       color: var(--dark);
     }
@@ -1079,7 +1091,7 @@
 
         <button class="nav-item enabled" data-tool-id="naming-strategy">
           <div class="icon">
-            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <svg viewBox="0 0 24 24"><path class="wh" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path class="pk" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </div>
           <span class="label">Naming Strategy</span>
         </button>
@@ -1110,7 +1122,7 @@
 
         <button class="nav-item enabled" data-tool-id="maturity-models">
           <div class="icon">
-            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
+            <svg viewBox="0 0 24 24"><path class="wh" d="M3 3v18h18"/><path class="pk" d="M7 16l4-8 4 4 4-6"/></svg>
           </div>
           <span class="label">Maturity Models</span>
         </button>
@@ -1257,7 +1269,7 @@
             </div>
             <div class="tool-card live" onclick="loadTool('naming-strategy')">
               <div class="tool-icon">
-                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <svg viewBox="0 0 24 24"><path class="wh" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path class="pk" d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </div>
               <div>
                 <div class="tool-name">Naming Strategy</div>
@@ -1293,7 +1305,7 @@
             </div>
             <div class="tool-card live" onclick="loadTool('maturity-models')">
               <div class="tool-icon">
-                <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>
+                <svg viewBox="0 0 24 24"><path class="wh" d="M3 3v18h18"/><path class="pk" d="M7 16l4-8 4 4 4-6"/></svg>
               </div>
               <div>
                 <div class="tool-name">Maturity Models</div>

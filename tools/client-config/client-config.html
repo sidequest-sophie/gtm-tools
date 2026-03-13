@@ -178,18 +178,28 @@
   }
 
   .cc-entity-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.65rem 0.85rem;
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     transition: border-color 0.15s ease;
+    overflow: hidden;
   }
 
   .cc-entity-item:hover {
     border-color: #d1d5db;
+  }
+
+  .cc-entity-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .cc-entity-header:hover {
+    background: #f9fafb;
   }
 
   .cc-entity-type {
@@ -216,6 +226,43 @@
     color: #9ca3af;
     flex: 1;
     text-align: right;
+  }
+
+  .cc-entity-chevron {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    transition: transform 0.15s ease;
+  }
+
+  .cc-entity-item.open .cc-entity-chevron {
+    transform: rotate(90deg);
+  }
+
+  .cc-entity-detail {
+    display: none;
+    padding: 0 0.85rem 0.85rem;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .cc-entity-item.open .cc-entity-detail {
+    display: block;
+  }
+
+  .cc-entity-detail .cc-form-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.65rem;
+  }
+
+  .cc-entity-detail .cc-form-group {
+    flex: 1;
+  }
+
+  .cc-entity-detail .cc-entity-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
   }
 
   .cc-entity-actions {
@@ -611,6 +658,10 @@
           <label class="cc-form-label">Description (optional)</label>
           <input type="text" class="cc-form-input" id="ccNewEntityDesc" placeholder="Brief description" />
         </div>
+        <div class="cc-form-group" style="flex:2;">
+          <label class="cc-form-label">Product URL (optional)</label>
+          <input type="url" class="cc-form-input" id="ccNewEntityUrl" placeholder="https://..." />
+        </div>
         <button class="cc-btn cc-btn-pink" id="ccAddEntityBtn">Add</button>
       </div>
     </div>
@@ -807,6 +858,7 @@ window.clientConfig = {
     const type = document.getElementById('ccNewEntityType').value;
     const name = document.getElementById('ccNewEntityName').value.trim();
     const desc = document.getElementById('ccNewEntityDesc').value.trim();
+    const url = document.getElementById('ccNewEntityUrl').value.trim();
 
     if (!name) return;
 
@@ -816,6 +868,7 @@ window.clientConfig = {
       type,
       name,
       description: desc,
+      url: url,
       status: 'active',
       createdAt: new Date().toISOString(),
     });
@@ -824,6 +877,7 @@ window.clientConfig = {
 
     document.getElementById('ccNewEntityName').value = '';
     document.getElementById('ccNewEntityDesc').value = '';
+    document.getElementById('ccNewEntityUrl').value = '';
     this.renderOntologyTab();
     this.renderCategoriesTab();
   },
@@ -970,6 +1024,29 @@ window.clientConfig = {
     this.renderLogoPreview();
   },
 
+  toggleEntity(entityId) {
+    const el = document.getElementById('ent-' + entityId);
+    if (el) el.classList.toggle('open');
+  },
+
+  updateEntity(entityId) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    const entities = client.brandEntities || [];
+    const entity = entities.find(e => e.id === entityId);
+    if (!entity) return;
+
+    const pre = 'ent_' + entityId + '_';
+    entity.type = document.getElementById(pre + 'type')?.value || entity.type;
+    entity.name = (document.getElementById(pre + 'name')?.value || '').trim() || entity.name;
+    entity.description = (document.getElementById(pre + 'desc')?.value || '').trim();
+    entity.url = (document.getElementById(pre + 'url')?.value || '').trim();
+
+    Storage.updateClient(client.id, { brandEntities: entities });
+    this.renderOntologyTab();
+    this.renderCategoriesTab();
+  },
+
   renderOntologyTab() {
     const client = Storage.getActiveClient();
     const container = document.getElementById('ccEntityList');
@@ -982,15 +1059,45 @@ window.clientConfig = {
       return;
     }
 
+    const typeOptions = ['Product','Service','Platform','Solution','Module','Brand'];
+
     container.innerHTML = entities.map(e => `
-      <div class="cc-entity-item">
-        <span class="cc-entity-type">${this.esc(e.type)}</span>
-        <span class="cc-entity-name">${this.esc(e.name)}</span>
-        <span class="cc-entity-desc">${this.esc(e.description || '')}</span>
-        <div class="cc-entity-actions">
-          <button class="cc-icon-btn danger" onclick="clientConfig.deleteEntity('${e.id}')" title="Remove">
-            <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-          </button>
+      <div class="cc-entity-item" id="ent-${e.id}">
+        <div class="cc-entity-header" onclick="clientConfig.toggleEntity('${e.id}')">
+          <span class="cc-entity-type">${this.esc(e.type)}</span>
+          <span class="cc-entity-name">${this.esc(e.name)}</span>
+          <span class="cc-entity-desc">${this.esc(e.description || '')}</span>
+          <span class="cc-entity-chevron">›</span>
+        </div>
+        <div class="cc-entity-detail">
+          <div class="cc-form-row">
+            <div class="cc-form-group" style="flex:0 0 140px;">
+              <label class="cc-form-label">Type</label>
+              <select class="cc-form-input" id="ent_${e.id}_type">
+                ${typeOptions.map(t => `<option value="${t}"${t === e.type ? ' selected' : ''}>${t}</option>`).join('')}
+              </select>
+            </div>
+            <div class="cc-form-group">
+              <label class="cc-form-label">Name</label>
+              <input type="text" class="cc-form-input" id="ent_${e.id}_name" value="${this.esc(e.name)}" />
+            </div>
+          </div>
+          <div class="cc-form-row">
+            <div class="cc-form-group">
+              <label class="cc-form-label">Description</label>
+              <input type="text" class="cc-form-input" id="ent_${e.id}_desc" value="${this.esc(e.description || '')}" placeholder="Brief description" />
+            </div>
+          </div>
+          <div class="cc-form-row">
+            <div class="cc-form-group">
+              <label class="cc-form-label">Product Page URL</label>
+              <input type="url" class="cc-form-input" id="ent_${e.id}_url" value="${this.esc(e.url || '')}" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="cc-entity-footer">
+            <button class="cc-btn cc-btn-pink" onclick="clientConfig.updateEntity('${e.id}')">Save</button>
+            <button class="cc-icon-btn danger" onclick="clientConfig.deleteEntity('${e.id}')" title="Delete" style="width:auto;height:auto;padding:0.35rem 0.75rem;color:#ef4444;font-size:0.75rem;">Delete</button>
+          </div>
         </div>
       </div>
     `).join('');
