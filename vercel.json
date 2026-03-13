@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/maturity/preview/:id",
+      "destination": "/maturity/index.html"
+    },
+    {
+      "source": "/maturity/:slug",
+      "destination": "/maturity/index.html"
+    }
+  ]
+}

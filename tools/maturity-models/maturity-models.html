@@ -1,0 +1,977 @@
+<!-- ────────────────────────────────────────────────────────────────────────────
+     MATURITY MODELS — Builder Tool
+     ──────────────────────────────────────────────────────────────────────────── -->
+
+<style>
+.mm-tool { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+
+/* ── Top Bar ── */
+.mm-topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--white); border-bottom: 1px solid var(--gray-200); flex-shrink: 0; gap: 1rem; }
+.mm-topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+.mm-topbar h2 { font-size: 1.25rem; font-weight: 700; color: var(--navy); margin: 0; }
+.mm-topbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+/* ── Buttons ── */
+.mm-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; }
+.mm-btn-primary { background: var(--pink); color: white; }
+.mm-btn-primary:hover { background: var(--pink-hover); }
+.mm-btn-secondary { background: var(--white); color: var(--gray-700); border: 1px solid var(--gray-200); }
+.mm-btn-secondary:hover { border-color: var(--pink); color: var(--pink); }
+.mm-btn-ghost { background: none; color: var(--gray-500); border: none; padding: 0.4rem 0.6rem; }
+.mm-btn-ghost:hover { color: var(--pink); }
+.mm-btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+.mm-btn-danger { background: none; color: var(--error); border: 1px solid var(--error); }
+.mm-btn-danger:hover { background: var(--error); color: white; }
+
+/* ── Scrollable body ── */
+.mm-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
+
+/* ── List View ── */
+.mm-list { display: flex; flex-direction: column; gap: 0.75rem; max-width: 720px; }
+.mm-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.15s; }
+.mm-card:hover { border-color: var(--pink); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.mm-card-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(208,32,144,0.08); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.mm-card-body { flex: 1; min-width: 0; }
+.mm-card-title { font-size: 0.95rem; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+.mm-card-meta { font-size: 0.75rem; color: var(--gray-500); display: flex; gap: 1rem; align-items: center; }
+.mm-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.15rem 0.5rem; border-radius: 4px; }
+.mm-badge-draft { background: var(--gray-100); color: var(--gray-500); }
+.mm-badge-published { background: rgba(16,185,129,0.1); color: #059669; }
+.mm-badge-archived { background: rgba(239,68,68,0.08); color: var(--error); }
+.mm-card-arrow { color: var(--gray-300); font-size: 1.2rem; }
+
+.mm-empty { text-align: center; padding: 3rem 1rem; color: var(--gray-500); }
+.mm-empty p { margin-bottom: 1rem; font-size: 0.9rem; }
+
+/* ── Editor ── */
+.mm-editor { max-width: 780px; }
+.mm-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 1.5rem; }
+.mm-tab { padding: 0.6rem 1.25rem; font-size: 0.8rem; font-weight: 600; color: var(--gray-400); cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; font-family: inherit; }
+.mm-tab:hover { color: var(--gray-600); }
+.mm-tab.active { color: var(--pink); border-bottom-color: var(--pink); }
+.mm-tab-panel { display: none; }
+.mm-tab-panel.active { display: block; }
+
+/* ── Form fields ── */
+.mm-field { margin-bottom: 1.25rem; }
+.mm-label { display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 0.4rem; }
+.mm-input, .mm-textarea, .mm-select { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: var(--gray-700); background: var(--white); transition: border-color 0.15s; }
+.mm-input:focus, .mm-textarea:focus, .mm-select:focus { outline: none; border-color: var(--pink); }
+.mm-textarea { min-height: 80px; resize: vertical; }
+.mm-hint { font-size: 0.7rem; color: var(--gray-400); margin-top: 0.25rem; }
+.mm-row { display: flex; gap: 1rem; }
+.mm-row > .mm-field { flex: 1; }
+
+/* ── Dimension cards in editor ── */
+.mm-dim-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.mm-dim-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 10px; padding: 1rem 1.25rem; }
+.mm-dim-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; }
+.mm-dim-icon { font-size: 1.2rem; }
+.mm-dim-name { font-weight: 600; font-size: 0.9rem; color: var(--navy); flex: 1; }
+.mm-dim-meta { font-size: 0.7rem; color: var(--gray-400); }
+.mm-dim-toggle { color: var(--gray-300); cursor: pointer; transition: transform 0.2s; font-size: 0.9rem; }
+.mm-dim-toggle.open { transform: rotate(90deg); }
+.mm-dim-body { display: none; padding-top: 0.75rem; border-top: 1px solid var(--gray-100); margin-top: 0.5rem; }
+.mm-dim-body.open { display: block; }
+.mm-dim-actions { display: flex; gap: 0.5rem; justify-content: flex-end; padding-top: 0.5rem; }
+
+/* ── Question list in dimension ── */
+.mm-q-list { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+.mm-q-item { background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 8px; padding: 0.75rem; }
+.mm-q-text { font-size: 0.8rem; color: var(--gray-700); margin-bottom: 0.5rem; font-weight: 500; }
+.mm-q-opts { display: flex; flex-direction: column; gap: 0.25rem; padding-left: 0.5rem; }
+.mm-q-opt { font-size: 0.72rem; color: var(--gray-500); display: flex; gap: 0.4rem; align-items: baseline; }
+.mm-q-opt-score { font-weight: 700; color: var(--pink); min-width: 1rem; text-align: center; }
+.mm-q-actions { display: flex; gap: 0.35rem; margin-top: 0.5rem; }
+
+/* ── Leads table ── */
+.mm-leads-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.mm-leads-table th { text-align: left; padding: 0.6rem 0.75rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); border-bottom: 2px solid var(--gray-200); }
+.mm-leads-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
+.mm-leads-table tr:hover td { background: var(--gray-50); }
+.mm-score-pill { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.2rem 0.5rem; border-radius: 100px; font-weight: 700; font-size: 0.7rem; }
+.mm-score-developing { background: rgba(239,68,68,0.08); color: #ef4444; }
+.mm-score-established { background: rgba(245,158,11,0.08); color: #d97706; }
+.mm-score-advanced { background: rgba(16,185,129,0.08); color: #059669; }
+.mm-score-optimising { background: rgba(16,185,129,0.15); color: #047857; }
+
+/* ── Publish bar ── */
+.mm-publish-bar { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem; background: var(--white); border-top: 1px solid var(--gray-200); flex-shrink: 0; }
+.mm-publish-bar .mm-pub-status { flex: 1; font-size: 0.8rem; color: var(--gray-500); }
+.mm-publish-bar .mm-pub-status strong { color: var(--navy); }
+.mm-url-display { font-size: 0.72rem; color: var(--gray-400); background: var(--gray-50); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid var(--gray-100); }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .mm-row { flex-direction: column; gap: 0; }
+  .mm-topbar { padding: 0.75rem 1rem; }
+  .mm-body { padding: 1rem; }
+}
+</style>
+
+<div class="mm-tool" id="mmTool">
+  <!-- LIST VIEW -->
+  <div id="mm-view-list">
+    <div class="mm-topbar">
+      <div class="mm-topbar-left">
+        <h2>Maturity Models</h2>
+      </div>
+      <div class="mm-topbar-actions">
+        <button class="mm-btn mm-btn-primary" onclick="mmCreateModel()">+ New Model</button>
+      </div>
+    </div>
+    <div class="mm-body">
+      <div class="mm-list" id="mm-model-list"></div>
+    </div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="mm-view-editor" style="display:none; flex-direction:column; height:100%;">
+    <div class="mm-topbar">
+      <div class="mm-topbar-left">
+        <button class="mm-btn mm-btn-ghost" onclick="mmShowList()">← Back</button>
+        <h2 id="mm-editor-title">Edit Model</h2>
+      </div>
+      <div class="mm-topbar-actions">
+        <button class="mm-btn mm-btn-secondary" onclick="mmPreview()">👁 Preview</button>
+        <button class="mm-btn mm-btn-primary" onclick="mmSaveModel()">Save</button>
+      </div>
+    </div>
+
+    <div class="mm-tabs" id="mm-tabs">
+      <button class="mm-tab active" data-tab="setup" onclick="mmSwitchTab('setup')">Setup</button>
+      <button class="mm-tab" data-tab="dimensions" onclick="mmSwitchTab('dimensions')">Dimensions & Questions</button>
+      <button class="mm-tab" data-tab="branding" onclick="mmSwitchTab('branding')">Branding</button>
+      <button class="mm-tab" data-tab="access" onclick="mmSwitchTab('access')">Access & CTA</button>
+      <button class="mm-tab" data-tab="leads" onclick="mmSwitchTab('leads')">Leads</button>
+    </div>
+
+    <div class="mm-body" style="flex:1; overflow-y:auto;">
+      <!-- TAB: Setup -->
+      <div class="mm-tab-panel active mm-editor" id="tab-setup">
+        <div class="mm-field">
+          <label class="mm-label">Assessment Title</label>
+          <input class="mm-input" id="mm-title" placeholder="e.g. Security ROI Assessment" oninput="mmDirty()">
+        </div>
+        <div class="mm-row">
+          <div class="mm-field">
+            <label class="mm-label">URL Slug</label>
+            <input class="mm-input" id="mm-slug" placeholder="e.g. security-roi" oninput="mmDirty()">
+            <div class="mm-hint" id="mm-slug-preview">reports.categoryleaders.co.uk/maturity/—</div>
+          </div>
+          <div class="mm-field">
+            <label class="mm-label">Status</label>
+            <select class="mm-select" id="mm-status" onchange="mmDirty()">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">Description</label>
+          <textarea class="mm-textarea" id="mm-description" placeholder="Shown on the welcome screen" oninput="mmDirty()"></textarea>
+        </div>
+        <div class="mm-field" style="padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+          <button class="mm-btn mm-btn-danger mm-btn-sm" onclick="mmDeleteModel()">Delete this model</button>
+        </div>
+      </div>
+
+      <!-- TAB: Dimensions & Questions -->
+      <div class="mm-tab-panel mm-editor" id="tab-dimensions">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <p style="font-size:0.8rem; color:var(--gray-500);">Define the dimensions and questions for your assessment.</p>
+          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmAddDimension()">+ Add Dimension</button>
+        </div>
+        <div class="mm-dim-list" id="mm-dim-list"></div>
+      </div>
+
+      <!-- TAB: Branding -->
+      <div class="mm-tab-panel mm-editor" id="tab-branding">
+        <div class="mm-field">
+          <label class="mm-label">Company Name (on assessment page)</label>
+          <input class="mm-input" id="mm-brand-company" placeholder="Your company name" oninput="mmDirty()">
+          <div class="mm-hint">Shown in the header of the published assessment</div>
+        </div>
+        <div class="mm-row">
+          <div class="mm-field">
+            <label class="mm-label">Accent Colour</label>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="color" id="mm-brand-color" value="#6366f1" style="width:38px;height:38px;border:1px solid var(--gray-200);border-radius:8px;cursor:pointer;padding:2px;background:none" oninput="mmDirty()">
+              <input class="mm-input" id="mm-brand-color-hex" value="#6366f1" style="flex:1" oninput="mmSyncColor(this.value)">
+            </div>
+          </div>
+          <div class="mm-field">
+            <label class="mm-label">Logo URL</label>
+            <input class="mm-input" id="mm-brand-logo" placeholder="https://..." oninput="mmDirty()">
+          </div>
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">White-label mode</label>
+          <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+            <input type="checkbox" id="mm-brand-wl" onchange="mmDirty()">
+            <span style="font-size:0.8rem; color:var(--gray-600);">Hide "Powered by Category Leaders" branding</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- TAB: Access & CTA -->
+      <div class="mm-tab-panel mm-editor" id="tab-access">
+        <div class="mm-field">
+          <label class="mm-label">Who can access the assessment?</label>
+          <select class="mm-select" id="mm-access-mode" onchange="mmToggleEmailList(); mmDirty()">
+            <option value="anyone">Anyone with the link</option>
+            <option value="email_list">Only specific email addresses</option>
+          </select>
+        </div>
+        <div class="mm-field" id="mm-email-list-field" style="display:none;">
+          <label class="mm-label">Allowed Email Addresses</label>
+          <textarea class="mm-textarea" id="mm-allowed-emails" placeholder="one@example.com&#10;two@example.com" oninput="mmDirty()"></textarea>
+          <div class="mm-hint">One email per line</div>
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">Lead Capture Gate</label>
+          <select class="mm-select" id="mm-lead-gate" onchange="mmDirty()">
+            <option value="before_full_report">Show headline scores, gate full report (recommended)</option>
+            <option value="before_any_results">Gate all results — capture before showing anything</option>
+            <option value="none">No gate — show full results freely</option>
+          </select>
+          <div class="mm-hint">Choose when prospects must provide their details</div>
+        </div>
+        <div class="mm-field" style="border-top:1px solid var(--gray-200); padding-top:1rem; margin-top:0.5rem;">
+          <label class="mm-label">CTA Button Text</label>
+          <input class="mm-input" id="mm-cta-text" placeholder="Get your personalised improvement plan" oninput="mmDirty()">
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">CTA Button Link</label>
+          <input class="mm-input" id="mm-cta-url" placeholder="https://..." oninput="mmDirty()">
+          <div class="mm-hint">Where the main results CTA links to (e.g. booking page, contact form)</div>
+        </div>
+      </div>
+
+      <!-- TAB: Leads -->
+      <div class="mm-tab-panel mm-editor" id="tab-leads">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <p style="font-size:0.8rem; color:var(--gray-500);" id="mm-leads-count">Loading leads…</p>
+          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmRefreshLeads()">↻ Refresh</button>
+        </div>
+        <div id="mm-leads-container"></div>
+      </div>
+    </div>
+
+    <!-- Publish bar at bottom of editor -->
+    <div class="mm-publish-bar" id="mm-publish-bar">
+      <div class="mm-pub-status" id="mm-pub-status"></div>
+      <button class="mm-btn mm-btn-secondary mm-btn-sm" id="mm-pub-toggle" onclick="mmTogglePublish()"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============================================
+//  MATURITY MODELS — Builder Logic
+// =============================================
+const MM = {
+  models: [],
+  current: null,       // current model being edited
+  dimensions: [],      // dims for current model
+  questions: {},       // { dimId: [questions] }
+  options: {},         // { qId: [options] }
+  dirty: false,
+  leadsCache: [],
+};
+
+// ── Supabase helper ──
+function mmSupa() {
+  return Auth.getClient();
+}
+
+function mmClientId() {
+  return Storage.getActiveClientId ? Storage.getActiveClientId() : Storage._activeClientId;
+}
+
+// =============================================
+//  LIST VIEW
+// =============================================
+async function mmLoadModels() {
+  const clientId = mmClientId();
+  if (!clientId) {
+    document.getElementById('mm-model-list').innerHTML = '<div class="mm-empty"><p>Select a client first</p></div>';
+    return;
+  }
+
+  const { data, error } = await mmSupa()
+    .from('maturity_models')
+    .select('id, title, slug, status, is_sample, created_at, updated_at')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[MM] Load error:', error);
+    return;
+  }
+
+  MM.models = data || [];
+  mmRenderList();
+}
+
+function mmRenderList() {
+  const container = document.getElementById('mm-model-list');
+
+  if (!MM.models.length) {
+    container.innerHTML = `
+      <div class="mm-empty">
+        <p>No maturity models yet.</p>
+        <button class="mm-btn mm-btn-primary" onclick="mmCreateModel()">Create your first model</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = MM.models.map(m => `
+    <div class="mm-card" onclick="mmEditModel('${m.id}')">
+      <div class="mm-card-icon">📊</div>
+      <div class="mm-card-body">
+        <div class="mm-card-title">${escHtml(m.title)}${m.is_sample ? ' <span style="font-size:0.65rem;color:var(--gray-400)">(sample)</span>' : ''}</div>
+        <div class="mm-card-meta">
+          <span class="mm-badge mm-badge-${m.status}">${m.status}</span>
+          ${m.slug ? `<span>/${m.slug}</span>` : '<span style="color:var(--gray-300)">no slug</span>'}
+          <span>Updated ${mmTimeAgo(m.updated_at)}</span>
+        </div>
+      </div>
+      <div class="mm-card-arrow">›</div>
+    </div>
+  `).join('');
+}
+
+// =============================================
+//  CREATE MODEL
+// =============================================
+async function mmCreateModel() {
+  const clientId = mmClientId();
+  if (!clientId) return alert('Please select a client first.');
+
+  const { data: model, error } = await mmSupa()
+    .from('maturity_models')
+    .insert({
+      client_id: clientId,
+      title: 'Untitled Assessment',
+      slug: '',
+      description: '',
+      status: 'draft',
+      created_by: Auth.getUser()?.id,
+    })
+    .select()
+    .single();
+
+  if (error) { console.error('[MM] Create error:', error); return; }
+
+  await mmEditModel(model.id);
+}
+
+// =============================================
+//  EDIT MODEL
+// =============================================
+async function mmEditModel(modelId) {
+  // Load model
+  const { data: model, error } = await mmSupa()
+    .from('maturity_models')
+    .select('*')
+    .eq('id', modelId)
+    .single();
+
+  if (error || !model) { console.error('[MM] Load model error:', error); return; }
+  MM.current = model;
+
+  // Load dimensions with questions and options
+  const { data: dims } = await mmSupa()
+    .from('maturity_dimensions')
+    .select('*')
+    .eq('model_id', modelId)
+    .order('sort_order');
+
+  MM.dimensions = dims || [];
+  MM.questions = {};
+  MM.options = {};
+
+  // Load questions for all dimensions
+  if (MM.dimensions.length) {
+    const dimIds = MM.dimensions.map(d => d.id);
+    const { data: qs } = await mmSupa()
+      .from('maturity_questions')
+      .select('*')
+      .in('dimension_id', dimIds)
+      .order('sort_order');
+
+    (qs || []).forEach(q => {
+      if (!MM.questions[q.dimension_id]) MM.questions[q.dimension_id] = [];
+      MM.questions[q.dimension_id].push(q);
+    });
+
+    // Load options for all questions
+    const qIds = (qs || []).map(q => q.id);
+    if (qIds.length) {
+      const { data: opts } = await mmSupa()
+        .from('maturity_options')
+        .select('*')
+        .in('question_id', qIds)
+        .order('sort_order');
+
+      (opts || []).forEach(o => {
+        if (!MM.options[o.question_id]) MM.options[o.question_id] = [];
+        MM.options[o.question_id].push(o);
+      });
+    }
+  }
+
+  // Populate form
+  mmPopulateEditor();
+  mmShowEditor();
+}
+
+function mmPopulateEditor() {
+  const m = MM.current;
+  document.getElementById('mm-editor-title').textContent = m.title || 'Untitled Assessment';
+  document.getElementById('mm-title').value = m.title || '';
+  document.getElementById('mm-slug').value = m.slug || '';
+  document.getElementById('mm-status').value = m.status;
+  document.getElementById('mm-description').value = m.description || '';
+
+  // Branding
+  const brand = m.brand || {};
+  document.getElementById('mm-brand-company').value = brand.companyName || '';
+  document.getElementById('mm-brand-color').value = brand.accentColor || '#6366f1';
+  document.getElementById('mm-brand-color-hex').value = brand.accentColor || '#6366f1';
+  document.getElementById('mm-brand-logo').value = brand.logoUrl || '';
+  document.getElementById('mm-brand-wl').checked = !!brand.whiteLabel;
+
+  // Access
+  document.getElementById('mm-access-mode').value = m.access_mode;
+  document.getElementById('mm-allowed-emails').value = (m.allowed_emails || []).join('\n');
+  document.getElementById('mm-lead-gate').value = m.lead_gate;
+  mmToggleEmailList();
+
+  // CTA
+  document.getElementById('mm-cta-text').value = m.cta_text || '';
+  document.getElementById('mm-cta-url').value = m.cta_url || '';
+
+  // Slug preview
+  mmUpdateSlugPreview();
+
+  // Publish bar
+  mmUpdatePublishBar();
+
+  // Dimensions
+  mmRenderDimensions();
+
+  MM.dirty = false;
+}
+
+// =============================================
+//  SAVE MODEL
+// =============================================
+async function mmSaveModel() {
+  const m = MM.current;
+  if (!m) return;
+
+  const updates = {
+    title: document.getElementById('mm-title').value.trim(),
+    slug: document.getElementById('mm-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/--+/g, '-'),
+    status: document.getElementById('mm-status').value,
+    description: document.getElementById('mm-description').value.trim(),
+    brand: {
+      companyName: document.getElementById('mm-brand-company').value.trim(),
+      accentColor: document.getElementById('mm-brand-color').value,
+      logoUrl: document.getElementById('mm-brand-logo').value.trim(),
+      whiteLabel: document.getElementById('mm-brand-wl').checked,
+    },
+    access_mode: document.getElementById('mm-access-mode').value,
+    allowed_emails: document.getElementById('mm-allowed-emails').value.split('\n').map(e => e.trim()).filter(Boolean),
+    lead_gate: document.getElementById('mm-lead-gate').value,
+    cta_text: document.getElementById('mm-cta-text').value.trim(),
+    cta_url: document.getElementById('mm-cta-url').value.trim(),
+  };
+
+  if (updates.status === 'published' && m.status !== 'published') {
+    updates.published_at = new Date().toISOString();
+  }
+
+  const { error } = await mmSupa()
+    .from('maturity_models')
+    .update(updates)
+    .eq('id', m.id);
+
+  if (error) { console.error('[MM] Save error:', error); alert('Save failed: ' + error.message); return; }
+
+  // Update local state
+  Object.assign(MM.current, updates);
+  document.getElementById('mm-editor-title').textContent = updates.title || 'Untitled Assessment';
+  mmUpdatePublishBar();
+  mmUpdateSlugPreview();
+  MM.dirty = false;
+}
+
+// =============================================
+//  DELETE MODEL
+// =============================================
+async function mmDeleteModel() {
+  if (!MM.current) return;
+  if (!confirm(`Delete "${MM.current.title}"? This removes all dimensions, questions and leads. This cannot be undone.`)) return;
+
+  const { error } = await mmSupa()
+    .from('maturity_models')
+    .delete()
+    .eq('id', MM.current.id);
+
+  if (error) { console.error('[MM] Delete error:', error); return; }
+  mmShowList();
+}
+
+// =============================================
+//  DIMENSIONS
+// =============================================
+function mmRenderDimensions() {
+  const container = document.getElementById('mm-dim-list');
+  if (!MM.dimensions.length) {
+    container.innerHTML = '<div class="mm-empty"><p>No dimensions yet. Add one to get started.</p></div>';
+    return;
+  }
+
+  container.innerHTML = MM.dimensions.map((dim, di) => {
+    const qs = MM.questions[dim.id] || [];
+    return `
+    <div class="mm-dim-card" data-dim-id="${dim.id}">
+      <div class="mm-dim-header" onclick="mmToggleDim('${dim.id}')">
+        <span class="mm-dim-icon">${dim.icon || '📊'}</span>
+        <span class="mm-dim-name">${escHtml(dim.name) || 'Unnamed Dimension'}</span>
+        <span class="mm-dim-meta">${qs.length} question${qs.length !== 1 ? 's' : ''}</span>
+        <span class="mm-dim-toggle" id="mm-dim-toggle-${dim.id}">›</span>
+      </div>
+      <div class="mm-dim-body" id="mm-dim-body-${dim.id}">
+        <div class="mm-row">
+          <div class="mm-field">
+            <label class="mm-label">Name</label>
+            <input class="mm-input" value="${escAttr(dim.name)}" onchange="mmUpdateDim('${dim.id}','name',this.value)">
+          </div>
+          <div class="mm-field" style="max-width:80px;">
+            <label class="mm-label">Icon</label>
+            <input class="mm-input" value="${escAttr(dim.icon)}" onchange="mmUpdateDim('${dim.id}','icon',this.value)" style="text-align:center;font-size:1.2rem;">
+          </div>
+        </div>
+        <div class="mm-row">
+          <div class="mm-field">
+            <label class="mm-label">Chart Label</label>
+            <input class="mm-input" value="${escAttr(dim.chart_label)}" onchange="mmUpdateDim('${dim.id}','chart_label',this.value)">
+          </div>
+          <div class="mm-field" style="max-width:100px;">
+            <label class="mm-label">Colour</label>
+            <input type="color" value="${dim.color || '#6366f1'}" style="width:100%;height:38px;border:1px solid var(--gray-200);border-radius:8px;cursor:pointer;padding:2px;background:none" onchange="mmUpdateDim('${dim.id}','color',this.value)">
+          </div>
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">Description</label>
+          <input class="mm-input" value="${escAttr(dim.description)}" onchange="mmUpdateDim('${dim.id}','description',this.value)">
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">Recommendation (shown for low scores)</label>
+          <textarea class="mm-textarea" style="min-height:60px;" onchange="mmUpdateDim('${dim.id}','recommendation',this.value)">${escHtml(dim.recommendation)}</textarea>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;">
+          <span class="mm-label" style="margin:0;">Questions</span>
+          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmAddQuestion('${dim.id}')">+ Add Question</button>
+        </div>
+        <div class="mm-q-list" id="mm-q-list-${dim.id}">
+          ${qs.map((q, qi) => mmRenderQuestion(q, qi)).join('')}
+        </div>
+
+        <div class="mm-dim-actions">
+          ${di > 0 ? `<button class="mm-btn mm-btn-ghost mm-btn-sm" onclick="mmMoveDim('${dim.id}',-1)">↑ Move up</button>` : ''}
+          ${di < MM.dimensions.length - 1 ? `<button class="mm-btn mm-btn-ghost mm-btn-sm" onclick="mmMoveDim('${dim.id}',1)">↓ Move down</button>` : ''}
+          <button class="mm-btn mm-btn-danger mm-btn-sm" onclick="mmDeleteDim('${dim.id}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mmRenderQuestion(q, qi) {
+  const opts = MM.options[q.id] || [];
+  return `
+  <div class="mm-q-item" data-q-id="${q.id}">
+    <div class="mm-q-text">Q${qi+1}: ${escHtml(q.text) || '(no question text)'}</div>
+    <div class="mm-q-opts">
+      ${opts.map(o => `<div class="mm-q-opt"><span class="mm-q-opt-score">${o.score}</span> ${escHtml(o.text)}</div>`).join('')}
+    </div>
+    <div class="mm-q-actions">
+      <button class="mm-btn mm-btn-ghost mm-btn-sm" onclick="mmEditQuestion('${q.id}')">Edit</button>
+      <button class="mm-btn mm-btn-ghost mm-btn-sm" style="color:var(--error)" onclick="mmDeleteQuestion('${q.id}','${q.dimension_id}')">Delete</button>
+    </div>
+  </div>`;
+}
+
+function mmToggleDim(dimId) {
+  const body = document.getElementById('mm-dim-body-' + dimId);
+  const toggle = document.getElementById('mm-dim-toggle-' + dimId);
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+async function mmAddDimension() {
+  const sortOrder = MM.dimensions.length;
+  const { data, error } = await mmSupa()
+    .from('maturity_dimensions')
+    .insert({
+      model_id: MM.current.id,
+      name: 'New Dimension',
+      chart_label: 'New Dim',
+      icon: '📊',
+      sort_order: sortOrder,
+    })
+    .select()
+    .single();
+
+  if (error) { console.error('[MM] Add dim error:', error); return; }
+  MM.dimensions.push(data);
+  MM.questions[data.id] = [];
+  mmRenderDimensions();
+}
+
+async function mmUpdateDim(dimId, field, value) {
+  const dim = MM.dimensions.find(d => d.id === dimId);
+  if (!dim) return;
+  dim[field] = value;
+
+  await mmSupa()
+    .from('maturity_dimensions')
+    .update({ [field]: value })
+    .eq('id', dimId);
+
+  // Re-render header only if name or icon changed
+  if (field === 'name' || field === 'icon') {
+    mmRenderDimensions();
+  }
+}
+
+async function mmDeleteDim(dimId) {
+  if (!confirm('Delete this dimension and all its questions?')) return;
+  await mmSupa().from('maturity_dimensions').delete().eq('id', dimId);
+  MM.dimensions = MM.dimensions.filter(d => d.id !== dimId);
+  delete MM.questions[dimId];
+  mmRenderDimensions();
+}
+
+async function mmMoveDim(dimId, direction) {
+  const idx = MM.dimensions.findIndex(d => d.id === dimId);
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= MM.dimensions.length) return;
+
+  // Swap
+  [MM.dimensions[idx], MM.dimensions[newIdx]] = [MM.dimensions[newIdx], MM.dimensions[idx]];
+
+  // Update sort_order for both
+  await Promise.all([
+    mmSupa().from('maturity_dimensions').update({ sort_order: idx }).eq('id', MM.dimensions[idx].id),
+    mmSupa().from('maturity_dimensions').update({ sort_order: newIdx }).eq('id', MM.dimensions[newIdx].id),
+  ]);
+
+  MM.dimensions[idx].sort_order = idx;
+  MM.dimensions[newIdx].sort_order = newIdx;
+  mmRenderDimensions();
+}
+
+// =============================================
+//  QUESTIONS (modal-style inline editor)
+// =============================================
+async function mmAddQuestion(dimId) {
+  const qs = MM.questions[dimId] || [];
+  const sortOrder = qs.length;
+
+  const { data: q, error } = await mmSupa()
+    .from('maturity_questions')
+    .insert({
+      dimension_id: dimId,
+      text: '',
+      sort_order: sortOrder,
+    })
+    .select()
+    .single();
+
+  if (error) { console.error('[MM] Add Q error:', error); return; }
+
+  if (!MM.questions[dimId]) MM.questions[dimId] = [];
+  MM.questions[dimId].push(q);
+  MM.options[q.id] = [];
+
+  // Add 5 default options (scores 1-5)
+  const defaultOpts = [
+    { question_id: q.id, text: '', score: 1, sort_order: 0 },
+    { question_id: q.id, text: '', score: 2, sort_order: 1 },
+    { question_id: q.id, text: '', score: 3, sort_order: 2 },
+    { question_id: q.id, text: '', score: 4, sort_order: 3 },
+    { question_id: q.id, text: '', score: 5, sort_order: 4 },
+  ];
+
+  const { data: opts } = await mmSupa()
+    .from('maturity_options')
+    .insert(defaultOpts)
+    .select();
+
+  MM.options[q.id] = opts || [];
+
+  mmRenderDimensions();
+  mmEditQuestion(q.id);
+}
+
+function mmEditQuestion(qId) {
+  // Find the question
+  let question = null;
+  for (const dimId in MM.questions) {
+    const q = MM.questions[dimId].find(q => q.id === qId);
+    if (q) { question = q; break; }
+  }
+  if (!question) return;
+
+  const opts = MM.options[qId] || [];
+
+  // Create inline edit modal
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:500;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:white;border-radius:12px;padding:1.5rem;width:90%;max-width:600px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.15);';
+
+  modal.innerHTML = `
+    <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1rem;">Edit Question</h3>
+    <div class="mm-field">
+      <label class="mm-label">Question Text</label>
+      <textarea class="mm-textarea" id="mmeq-text" style="min-height:60px;">${escHtml(question.text)}</textarea>
+    </div>
+    <div class="mm-label" style="margin-bottom:0.5rem;">Answer Options (score 1–5, lowest to highest maturity)</div>
+    ${opts.sort((a,b) => a.score - b.score).map(o => `
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
+        <span style="font-weight:700;color:var(--pink);min-width:1.5rem;text-align:center;font-size:0.8rem;">${o.score}</span>
+        <input class="mm-input" value="${escAttr(o.text)}" data-opt-id="${o.id}" style="flex:1;font-size:0.8rem;">
+      </div>
+    `).join('')}
+    <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;">
+      <button class="mm-btn mm-btn-secondary" onclick="this.closest('div[style*=fixed]').remove()">Cancel</button>
+      <button class="mm-btn mm-btn-primary" onclick="mmSaveQuestion('${qId}',this)">Save Question</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
+async function mmSaveQuestion(qId, btnEl) {
+  const overlay = btnEl.closest('div[style*="fixed"]');
+  const qText = overlay.querySelector('#mmeq-text').value.trim();
+
+  // Update question text
+  await mmSupa().from('maturity_questions').update({ text: qText }).eq('id', qId);
+
+  // Update each option
+  const optInputs = overlay.querySelectorAll('[data-opt-id]');
+  for (const input of optInputs) {
+    const optId = input.dataset.optId;
+    const text = input.value.trim();
+    await mmSupa().from('maturity_options').update({ text }).eq('id', optId);
+    // Update local cache
+    const optArr = MM.options[qId] || [];
+    const opt = optArr.find(o => o.id === optId);
+    if (opt) opt.text = text;
+  }
+
+  // Update local question cache
+  for (const dimId in MM.questions) {
+    const q = MM.questions[dimId].find(q => q.id === qId);
+    if (q) { q.text = qText; break; }
+  }
+
+  overlay.remove();
+  mmRenderDimensions();
+}
+
+async function mmDeleteQuestion(qId, dimId) {
+  if (!confirm('Delete this question?')) return;
+  await mmSupa().from('maturity_questions').delete().eq('id', qId);
+  MM.questions[dimId] = (MM.questions[dimId] || []).filter(q => q.id !== qId);
+  delete MM.options[qId];
+  mmRenderDimensions();
+}
+
+// =============================================
+//  LEADS TAB
+// =============================================
+async function mmRefreshLeads() {
+  if (!MM.current) return;
+
+  const { data, error } = await mmSupa()
+    .from('maturity_submissions')
+    .select('*')
+    .eq('model_id', MM.current.id)
+    .eq('completed', true)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if (error) { console.error('[MM] Leads error:', error); return; }
+  MM.leadsCache = data || [];
+  mmRenderLeads();
+}
+
+function mmRenderLeads() {
+  const leads = MM.leadsCache;
+  document.getElementById('mm-leads-count').textContent = `${leads.length} lead${leads.length !== 1 ? 's' : ''}`;
+
+  if (!leads.length) {
+    document.getElementById('mm-leads-container').innerHTML = '<div class="mm-empty"><p>No submissions yet. Share your assessment link to start capturing leads.</p></div>';
+    return;
+  }
+
+  const rows = leads.map(l => {
+    const band = mmScoreBand(l.overall_score);
+    return `<tr>
+      <td>${escHtml(l.full_name || '—')}</td>
+      <td>${escHtml(l.email || '—')}</td>
+      <td>${escHtml(l.company || '—')}</td>
+      <td><span class="mm-score-pill mm-score-${band.key}">${Number(l.overall_score).toFixed(1)}</span></td>
+      <td>${mmTimeAgo(l.created_at)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('mm-leads-container').innerHTML = `
+    <table class="mm-leads-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Score</th><th>When</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// =============================================
+//  PREVIEW & PUBLISH
+// =============================================
+function mmPreview() {
+  if (!MM.current) return;
+  const slug = document.getElementById('mm-slug').value.trim() || MM.current.id;
+  // Open in new tab with preview flag
+  window.open(`/maturity/preview/${MM.current.id}`, '_blank');
+}
+
+async function mmTogglePublish() {
+  if (!MM.current) return;
+  const newStatus = MM.current.status === 'published' ? 'draft' : 'published';
+  const slug = document.getElementById('mm-slug').value.trim();
+
+  if (newStatus === 'published' && !slug) {
+    alert('Please set a URL slug before publishing.');
+    mmSwitchTab('setup');
+    document.getElementById('mm-slug').focus();
+    return;
+  }
+
+  document.getElementById('mm-status').value = newStatus;
+  MM.current.status = newStatus;
+  await mmSaveModel();
+  mmUpdatePublishBar();
+}
+
+function mmUpdatePublishBar() {
+  const m = MM.current;
+  if (!m) return;
+
+  const status = document.getElementById('mm-pub-status');
+  const btn = document.getElementById('mm-pub-toggle');
+  const slug = m.slug || document.getElementById('mm-slug').value.trim();
+
+  if (m.status === 'published') {
+    const url = `reports.categoryleaders.co.uk/maturity/${slug}`;
+    status.innerHTML = `<strong>Published</strong> — <span class="mm-url-display">${url}</span>`;
+    btn.textContent = 'Unpublish';
+    btn.className = 'mm-btn mm-btn-danger mm-btn-sm';
+  } else {
+    status.innerHTML = `<strong>Draft</strong> — not yet visible to anyone`;
+    btn.textContent = 'Publish';
+    btn.className = 'mm-btn mm-btn-primary mm-btn-sm';
+  }
+}
+
+// =============================================
+//  UI HELPERS
+// =============================================
+function mmShowList() {
+  document.getElementById('mm-view-list').style.display = '';
+  document.getElementById('mm-view-editor').style.display = 'none';
+  mmLoadModels();
+}
+
+function mmShowEditor() {
+  document.getElementById('mm-view-list').style.display = 'none';
+  document.getElementById('mm-view-editor').style.display = 'flex';
+}
+
+function mmSwitchTab(tabName) {
+  document.querySelectorAll('.mm-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  document.querySelectorAll('.mm-tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabName));
+  if (tabName === 'leads') mmRefreshLeads();
+}
+
+function mmToggleEmailList() {
+  const mode = document.getElementById('mm-access-mode').value;
+  document.getElementById('mm-email-list-field').style.display = mode === 'email_list' ? '' : 'none';
+}
+
+function mmUpdateSlugPreview() {
+  const slug = document.getElementById('mm-slug').value.trim() || '—';
+  document.getElementById('mm-slug-preview').textContent = `reports.categoryleaders.co.uk/maturity/${slug}`;
+}
+
+document.getElementById('mm-slug').addEventListener('input', mmUpdateSlugPreview);
+
+function mmSyncColor(val) {
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    document.getElementById('mm-brand-color').value = val;
+  }
+  document.getElementById('mm-brand-color-hex').value = val;
+  mmDirty();
+}
+
+document.getElementById('mm-brand-color').addEventListener('input', function() {
+  document.getElementById('mm-brand-color-hex').value = this.value;
+  mmDirty();
+});
+
+function mmDirty() { MM.dirty = true; }
+
+function mmScoreBand(score) {
+  const s = Number(score);
+  if (s < 2) return { key: 'developing', label: 'Developing' };
+  if (s < 3) return { key: 'established', label: 'Established' };
+  if (s < 4) return { key: 'advanced', label: 'Advanced' };
+  return { key: 'optimising', label: 'Optimising' };
+}
+
+function mmTimeAgo(dateStr) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// =============================================
+//  INIT
+// =============================================
+const maturityModels = {
+  init() {
+    mmLoadModels();
+  }
+};
+
+maturityModels.init();
+</script>

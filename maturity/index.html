@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maturity Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --accent:#6366f1;
+  --accent-light:#eef2ff;
+  --accent-dark:#4338ca;
+  --text:#111827;
+  --text-muted:#6b7280;
+  --border:#e5e7eb;
+  --bg:#f9fafb;
+  --white:#ffffff;
+  --radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04);
+}
+
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── Loading ── */
+.loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--text-muted);font-size:0.9rem;}
+
+/* ── Header ── */
+.header{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:var(--accent)}
+.logo-badge{width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:800;flex-shrink:0}
+.logo-img{height:32px;width:auto;}
+.header-actions{display:flex;gap:8px;align-items:center}
+
+/* ── Progress ── */
+.progress-wrap{background:var(--border);height:3px;width:100%}
+.progress-fill{height:100%;background:var(--accent);transition:width .4s ease}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none;letter-spacing:-.1px;font-family:inherit}
+.btn-primary{background:var(--accent);color:white}
+.btn-primary:hover:not(:disabled){background:var(--accent-dark);transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,.3)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:var(--white);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--text-muted);padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s;font-family:inherit}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── Welcome ── */
+.welcome-container{max-width:700px;margin:0 auto;padding:56px 24px 64px}
+.welcome-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;padding:5px 12px;border-radius:100px;margin-bottom:20px;letter-spacing:.6px;text-transform:uppercase}
+.welcome-h1{font-size:34px;font-weight:800;color:var(--text);line-height:1.2;margin-bottom:14px;letter-spacing:-.5px}
+.welcome-sub{font-size:16px;color:var(--text-muted);max-width:520px;margin-bottom:40px;line-height:1.65}
+.welcome-meta{display:flex;gap:28px;margin-bottom:40px;flex-wrap:wrap}
+.meta-item{display:flex;flex-direction:column;align-items:flex-start}
+.meta-value{font-size:26px;font-weight:900;color:var(--accent);line-height:1}
+.meta-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:2px}
+.checklist{display:flex;flex-direction:column;gap:10px;margin-bottom:44px}
+.checklist-item{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;align-items:center;gap:14px}
+.cl-num{width:28px;height:28px;border-radius:7px;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cl-icon{font-size:18px;flex-shrink:0}
+.cl-body{flex:1;min-width:0}
+.cl-title{font-weight:600;font-size:14px;color:var(--text)}
+.cl-desc{font-size:12px;color:var(--text-muted);margin-top:1px}
+.cl-qs{font-size:11px;color:var(--text-muted);background:var(--bg);padding:3px 8px;border-radius:100px;flex-shrink:0;font-weight:600;border:1px solid var(--border)}
+
+/* ── Assessment ── */
+.assessment-layout{max-width:660px;margin:0 auto;padding:44px 24px}
+.q-context{display:flex;align-items:center;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.dim-chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;letter-spacing:.3px}
+.q-num{font-size:12px;color:var(--text-muted);font-weight:500}
+.q-text{font-size:22px;font-weight:700;color:var(--text);line-height:1.38;margin-bottom:28px;letter-spacing:-.3px}
+.options-list{display:flex;flex-direction:column;gap:9px;margin-bottom:36px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--white);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;text-align:left}
+.opt:hover{border-color:var(--accent);background:var(--accent-light)}
+.opt.selected{border-color:var(--accent);background:var(--accent-light)}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:2px;transition:all .15s;position:relative;background:var(--white)}
+.opt.selected .opt-radio{background:var(--accent);border-color:var(--accent)}
+.opt.selected .opt-radio::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:white}
+.opt-text{font-size:14px;color:var(--text);line-height:1.45}
+.q-nav{display:flex;justify-content:space-between;align-items:center}
+.q-dots{display:flex;gap:5px}
+.q-dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all .2s}
+.q-dot.done{background:var(--accent);opacity:.45}
+.q-dot.active{background:var(--accent);width:18px;border-radius:4px}
+
+/* ── Results ── */
+.results-layout{max-width:880px;margin:0 auto;padding:44px 24px 80px}
+.results-hdr{text-align:center;margin-bottom:44px}
+.results-badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:700;padding:5px 14px;border-radius:100px;margin-bottom:14px;letter-spacing:.3px}
+.results-hdr h2{font-size:26px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.results-hdr p{color:var(--text-muted);font-size:15px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card-h{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px}
+.chart-wrap{display:flex;flex-direction:column;align-items:center}
+.chart-canvas-wrap-lg{width:100%;max-width:480px;height:480px;position:relative;margin:0 auto}
+.score-row{display:flex;align-items:baseline;justify-content:center;gap:6px;margin-top:16px}
+.score-num{font-size:52px;font-weight:900;color:var(--accent);line-height:1}
+.score-lbl{font-size:14px;color:var(--text-muted);font-weight:600}
+
+.findings-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:680px){.findings-row{grid-template-columns:1fr}}
+.finding{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:8px}
+.finding.str{border-top:3px solid #10b981}
+.finding.opp{border-top:3px solid #f59e0b}
+.finding.risk{border-top:3px solid #ef4444}
+.finding-head{display:flex;align-items:center;gap:7px}
+.finding-ico{font-size:18px;flex-shrink:0}
+.finding-type{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+.finding.str .finding-type{color:#10b981}
+.finding.opp .finding-type{color:#d97706}
+.finding.risk .finding-type{color:#ef4444}
+.finding-body{font-size:13px;color:var(--text);line-height:1.5}
+
+.recs{margin-top:20px}
+.recs-h{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.rec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;border-left:4px solid var(--accent)}
+.rec-dim{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.rec-text{font-size:13px;color:var(--text);line-height:1.55}
+
+.results-cta{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);margin-top:32px}
+.results-cta p{color:var(--text-muted);font-size:14px;margin-bottom:16px}
+
+.powered-by{text-align:center;font-size:11px;color:var(--text-muted);padding:24px 0 8px;border-top:1px solid var(--border);margin-top:16px}
+.powered-by a{color:var(--accent);text-decoration:none;font-weight:600}
+.powered-by.hidden{display:none}
+
+/* ── Lead gate overlay ── */
+.gate-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.gate-overlay.open{opacity:1;pointer-events:all}
+.gate-modal{background:var(--white);border-radius:16px;padding:2rem;width:90%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.gate-modal h3{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:0.5rem}
+.gate-modal p{font-size:0.85rem;color:var(--text-muted);margin-bottom:1.25rem;line-height:1.5}
+.gate-field{margin-bottom:0.75rem}
+.gate-field label{display:block;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.3rem}
+.gate-field input{width:100%;padding:0.6rem 0.75rem;border:1px solid var(--border);border-radius:8px;font-size:0.85rem;font-family:inherit;color:var(--text);background:var(--white)}
+.gate-field input:focus{outline:none;border-color:var(--accent)}
+
+/* ── Blurred results section ── */
+.results-gated{position:relative}
+.results-gated .gated-blur{filter:blur(6px);pointer-events:none;user-select:none}
+.results-gated .gate-prompt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:10;background:rgba(255,255,255,0.9);padding:2rem;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.gate-prompt h3{font-size:1rem;font-weight:700;margin-bottom:0.5rem}
+.gate-prompt p{font-size:0.85rem;color:var(--text-muted);margin-bottom:1rem}
+
+/* ── Preview banner ── */
+.preview-banner{background:#fef3c7;border-bottom:2px solid #f59e0b;padding:8px 16px;text-align:center;font-size:13px;font-weight:600;color:#92400e;display:none}
+.preview-banner.active{display:block}
+</style>
+</head>
+<body>
+
+<div class="preview-banner" id="preview-banner">Preview Mode — this assessment is not yet published</div>
+
+<!-- LOADING -->
+<div class="screen active" id="screen-loading">
+  <div class="loading-screen">Loading assessment…</div>
+</div>
+
+<!-- ERROR -->
+<div class="screen" id="screen-error">
+  <div class="loading-screen" id="error-msg">Assessment not found.</div>
+</div>
+
+<!-- WELCOME -->
+<div class="screen" id="screen-welcome">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-badge" id="w-badge">CL</div>
+      <span id="w-company">Assessment</span>
+    </div>
+  </header>
+  <div class="welcome-container">
+    <div class="welcome-eyebrow" id="w-eyebrow">📊 Maturity Assessment</div>
+    <h1 class="welcome-h1" id="w-title"></h1>
+    <p class="welcome-sub" id="w-desc"></p>
+    <div class="welcome-meta">
+      <div class="meta-item"><div class="meta-value" id="w-qcount">0</div><div class="meta-label">Questions</div></div>
+      <div class="meta-item"><div class="meta-value" id="w-mins">~5</div><div class="meta-label">Minutes</div></div>
+      <div class="meta-item"><div class="meta-value" id="w-dims">0</div><div class="meta-label">Dimensions</div></div>
+    </div>
+    <div class="checklist" id="w-checklist"></div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="startAssessment()">Start your assessment →</button>
+      <span style="font-size:13px;color:var(--text-muted)">No account needed · Results shown instantly</span>
+    </div>
+    <div class="powered-by" id="pw-welcome">Powered by <a href="https://categoryleaders.co.uk">Category Leaders</a></div>
+  </div>
+</div>
+
+<!-- ASSESSMENT -->
+<div class="screen" id="screen-assessment">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-badge" id="a-badge">CL</div>
+      <span id="a-company">Assessment</span>
+    </div>
+  </header>
+  <div class="progress-wrap"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="assessment-layout">
+    <div class="q-context" id="q-ctx"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="options-list" id="q-opts"></div>
+    <div class="q-nav">
+      <button class="btn btn-secondary" id="btn-back" onclick="goBack()">← Back</button>
+      <div class="q-dots" id="q-dots"></div>
+      <button class="btn btn-primary" id="btn-next" onclick="goNext()" disabled>Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-badge" id="r-badge">CL</div>
+      <span id="r-company">Assessment</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost" onclick="restartAssessment()">↺ Retake</button>
+    </div>
+  </header>
+  <div class="results-layout">
+    <div class="results-hdr">
+      <div class="results-badge">✓ Assessment Complete</div>
+      <h2>Your Maturity Report</h2>
+      <p id="r-subtitle"></p>
+    </div>
+
+    <!-- Headline — always shown -->
+    <div class="card chart-wrap" id="r-headline">
+      <div class="card-h">Overall maturity score</div>
+      <div class="chart-canvas-wrap-lg"><canvas id="radarChart"></canvas></div>
+      <div class="score-row">
+        <div class="score-num" id="r-score">—</div>
+        <div class="score-lbl">/ 5.0</div>
+      </div>
+    </div>
+
+    <!-- Findings — headline metrics (partially shown) -->
+    <div class="findings-row" id="findings-list"></div>
+
+    <!-- GATED SECTION: full report behind lead capture -->
+    <div id="r-gated-section">
+      <div class="card" id="r-col-chart-card">
+        <div class="card-h">Maturity by dimension</div>
+        <div style="position:relative;height:340px;padding-top:8px"><canvas id="colChart"></canvas></div>
+      </div>
+      <div id="rec-section" style="display:none">
+        <div class="recs-h">🎯 Priority areas for improvement</div>
+        <div class="rec-grid" id="rec-grid"></div>
+      </div>
+      <div class="results-cta" id="r-cta">
+        <p id="r-cta-text"></p>
+        <a class="btn btn-primary" id="r-cta-link" href="#" target="_blank"></a>
+      </div>
+    </div>
+
+    <div class="powered-by" id="pw-results">Powered by <a href="https://categoryleaders.co.uk">Category Leaders</a></div>
+  </div>
+</div>
+
+<!-- Lead Gate Overlay -->
+<div class="gate-overlay" id="gate-overlay" onclick="if(event.target===this)closeGate()">
+  <div class="gate-modal">
+    <h3>Unlock your full report</h3>
+    <p>Enter your details to see the complete maturity breakdown, dimension-level scores, and personalised recommendations.</p>
+    <div class="gate-field"><label>Full Name</label><input id="gate-name" placeholder="Your name"></div>
+    <div class="gate-field"><label>Email</label><input id="gate-email" type="email" placeholder="you@company.com"></div>
+    <div class="gate-field"><label>Company</label><input id="gate-company" placeholder="Company name"></div>
+    <div class="gate-field"><label>Job Title</label><input id="gate-title" placeholder="Your role"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="submitGate()">See my full report →</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// =============================================
+//  CONFIG
+// =============================================
+const SUPABASE_URL = 'https://api.categoryleaders.co.uk';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdnhod3pkYXBsdXB6d2Jrc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMzk0OTQsImV4cCI6MjA4ODkxNTQ5NH0.cc5aPNG3EyxiIMXgQ0rVGGSj7J7VAMU6pzSuI8U96Ng';
+
+const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let MODEL = null;    // maturity_models row
+let DIMS = [];       // maturity_dimensions rows (ordered)
+let QS = {};         // { dimId: [questions with opts] }
+let S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null };
+let SUBMISSION_ID = null;
+let radarChart = null, colChart = null;
+let IS_PREVIEW = false;
+
+// =============================================
+//  LOAD MODEL
+// =============================================
+async function loadModel() {
+  const path = window.location.pathname;
+
+  // Determine if preview mode: /maturity/preview/[model-id]
+  const previewMatch = path.match(/\/maturity\/preview\/([a-f0-9-]+)/i);
+  const slugMatch = path.match(/\/maturity\/([a-z0-9-]+)/i);
+
+  let model = null;
+
+  if (previewMatch) {
+    IS_PREVIEW = true;
+    const modelId = previewMatch[1];
+    const { data, error } = await supa
+      .from('maturity_models')
+      .select('*')
+      .eq('id', modelId)
+      .single();
+    if (error || !data) return showError('Assessment not found.');
+    model = data;
+  } else if (slugMatch) {
+    const slug = slugMatch[1];
+    const { data, error } = await supa
+      .from('maturity_models')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .limit(1)
+      .single();
+    if (error || !data) return showError('Assessment not found or not yet published.');
+    model = data;
+  } else {
+    return showError('No assessment specified.');
+  }
+
+  MODEL = model;
+
+  // Show preview banner
+  if (IS_PREVIEW) {
+    document.getElementById('preview-banner').classList.add('active');
+  }
+
+  // Load dimensions
+  const { data: dims } = await supa
+    .from('maturity_dimensions')
+    .select('*')
+    .eq('model_id', MODEL.id)
+    .order('sort_order');
+  DIMS = dims || [];
+
+  if (!DIMS.length) return showError('This assessment has no dimensions configured yet.');
+
+  // Load questions + options for each dimension
+  const dimIds = DIMS.map(d => d.id);
+  const { data: questions } = await supa
+    .from('maturity_questions')
+    .select('*, maturity_options(*)')
+    .in('dimension_id', dimIds)
+    .order('sort_order');
+
+  QS = {};
+  (questions || []).forEach(q => {
+    if (!QS[q.dimension_id]) QS[q.dimension_id] = [];
+    // Sort options by sort_order
+    q.maturity_options = (q.maturity_options || []).sort((a,b) => a.sort_order - b.sort_order);
+    QS[q.dimension_id].push(q);
+  });
+
+  // Apply branding
+  applyBranding();
+
+  // Set up welcome screen
+  setupWelcome();
+
+  // Show welcome
+  showScreen('welcome');
+}
+
+function showError(msg) {
+  document.getElementById('error-msg').textContent = msg;
+  showScreen('error');
+}
+
+// =============================================
+//  BRANDING
+// =============================================
+function applyBranding() {
+  const brand = MODEL.brand || {};
+  const accent = brand.accentColor || '#6366f1';
+  const companyName = brand.companyName || 'Assessment';
+  const whiteLabel = brand.whiteLabel;
+
+  document.documentElement.style.setProperty('--accent', accent);
+  document.documentElement.style.setProperty('--accent-light', lighten(accent));
+  document.documentElement.style.setProperty('--accent-dark', darken(accent));
+
+  // Company name in headers
+  const initials = companyName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  ['w-badge','a-badge','r-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = initials;
+  });
+  ['w-company','a-company','r-company'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = companyName;
+  });
+
+  // White-label
+  if (whiteLabel) {
+    document.querySelectorAll('.powered-by').forEach(el => el.classList.add('hidden'));
+  }
+
+  // Page title
+  document.title = MODEL.title + ' — ' + companyName;
+}
+
+function hexToRgb(hex) { return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)]; }
+function lighten(hex, f=0.88) { const [r,g,b]=hexToRgb(hex); return `rgb(${Math.round(r+(255-r)*f)},${Math.round(g+(255-g)*f)},${Math.round(b+(255-b)*f)})`; }
+function darken(hex, f=0.15) { const [r,g,b]=hexToRgb(hex); return `rgb(${Math.round(r*(1-f))},${Math.round(g*(1-f))},${Math.round(b*(1-f))})`; }
+
+// =============================================
+//  WELCOME
+// =============================================
+function setupWelcome() {
+  document.getElementById('w-title').textContent = MODEL.title;
+  document.getElementById('w-desc').textContent = MODEL.description || 'Answer a short set of questions about how your organisation operates today. We\'ll identify where you\'re performing well — and where there\'s room to grow.';
+
+  const totalQ = DIMS.reduce((n, d) => n + (QS[d.id]||[]).length, 0);
+  document.getElementById('w-qcount').textContent = totalQ;
+  document.getElementById('w-dims').textContent = DIMS.length;
+  document.getElementById('w-mins').textContent = '~' + Math.max(3, Math.ceil(totalQ * 0.3));
+
+  // Checklist
+  document.getElementById('w-checklist').innerHTML = DIMS.map((d, i) => `
+    <div class="checklist-item">
+      <div class="cl-num">${i+1}</div>
+      <div class="cl-icon">${d.icon}</div>
+      <div class="cl-body">
+        <div class="cl-title">${esc(d.name)}</div>
+        <div class="cl-desc">${esc(d.description)}</div>
+      </div>
+      <div class="cl-qs">${(QS[d.id]||[]).length}q</div>
+    </div>
+  `).join('');
+}
+
+// =============================================
+//  ASSESSMENT FLOW
+// =============================================
+function totalQs() { return DIMS.reduce((n, d) => n + (QS[d.id]||[]).length, 0); }
+function qsBefore(di) { let n=0; for(let i=0;i<di;i++) n += (QS[DIMS[i].id]||[]).length; return n; }
+function progress() { return ((qsBefore(S.dimIdx) + S.qIdx) / totalQs()) * 100; }
+
+function startAssessment() {
+  S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null };
+  DIMS.forEach(d => { S.answers[d.id] = []; });
+  showScreen('assessment');
+  renderQ();
+}
+
+function restartAssessment() {
+  if (radarChart) { radarChart.destroy(); radarChart = null; }
+  if (colChart) { colChart.destroy(); colChart = null; }
+  startAssessment();
+}
+
+function goNext() {
+  if (S.selected === null) return;
+  const dim = DIMS[S.dimIdx];
+  S.answers[dim.id][S.qIdx] = S.selected;
+  S.selected = null;
+  const qs = QS[dim.id] || [];
+  if (S.qIdx < qs.length - 1) { S.qIdx++; renderQ(); }
+  else if (S.dimIdx < DIMS.length - 1) { S.dimIdx++; S.qIdx = 0; renderQ(); }
+  else { showResults(); }
+}
+
+function goBack() {
+  S.selected = null;
+  if (S.qIdx > 0) { S.qIdx--; }
+  else if (S.dimIdx > 0) { S.dimIdx--; S.qIdx = (QS[DIMS[S.dimIdx].id]||[]).length - 1; }
+  else { showScreen('welcome'); return; }
+  renderQ();
+}
+
+function selectOpt(score, optId, el) {
+  S.selected = { score, optId };
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-next').disabled = false;
+  const dim = DIMS[S.dimIdx];
+  const qs = QS[dim.id] || [];
+  const isLast = S.dimIdx === DIMS.length - 1 && S.qIdx === qs.length - 1;
+  document.getElementById('btn-next').textContent = isLast ? 'See my results →' : 'Next →';
+}
+
+function renderQ() {
+  const dim = DIMS[S.dimIdx];
+  const qs = QS[dim.id] || [];
+  const q = qs[S.qIdx];
+  if (!q) return;
+  const globalNum = qsBefore(S.dimIdx) + S.qIdx + 1;
+  const total = totalQs();
+  const isLast = S.dimIdx === DIMS.length - 1 && S.qIdx === qs.length - 1;
+  const isFirst = S.dimIdx === 0 && S.qIdx === 0;
+
+  document.getElementById('prog-fill').style.width = progress() + '%';
+  document.getElementById('q-ctx').innerHTML = `<span class="dim-chip">${dim.icon} ${esc(dim.name)}</span><span class="q-num">Question ${globalNum} of ${total}</span>`;
+  document.getElementById('q-text').textContent = q.text;
+
+  const saved = S.answers[dim.id][S.qIdx];
+  const opts = q.maturity_options || [];
+
+  document.getElementById('q-opts').innerHTML = opts.map(opt => `
+    <div class="opt ${saved && saved.optId === opt.id ? 'selected' : ''}" onclick="selectOpt(${opt.score},'${opt.id}',this)">
+      <div class="opt-radio"></div>
+      <div class="opt-text">${esc(opt.text)}</div>
+    </div>
+  `).join('');
+
+  if (saved) {
+    S.selected = saved;
+    document.getElementById('btn-next').disabled = false;
+  } else {
+    S.selected = null;
+    document.getElementById('btn-next').disabled = true;
+  }
+  document.getElementById('btn-next').textContent = isLast ? 'See my results →' : 'Next →';
+
+  const btnBack = document.getElementById('btn-back');
+  btnBack.disabled = isFirst;
+  btnBack.style.opacity = isFirst ? '0.3' : '1';
+
+  document.getElementById('q-dots').innerHTML = qs.map((_,i) => {
+    let cls = 'q-dot';
+    if (i < S.qIdx) cls += ' done';
+    if (i === S.qIdx) cls += ' active';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  // Animate
+  const layout = document.querySelector('.assessment-layout');
+  layout.style.opacity = '0'; layout.style.transform = 'translateY(10px)';
+  requestAnimationFrame(() => {
+    layout.style.transition = 'opacity .22s ease, transform .22s ease';
+    layout.style.opacity = '1'; layout.style.transform = 'translateY(0)';
+  });
+}
+
+// =============================================
+//  RESULTS
+// =============================================
+function dimScore(dimId) {
+  const a = S.answers[dimId] || [];
+  if (!a.length) return 0;
+  return a.reduce((s, v) => s + v.score, 0) / a.length;
+}
+
+function overallScore() {
+  const scores = DIMS.map(d => dimScore(d.id));
+  return scores.reduce((s,v) => s+v, 0) / scores.length;
+}
+
+async function showResults() {
+  showScreen('results');
+
+  const scores = DIMS.map(d => dimScore(d.id));
+  const overall = overallScore();
+  const accent = (MODEL.brand || {}).accentColor || '#6366f1';
+
+  document.getElementById('r-score').textContent = overall.toFixed(1);
+  document.getElementById('r-subtitle').textContent = `Based on your responses across ${DIMS.length} dimensions`;
+
+  // Radar chart
+  if (radarChart) radarChart.destroy();
+  radarChart = new Chart(document.getElementById('radarChart').getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: DIMS.map(d => d.chart_label || d.name),
+      datasets: [{ data: scores, backgroundColor: accent + '18', borderColor: accent, borderWidth: 2.5, pointBackgroundColor: accent, pointRadius: 5 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { r: { min: 0, max: 5, ticks: { display: false, stepSize: 1 }, grid: { color: 'rgba(0,0,0,.06)' }, angleLines: { color: 'rgba(0,0,0,.06)' }, pointLabels: { font: { size: 12, weight: '600' }, color: '#6b7280' } } },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw.toFixed(1)} / 5` } } }
+    }
+  });
+
+  // Findings
+  const ranked = DIMS.map((d,i) => ({d,score:scores[i]})).sort((a,b) => b.score - a.score);
+  const strongest = ranked[0], opp = ranked[ranked.length-2], risk = ranked[ranked.length-1];
+  document.getElementById('findings-list').innerHTML = `
+    <div class="finding str"><div class="finding-head"><span class="finding-ico">💪</span><span class="finding-type">Strength</span></div><div class="finding-body"><strong>${esc(strongest.d.name)}</strong> is your highest-performing area (${strongest.score.toFixed(1)}/5).</div></div>
+    <div class="finding opp"><div class="finding-head"><span class="finding-ico">🚀</span><span class="finding-type">Biggest Opportunity</span></div><div class="finding-body"><strong>${esc(opp.d.name)}</strong> (${opp.score.toFixed(1)}/5) shows the most potential for improvement.</div></div>
+    <div class="finding risk"><div class="finding-head"><span class="finding-ico">⚠️</span><span class="finding-type">Priority Risk</span></div><div class="finding-body"><strong>${esc(risk.d.name)}</strong> (${risk.score.toFixed(1)}/5) is your most exposed area.</div></div>`;
+
+  // Apply lead gate
+  const gate = MODEL.lead_gate || 'before_full_report';
+  if (gate === 'before_full_report') {
+    // Show headline (radar + findings), blur the rest
+    const gated = document.getElementById('r-gated-section');
+    gated.classList.add('gated-blur');
+    gated.style.position = 'relative';
+    // Add prompt overlay
+    const prompt = document.createElement('div');
+    prompt.className = 'gate-prompt';
+    prompt.innerHTML = `<h3>Unlock your full report</h3><p>Enter your details to see the complete dimension breakdown and personalised recommendations.</p><button class="btn btn-primary" onclick="openGate()">Unlock full report →</button>`;
+    gated.parentElement.insertBefore(prompt, gated);
+    prompt.style.cssText = 'text-align:center;background:rgba(255,255,255,0.95);padding:2rem;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);margin-bottom:1rem;';
+  } else if (gate === 'before_any_results') {
+    openGate();
+  } else {
+    // No gate — render full results
+    renderFullResults(scores);
+    saveSubmission(overall, scores, null);
+  }
+
+  // CTA
+  document.getElementById('r-cta-text').textContent = MODEL.cta_text || 'Want to turn these findings into a roadmap?';
+  const ctaLink = document.getElementById('r-cta-link');
+  ctaLink.textContent = MODEL.cta_text || 'Get your personalised improvement plan →';
+  ctaLink.href = MODEL.cta_url || '#';
+  if (!MODEL.cta_url) ctaLink.style.display = 'none';
+}
+
+function openGate() {
+  document.getElementById('gate-overlay').classList.add('open');
+}
+
+function closeGate() {
+  document.getElementById('gate-overlay').classList.remove('open');
+}
+
+async function submitGate() {
+  const name = document.getElementById('gate-name').value.trim();
+  const email = document.getElementById('gate-email').value.trim();
+  const company = document.getElementById('gate-company').value.trim();
+  const title = document.getElementById('gate-title').value.trim();
+
+  if (!email) { alert('Please enter your email address.'); return; }
+
+  closeGate();
+
+  const scores = DIMS.map(d => dimScore(d.id));
+  const overall = overallScore();
+
+  // Remove blur
+  const gated = document.getElementById('r-gated-section');
+  gated.classList.remove('gated-blur');
+  // Remove prompt overlay
+  const prompt = gated.parentElement.querySelector('.gate-prompt');
+  if (prompt) prompt.remove();
+
+  renderFullResults(scores);
+  await saveSubmission(overall, scores, { full_name: name, email, company, job_title: title });
+}
+
+function renderFullResults(scores) {
+  const accent = (MODEL.brand || {}).accentColor || '#6366f1';
+
+  // Column chart with maturity bands
+  if (colChart) colChart.destroy();
+  const maturityBandsPlugin = {
+    id: 'maturityBands',
+    beforeDatasetsDraw(chart) {
+      const { ctx, chartArea, scales: { y } } = chart;
+      if (!y || !chartArea) return;
+      const { left, right } = chartArea;
+      const bands = [
+        { min:0, max:2, color:'rgba(239,68,68,.05)', label:'Developing' },
+        { min:2, max:3, color:'rgba(245,158,11,.06)', label:'Established' },
+        { min:3, max:4, color:'rgba(16,185,129,.06)', label:'Advanced' },
+        { min:4, max:5, color:'rgba(16,185,129,.12)', label:'Optimising' }
+      ];
+      bands.forEach(b => {
+        const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
+        ctx.save(); ctx.fillStyle = b.color; ctx.fillRect(left, yTop, right-left, yBottom-yTop);
+        ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.font = '600 10px Inter,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        ctx.fillText(b.label, right-6, (yTop+yBottom)/2); ctx.restore();
+      });
+    }
+  };
+  const scoreLabelsPlugin = {
+    id: 'scoreLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      chart.getDatasetMeta(0).data.forEach((bar,i) => {
+        const val = chart.data.datasets[0].data[i];
+        ctx.save(); ctx.fillStyle = '#374151'; ctx.font = '700 13px Inter,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.fillText(val.toFixed(1), bar.x, bar.y - 5); ctx.restore();
+      });
+    }
+  };
+
+  colChart = new Chart(document.getElementById('colChart').getContext('2d'), {
+    type: 'bar',
+    plugins: [maturityBandsPlugin, scoreLabelsPlugin],
+    data: {
+      labels: DIMS.map(d => d.chart_label || d.name),
+      datasets: [{ data: scores, backgroundColor: DIMS.map(d => (d.color||accent)+'bb'), borderColor: DIMS.map(d => d.color||accent), borderWidth: 1.5, borderRadius: 6, borderSkipped: false }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 24, right: 72 } },
+      scales: { y: { min:0, max:5, ticks:{stepSize:1,font:{size:11},color:'#9ca3af'}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} }, x: { grid:{display:false}, ticks:{font:{size:11,weight:'600'},color:'#6b7280'}, border:{display:false} } },
+      plugins: { legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw.toFixed(1)} / 5`}} }
+    }
+  });
+
+  // Recommendations
+  const lowDims = DIMS.filter((d,i) => scores[i] < 3);
+  const recSec = document.getElementById('rec-section');
+  if (lowDims.length) {
+    recSec.style.display = 'block';
+    document.getElementById('rec-grid').innerHTML = lowDims.map(d => `
+      <div class="rec-card" style="border-left-color:${d.color||accent}">
+        <div class="rec-dim">${d.icon} ${esc(d.name)}</div>
+        <div class="rec-text">${esc(d.recommendation)}</div>
+      </div>
+    `).join('');
+  }
+}
+
+// =============================================
+//  SAVE SUBMISSION
+// =============================================
+async function saveSubmission(overall, scores, leadInfo) {
+  if (IS_PREVIEW) return; // Don't save in preview mode
+
+  const dimScores = {};
+  DIMS.forEach((d,i) => { dimScores[d.id] = scores[i]; });
+
+  const answers = {};
+  DIMS.forEach(d => {
+    const qs = QS[d.id] || [];
+    const ans = S.answers[d.id] || [];
+    qs.forEach((q, qi) => {
+      if (ans[qi]) {
+        answers[q.id] = { option_id: ans[qi].optId, score: ans[qi].score };
+      }
+    });
+  });
+
+  const row = {
+    model_id: MODEL.id,
+    overall_score: overall.toFixed(2),
+    dimension_scores: dimScores,
+    answers: answers,
+    completed: true,
+    completed_at: new Date().toISOString(),
+    utm_source: new URLSearchParams(window.location.search).get('utm_source'),
+    utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
+    utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign'),
+    referrer: document.referrer || null,
+  };
+
+  if (leadInfo) {
+    Object.assign(row, leadInfo);
+  }
+
+  try {
+    const { data, error } = await supa
+      .from('maturity_submissions')
+      .insert(row)
+      .select('id, report_token')
+      .single();
+
+    if (error) console.error('[Assessment] Save error:', error);
+    else SUBMISSION_ID = data.id;
+  } catch (err) {
+    console.error('[Assessment] Save exception:', err);
+  }
+}
+
+// =============================================
+//  HELPERS
+// =============================================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── INIT ──
+loadModel();
+</script>
+</body>
+</html>
