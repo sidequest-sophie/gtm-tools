@@ -4,7 +4,7 @@
  * Handles Google OAuth, Magic Link, Email/Password, and session management.
  */
 
-const SUPABASE_URL = 'https://umvxhwzdaplupzwbkskt.supabase.co';
+const SUPABASE_URL = 'https://api.categoryleaders.co.uk';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtdnhod3pkYXBsdXB6d2Jrc2t0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMzk0OTQsImV4cCI6MjA4ODkxNTQ5NH0.cc5aPNG3EyxiIMXgQ0rVGGSj7J7VAMU6pzSuI8U96Ng';
 
 const Auth = {
