@@ -39,6 +39,11 @@ const Auth = {
         detectSessionInUrl: true,
         persistSession: true,
         autoRefreshToken: true,
+        storageKey: 'cl-gtm-auth',
+        lock: async (name, acquireTimeout, fn) => {
+          // Bypass Web Locks to avoid contention between tabs
+          return await fn();
+        },
       },
     });
 
