@@ -44,23 +44,27 @@ const Auth = {
 
     // Set up auth state change listener
     this._readyPromise = new Promise((resolve) => {
-      this._client.auth.onAuthStateChange(async (event, session) => {
+      this._client.auth.onAuthStateChange((event, session) => {
         console.log('[Auth] State change:', event);
         this._session = session;
         this._user = session?.user || null;
 
-        if (this._user) {
-          await this._loadProfile();
-        } else {
-          this._profile = null;
-        }
-
-        // Notify all listeners
-        this._listeners.forEach(fn => fn(event, session, this._profile));
-
+        // Resolve ready immediately — don't block on profile load
         if (!this._ready) {
           this._ready = true;
           resolve();
+        }
+
+        // Load profile in background then notify listeners
+        const finish = (profile) => {
+          this._listeners.forEach(fn => fn(event, session, profile));
+        };
+
+        if (this._user) {
+          this._loadProfile().then(() => finish(this._profile)).catch(() => finish(null));
+        } else {
+          this._profile = null;
+          finish(null);
         }
       });
     });
@@ -83,11 +87,18 @@ const Auth = {
   async _loadProfile() {
     if (!this._user) return null;
     try {
-      const { data, error } = await this._client
+      // Race the query against a 5-second timeout to prevent hanging
+      const query = this._client
         .from('profiles')
         .select('*')
         .eq('id', this._user.id)
         .single();
+
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Profile load timeout')), 5000)
+      );
+
+      const { data, error } = await Promise.race([query, timeout]);
 
       if (error) {
         console.warn('[Auth] Profile load error:', error.message);
@@ -96,7 +107,7 @@ const Auth = {
         this._profile = data;
       }
     } catch (err) {
-      console.error('[Auth] Profile load exception:', err);
+      console.warn('[Auth] Profile load failed:', err.message);
       this._profile = null;
     }
     return this._profile;
