@@ -598,9 +598,12 @@ async function showResults() {
     <div class="finding opp"><div class="finding-head"><span class="finding-ico">🚀</span><span class="finding-type">Biggest Opportunity</span></div><div class="finding-body"><strong>${esc(opp.d.name)}</strong> (${opp.score.toFixed(1)}/5) shows the most potential for improvement.</div></div>
     <div class="finding risk"><div class="finding-head"><span class="finding-ico">⚠️</span><span class="finding-type">Priority Risk</span></div><div class="finding-body"><strong>${esc(risk.d.name)}</strong> (${risk.score.toFixed(1)}/5) is your most exposed area.</div></div>`;
 
-  // Apply lead gate
+  // Apply lead gate (skip in preview mode)
   const gate = MODEL.lead_gate || 'before_full_report';
-  if (gate === 'before_full_report') {
+  if (IS_PREVIEW) {
+    // Preview mode — show full results, no gate
+    renderFullResults(scores);
+  } else if (gate === 'before_full_report') {
     // Show headline (radar + findings), blur the rest
     const gated = document.getElementById('r-gated-section');
     gated.classList.add('gated-blur');
