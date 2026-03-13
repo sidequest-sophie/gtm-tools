@@ -299,6 +299,14 @@
           <input class="mm-input" id="mm-cta-url" placeholder="https://..." oninput="mmDirty()">
           <div class="mm-hint">Where the main results CTA links to (e.g. booking page, contact form)</div>
         </div>
+        <div class="mm-field" style="border-top:1px solid var(--gray-200); padding-top:1rem; margin-top:0.5rem;">
+          <label class="mm-label">Output Options</label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color:#374151; cursor:pointer; margin-top:0.35rem;">
+            <input type="checkbox" id="mm-include-boilerplate" onchange="mmDirty()" style="accent-color:#d02090;">
+            Include company boilerplate at the bottom of results
+          </label>
+          <div class="mm-hint" id="mm-boilerplate-hint">Set boilerplate text in Client Configuration → Boilerplate tab</div>
+        </div>
       </div>
 
       <!-- TAB: Leads -->
@@ -518,6 +526,16 @@ function mmPopulateEditor() {
   document.getElementById('mm-cta-text').value = m.cta_text || '';
   document.getElementById('mm-cta-url').value = m.cta_url || '';
 
+  // Boilerplate checkbox
+  document.getElementById('mm-include-boilerplate').checked = !!m.include_boilerplate;
+  const client = Storage.getActiveClient();
+  const bpHint = document.getElementById('mm-boilerplate-hint');
+  if (bpHint) {
+    bpHint.textContent = (client?.boilerplate) ?
+      'Will append company boilerplate to assessment results.' :
+      'No boilerplate set yet — add it in Client Configuration → Boilerplate tab.';
+  }
+
   // Slug preview
   mmUpdateSlugPreview();
 
@@ -553,6 +571,7 @@ async function mmSaveModel() {
     lead_gate: document.getElementById('mm-lead-gate').value,
     cta_text: document.getElementById('mm-cta-text').value.trim(),
     cta_url: document.getElementById('mm-cta-url').value.trim(),
+    include_boilerplate: document.getElementById('mm-include-boilerplate').checked,
     va_dimensions: parseFloat(document.getElementById('mm-va-dimensions').value),
     va_questions: parseFloat(document.getElementById('mm-va-questions').value),
     va_recommendations: parseFloat(document.getElementById('mm-va-recommendations').value),

@@ -533,6 +533,7 @@
     <button class="cc-tab active" data-tab="details">Company Details</button>
     <button class="cc-tab" data-tab="ontology">Brand Ontology</button>
     <button class="cc-tab" data-tab="categories">Category Management</button>
+    <button class="cc-tab" data-tab="boilerplate">Boilerplate</button>
   </div>
 
   <!-- Body -->
@@ -686,6 +687,23 @@
       <div id="ccProductCats"></div>
     </div>
 
+    <div class="cc-panel" id="ccBoilerplate">
+      <div class="cc-section-title">Standard Boilerplate</div>
+      <div class="cc-section-desc">
+        A standard company description used across tool outputs — for example, appended to the bottom of PDF reports or web-based assessment results. This text is shared across all tools.
+      </div>
+
+      <label class="cc-label" style="margin-bottom:0.35rem;">BOILERPLATE TEXT</label>
+      <textarea id="ccBoilerplateText"
+        style="width:100%; min-height:160px; padding:0.75rem; border:1px solid #e5e7eb; border-radius:8px; font-family:inherit; font-size:0.85rem; line-height:1.65; resize:vertical; color:#1e293b;"
+        placeholder="e.g. Acme Corp is the leading platform for…"
+        maxlength="1740"></textarea>
+      <div style="display:flex; justify-content:space-between; margin-top:0.35rem;">
+        <span class="cc-section-desc" style="margin-bottom:0;">Max 1,740 characters.</span>
+        <span id="ccBoilerplateCount" style="font-size:0.78rem; color:#9ca3af;">0 / 1,740</span>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -733,6 +751,7 @@ window.clientConfig = {
     this.setupTabs();
     this.setupDetailsListeners();
     this.setupOntologyListeners();
+    this.setupBoilerplateListeners();
     this.setupLogoUpload();
     this.renderAll();
   },
@@ -746,7 +765,7 @@ window.clientConfig = {
         tab.classList.add('active');
         const tabName = tab.getAttribute('data-tab');
         this.activeTab = tabName;
-        const panelMap = { details: 'ccDetails', ontology: 'ccOntology', categories: 'ccCategories' };
+        const panelMap = { details: 'ccDetails', ontology: 'ccOntology', categories: 'ccCategories', boilerplate: 'ccBoilerplate' };
         document.getElementById(panelMap[tabName])?.classList.add('active');
         this.renderAll();
       });
@@ -1000,6 +1019,7 @@ window.clientConfig = {
     this.renderDetailsTab();
     this.renderOntologyTab();
     this.renderCategoriesTab();
+    this.renderBoilerplateTab();
   },
 
   renderDetailsTab() {
@@ -1101,6 +1121,40 @@ window.clientConfig = {
         </div>
       </div>
     `).join('');
+  },
+
+  // ── Boilerplate Tab ──
+  setupBoilerplateListeners() {
+    let debounceTimer = null;
+    const ta = document.getElementById('ccBoilerplateText');
+    const counter = document.getElementById('ccBoilerplateCount');
+    if (!ta) return;
+
+    ta.addEventListener('input', () => {
+      const len = ta.value.length;
+      counter.textContent = len + ' / 1,740';
+      counter.style.color = len > 1700 ? '#ef4444' : '#9ca3af';
+
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const client = Storage.getActiveClient();
+        if (!client) return;
+        Storage.updateClient(client.id, { boilerplate: ta.value });
+      }, 600);
+    });
+  },
+
+  renderBoilerplateTab() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    const ta = document.getElementById('ccBoilerplateText');
+    const counter = document.getElementById('ccBoilerplateCount');
+    if (!ta || document.activeElement === ta) return;
+    ta.value = client.boilerplate || '';
+    if (counter) {
+      const len = (client.boilerplate || '').length;
+      counter.textContent = len + ' / 1,740';
+    }
   },
 
   renderCategoriesTab() {

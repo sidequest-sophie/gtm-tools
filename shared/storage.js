@@ -282,6 +282,7 @@ const Storage = {
           problems: 'problems',
           toolAccess: 'tool_access',
           settings: 'settings',
+          boilerplate: 'boilerplate',
         };
 
         for (const [jsKey, dbKey] of Object.entries(fieldMap)) {
