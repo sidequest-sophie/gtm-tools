@@ -33,7 +33,14 @@ const Auth = {
       });
     }
 
-    this._client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    this._client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        flowType: 'implicit',
+        detectSessionInUrl: true,
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    });
 
     // Set up auth state change listener
     this._readyPromise = new Promise((resolve) => {
