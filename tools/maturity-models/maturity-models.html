@@ -172,6 +172,24 @@
           <label class="mm-label">Description</label>
           <textarea class="mm-textarea" id="mm-description" placeholder="Shown on the welcome screen" oninput="mmDirty()"></textarea>
         </div>
+
+        <div style="padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+          <div class="mm-field">
+            <label class="mm-label">Recommendation Alignment</label>
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-top:4px;">
+              <span style="font-size:0.75rem;color:var(--gray-500);white-space:nowrap;">Industry best practice</span>
+              <input type="range" id="mm-vendor-alignment" min="0" max="1" step="0.05" value="0.5" style="flex:1;" oninput="document.getElementById('mm-va-val').textContent=Math.round(this.value*100)+'%'; mmDirty()">
+              <span style="font-size:0.75rem;color:var(--gray-500);white-space:nowrap;">Vendor aligned</span>
+              <span id="mm-va-val" style="font-size:0.75rem;font-weight:600;color:var(--gray-700);min-width:32px;text-align:right;">50%</span>
+            </div>
+            <div class="mm-hint">Controls how recommendations blend between industry-standard guidance and vendor-specific positioning. Even at 100%, recommendations stay credible.</div>
+          </div>
+          <div class="mm-field">
+            <label class="mm-label">Client Context</label>
+            <textarea class="mm-textarea" id="mm-client-context" placeholder="Describe what this client does, their products, target buyers, and key differentiators. Used to inform vendor-aligned recommendations." oninput="mmDirty()" style="min-height:80px;"></textarea>
+          </div>
+        </div>
+
         <div class="mm-field" style="padding-top: 1rem; border-top: 1px solid var(--gray-200);">
           <button class="mm-btn mm-btn-danger mm-btn-sm" onclick="mmDeleteModel()">Delete this model</button>
         </div>
@@ -436,6 +454,12 @@ function mmPopulateEditor() {
   document.getElementById('mm-status').value = m.status;
   document.getElementById('mm-description').value = m.description || '';
 
+  // Vendor alignment & client context
+  const vaSlider = document.getElementById('mm-vendor-alignment');
+  vaSlider.value = m.vendor_alignment != null ? m.vendor_alignment : 0.5;
+  document.getElementById('mm-va-val').textContent = Math.round(vaSlider.value * 100) + '%';
+  document.getElementById('mm-client-context').value = m.client_context || '';
+
   // Branding
   const brand = m.brand || {};
   document.getElementById('mm-brand-company').value = brand.companyName || '';
@@ -489,6 +513,8 @@ async function mmSaveModel() {
     lead_gate: document.getElementById('mm-lead-gate').value,
     cta_text: document.getElementById('mm-cta-text').value.trim(),
     cta_url: document.getElementById('mm-cta-url').value.trim(),
+    vendor_alignment: parseFloat(document.getElementById('mm-vendor-alignment').value),
+    client_context: document.getElementById('mm-client-context').value.trim(),
   };
 
   if (updates.status === 'published' && m.status !== 'published') {
@@ -571,9 +597,50 @@ function mmRenderDimensions() {
           <label class="mm-label">Description</label>
           <input class="mm-input" value="${escAttr(dim.description)}" onchange="mmUpdateDim('${dim.id}','description',this.value)">
         </div>
-        <div class="mm-field">
-          <label class="mm-label">Recommendation (shown for low scores)</label>
-          <textarea class="mm-textarea" style="min-height:60px;" onchange="mmUpdateDim('${dim.id}','recommendation',this.value)">${escHtml(dim.recommendation)}</textarea>
+        <div style="border:1px solid var(--gray-200);border-radius:8px;padding:0.75rem;margin-top:0.25rem;">
+          <div style="font-size:0.75rem;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Recommendations by Score Band</div>
+
+          <details style="margin-bottom:0.5rem;">
+            <summary style="cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--error);padding:4px 0;">Low Score (1–2)</summary>
+            <div style="padding:0.5rem 0 0.25rem;">
+              <div class="mm-field" style="margin-bottom:0.5rem;">
+                <label class="mm-label" style="font-size:0.7rem;">Industry Recommendation</label>
+                <textarea class="mm-textarea" style="min-height:50px;font-size:0.8rem;" onchange="mmUpdateDim('${dim.id}','rec_low_industry',this.value)" placeholder="Best-practice guidance for low-scoring areas">${escHtml(dim.rec_low_industry||'')}</textarea>
+              </div>
+              <div class="mm-field">
+                <label class="mm-label" style="font-size:0.7rem;">Vendor-Aligned Recommendation</label>
+                <textarea class="mm-textarea" style="min-height:50px;font-size:0.8rem;" onchange="mmUpdateDim('${dim.id}','rec_low_vendor',this.value)" placeholder="How this vendor's approach addresses the gap">${escHtml(dim.rec_low_vendor||'')}</textarea>
+              </div>
+            </div>
+          </details>
+
+          <details style="margin-bottom:0.5rem;">
+            <summary style="cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--warning, #d97706);padding:4px 0;">Mid Score (3)</summary>
+            <div style="padding:0.5rem 0 0.25rem;">
+              <div class="mm-field" style="margin-bottom:0.5rem;">
+                <label class="mm-label" style="font-size:0.7rem;">Industry Recommendation</label>
+                <textarea class="mm-textarea" style="min-height:50px;font-size:0.8rem;" onchange="mmUpdateDim('${dim.id}','rec_mid_industry',this.value)" placeholder="Guidance for mid-maturity areas">${escHtml(dim.rec_mid_industry||'')}</textarea>
+              </div>
+              <div class="mm-field">
+                <label class="mm-label" style="font-size:0.7rem;">Vendor-Aligned Recommendation</label>
+                <textarea class="mm-textarea" style="min-height:50px;font-size:0.8rem;" onchange="mmUpdateDim('${dim.id}','rec_mid_vendor',this.value)" placeholder="How this vendor helps level up from mid">${escHtml(dim.rec_mid_vendor||'')}</textarea>
+              </div>
+            </div>
+          </details>
+
+          <details>
+            <summary style="cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--success, #16a34a);padding:4px 0;">High Score (4–5)</summary>
+            <div style="padding:0.5rem 0 0.25rem;">
+              <div class="mm-field" style="margin-bottom:0.5rem;">
+                <label class="mm-label" style="font-size:0.7rem;">Industry Recommendation</label>
+                <textarea class="mm-textarea" style="min-height:50px;font-size:0.8rem;" onchange="mmUpdateDim('${dim.id}','rec_high_industry',this.value)" placeholder="Advanced guidance for high-maturity areas">${escHtml(dim.rec_high_industry||'')}</textarea>
+              </div>
+              <div class="mm-field">
+                <label class="mm-label" style="font-size:0.7rem;">Vendor-Aligned Recommendation</label>
+                <textarea class="mm-textarea" style="min-height:50px;font-size:0.8rem;" onchange="mmUpdateDim('${dim.id}','rec_high_vendor',this.value)" placeholder="How this vendor extends already-strong capabilities">${escHtml(dim.rec_high_vendor||'')}</textarea>
+              </div>
+            </div>
+          </details>
         </div>
 
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;">

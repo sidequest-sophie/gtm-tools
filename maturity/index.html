@@ -255,7 +255,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div style="position:relative;height:340px;padding-top:8px"><canvas id="colChart"></canvas></div>
       </div>
       <div id="rec-section" style="display:none">
-        <div class="recs-h">🎯 Priority areas for improvement</div>
+        <div class="recs-h">🎯 Recommendations</div>
         <div class="rec-grid" id="rec-grid"></div>
       </div>
       <div class="results-cta" id="r-cta">
@@ -711,17 +711,45 @@ function renderFullResults(scores) {
     }
   });
 
-  // Recommendations
-  const lowDims = DIMS.filter((d,i) => scores[i] < 3);
+  // Recommendations — tiered by score band, blended by vendor_alignment
+  const va = MODEL.vendor_alignment != null ? MODEL.vendor_alignment : 0.5;
+  const recCards = [];
+  DIMS.forEach((d, i) => {
+    const sc = scores[i];
+    let band;
+    if (sc < 2.5) band = 'low';
+    else if (sc < 3.5) band = 'mid';
+    else band = 'high';
+
+    const indKey = 'rec_' + band + '_industry';
+    const venKey = 'rec_' + band + '_vendor';
+    const indRec = d[indKey] || '';
+    const venRec = d[venKey] || '';
+
+    // Pick the recommendation: if both exist, prefer vendor at high alignment, else industry; fallback to whichever exists
+    let rec = '';
+    if (indRec && venRec) {
+      rec = va >= 0.5 ? venRec : indRec;
+    } else {
+      rec = venRec || indRec || d.recommendation || '';
+    }
+
+    if (rec) {
+      const bandLabel = band === 'low' ? 'Needs attention' : band === 'mid' ? 'Developing' : 'Strong';
+      const bandColor = band === 'low' ? '#ef4444' : band === 'mid' ? '#d97706' : '#16a34a';
+      recCards.push(`
+        <div class="rec-card" style="border-left-color:${d.color||accent}">
+          <div class="rec-dim">${d.icon} ${esc(d.name)} <span style="font-size:0.7rem;font-weight:500;color:${bandColor};margin-left:6px;">${bandLabel}</span></div>
+          <div class="rec-text">${esc(rec)}</div>
+        </div>
+      `);
+    }
+  });
+
   const recSec = document.getElementById('rec-section');
-  if (lowDims.length) {
+  if (recCards.length) {
     recSec.style.display = 'block';
-    document.getElementById('rec-grid').innerHTML = lowDims.map(d => `
-      <div class="rec-card" style="border-left-color:${d.color||accent}">
-        <div class="rec-dim">${d.icon} ${esc(d.name)}</div>
-        <div class="rec-text">${esc(d.recommendation)}</div>
-      </div>
-    `).join('');
+    document.getElementById('rec-grid').innerHTML = recCards.join('');
   }
 }
 
