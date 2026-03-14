@@ -7,6 +7,7 @@
     height: 100%;
     background: #f7f6f4;
     font-family: 'Inter', sans-serif;
+    position: relative;
   }
 
   .cm-header {
@@ -365,6 +366,208 @@
     transform: translateX(18px);
   }
 
+  /* ── Header Actions ── */
+  .cm-header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .cm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .cm-btn svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .cm-btn-pink {
+    background: #d02090;
+    color: #fff;
+  }
+  .cm-btn-pink:hover { background: #b01c7a; }
+
+  .cm-btn-outline {
+    background: #fff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+  }
+  .cm-btn-outline:hover { background: #f9fafb; border-color: #d1d5db; }
+
+  /* ── Quick Add Inline ── */
+  .cm-quick-add {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.85rem 1rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+  }
+
+  .cm-quick-add.active { display: flex; }
+
+  .cm-quick-add input {
+    flex: 1;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .cm-quick-add input:focus { border-color: #d02090; }
+
+  /* ── Onboarding Wizard Overlay ── */
+  .cm-wizard-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 45, 68, 0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .cm-wizard-overlay.active { display: flex; }
+
+  .cm-wizard {
+    background: #fff;
+    border-radius: 14px;
+    width: 520px;
+    max-width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+
+  .cm-wizard-header {
+    padding: 1.25rem 1.5rem 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cm-wizard-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #134461;
+  }
+
+  .cm-wizard-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .cm-wizard-close:hover { background: #f3f4f6; color: #374151; }
+  .cm-wizard-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .cm-wizard-body { padding: 1.25rem 1.5rem; }
+
+  .cm-wizard-steps {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .cm-wizard-step-bar {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: #e5e7eb;
+    transition: background 0.2s;
+  }
+  .cm-wizard-step-bar.done { background: #059669; }
+  .cm-wizard-step-bar.active { background: #d02090; }
+
+  .cm-wizard-step-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #134461;
+    margin-bottom: 0.15rem;
+  }
+
+  .cm-wizard-step-desc {
+    font-size: 0.78rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .cm-wizard-field {
+    margin-bottom: 0.85rem;
+  }
+
+  .cm-wizard-field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 0.3rem;
+  }
+
+  .cm-wizard-field input,
+  .cm-wizard-field textarea,
+  .cm-wizard-field select {
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .cm-wizard-field input:focus,
+  .cm-wizard-field textarea:focus { border-color: #d02090; }
+
+  .cm-wizard-field textarea { resize: vertical; min-height: 60px; }
+
+  .cm-wizard-footer {
+    padding: 0.75rem 1.5rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cm-wizard-skip {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0.3rem 0;
+  }
+  .cm-wizard-skip:hover { color: #6b7280; }
+
   /* ── Info Grid ── */
   .cm-info-grid {
     display: grid;
@@ -423,13 +626,31 @@
 
   <div class="cm-header">
     <div class="cm-header-row">
-      <div class="cm-title">Client Management</div>
-      <div class="cm-badge">Admin</div>
+      <div>
+        <div class="cm-title">Manage Clients</div>
+        <div class="cm-subtitle">Manage all client accounts, toggle access, and configure tool permissions.</div>
+      </div>
+      <div class="cm-header-actions">
+        <button class="cm-btn cm-btn-outline" onclick="clientManagement.toggleQuickAdd()" title="Quick Add">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Quick Add
+        </button>
+        <button class="cm-btn cm-btn-pink" onclick="clientManagement.openWizard()" title="Onboard Client">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Onboard Client
+        </button>
+      </div>
     </div>
-    <div class="cm-subtitle">Manage all client accounts, toggle access, and configure tool permissions.</div>
   </div>
 
   <div class="cm-body">
+
+    <!-- QUICK ADD INLINE -->
+    <div class="cm-quick-add" id="cmQuickAdd">
+      <input type="text" id="cmQuickName" placeholder="Client name" onkeydown="if(event.key==='Enter') clientManagement.quickAddSave()" autofocus />
+      <button class="cm-btn cm-btn-pink" onclick="clientManagement.quickAddSave()">Create</button>
+      <button class="cm-btn cm-btn-outline" onclick="clientManagement.toggleQuickAdd()">Cancel</button>
+    </div>
 
     <!-- TABLE VIEW -->
     <div id="cmTableView">
@@ -453,6 +674,21 @@
     </div>
 
   </div>
+
+  <!-- ONBOARDING WIZARD OVERLAY -->
+  <div class="cm-wizard-overlay" id="cmWizardOverlay" onclick="if(event.target===this) clientManagement.closeWizard()">
+    <div class="cm-wizard">
+      <div class="cm-wizard-header">
+        <div class="cm-wizard-title">Onboard New Client</div>
+        <button class="cm-wizard-close" onclick="clientManagement.closeWizard()">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="cm-wizard-body" id="cmWizardBody"></div>
+      <div class="cm-wizard-footer" id="cmWizardFooter"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -873,6 +1109,240 @@ window.clientManagement = {
       console.error('inviteUser error:', err);
       alert('Invite failed: ' + (err.message || 'Unknown error'));
     }
+  },
+
+  // ═══════════════════════════════════════════════════
+  // QUICK ADD
+  // ═══════════════════════════════════════════════════
+  toggleQuickAdd() {
+    const el = document.getElementById('cmQuickAdd');
+    el.classList.toggle('active');
+    if (el.classList.contains('active')) {
+      const inp = document.getElementById('cmQuickName');
+      inp.value = '';
+      inp.focus();
+    }
+  },
+
+  async quickAddSave() {
+    const inp = document.getElementById('cmQuickName');
+    const name = (inp.value || '').trim();
+    if (!name) { inp.style.borderColor = '#dc2626'; return; }
+    inp.style.borderColor = '#e5e7eb';
+
+    const client = await Storage.addClientAsync(name, false);
+    if (client) {
+      this.toggleQuickAdd();
+      await this.renderTable();
+    }
+  },
+
+  // ═══════════════════════════════════════════════════
+  // ONBOARDING WIZARD
+  // ═══════════════════════════════════════════════════
+  wizardStep: 0,
+  wizardData: {},
+
+  wizardSteps: [
+    {
+      title: 'Company Basics',
+      desc: 'Start with the essentials — we can fill in the rest later.',
+      fields: [
+        { key: 'name', label: 'Company Name', type: 'text', required: true, placeholder: 'e.g. Acme Corp' },
+        { key: 'vertical', label: 'Industry / Vertical', type: 'text', placeholder: 'e.g. Cybersecurity, FinTech' },
+      ]
+    },
+    {
+      title: 'Primary Contact',
+      desc: 'Who is the main point of contact at this company?',
+      fields: [
+        { key: 'contactName', label: 'Contact Name', type: 'text', placeholder: 'e.g. Jane Smith' },
+        { key: 'contactEmail', label: 'Contact Email', type: 'email', placeholder: 'e.g. jane@acme.com' },
+        { key: 'contactRole', label: 'Role / Title', type: 'text', placeholder: 'e.g. VP Marketing' },
+        { key: 'contactPhone', label: 'Phone', type: 'tel', placeholder: 'Optional' },
+      ]
+    },
+    {
+      title: 'Branding',
+      desc: 'Upload a logo or paste a URL. You can change this later in Client Configuration.',
+      fields: [
+        { key: 'logo', label: 'Logo URL', type: 'text', placeholder: 'https://example.com/logo.png (optional)' },
+        { key: 'boilerplate', label: 'Company Boilerplate', type: 'textarea', placeholder: 'Short company description for use in reports and assessments…' },
+      ]
+    },
+    {
+      title: 'Tool Access',
+      desc: 'Choose which tools this client should have access to.',
+      fields: 'tools' // special render
+    },
+  ],
+
+  openWizard() {
+    this.wizardStep = 0;
+    this.wizardData = {};
+    // Default all tools on
+    this.tools.forEach(t => { this.wizardData['tool_' + t.id] = true; });
+    document.getElementById('cmWizardOverlay').classList.add('active');
+    this.renderWizardStep();
+  },
+
+  closeWizard() {
+    document.getElementById('cmWizardOverlay').classList.remove('active');
+    this.wizardData = {};
+    this.wizardStep = 0;
+  },
+
+  renderWizardStep() {
+    const step = this.wizardSteps[this.wizardStep];
+    const body = document.getElementById('cmWizardBody');
+    const footer = document.getElementById('cmWizardFooter');
+    const total = this.wizardSteps.length;
+
+    // Progress bars
+    let bars = '<div class="cm-wizard-steps">';
+    for (let i = 0; i < total; i++) {
+      const cls = i < this.wizardStep ? 'done' : i === this.wizardStep ? 'active' : '';
+      bars += `<div class="cm-wizard-step-bar ${cls}"></div>`;
+    }
+    bars += '</div>';
+
+    let fieldsHtml = '';
+    if (step.fields === 'tools') {
+      fieldsHtml = this.tools.map(t => {
+        const checked = this.wizardData['tool_' + t.id] !== false ? 'checked' : '';
+        return `<div class="cm-toggle-row">
+          <div class="cm-toggle-label">${this.esc(t.label)}</div>
+          <label class="cm-toggle">
+            <input type="checkbox" ${checked} onchange="clientManagement.wizardData['tool_${t.id}'] = this.checked" />
+            <span class="cm-toggle-slider"></span>
+          </label>
+        </div>`;
+      }).join('');
+    } else {
+      fieldsHtml = step.fields.map(f => {
+        const val = this.wizardData[f.key] || '';
+        if (f.type === 'textarea') {
+          return `<div class="cm-wizard-field">
+            <label>${f.label}</label>
+            <textarea id="wiz_${f.key}" placeholder="${f.placeholder || ''}" oninput="clientManagement.wizardData['${f.key}']=this.value">${this.esc(val)}</textarea>
+          </div>`;
+        }
+        return `<div class="cm-wizard-field">
+          <label>${f.label}${f.required ? ' *' : ''}</label>
+          <input type="${f.type}" id="wiz_${f.key}" value="${this.esc(val)}" placeholder="${f.placeholder || ''}" oninput="clientManagement.wizardData['${f.key}']=this.value" />
+        </div>`;
+      }).join('');
+    }
+
+    body.innerHTML = `
+      ${bars}
+      <div class="cm-wizard-step-title">Step ${this.wizardStep + 1}: ${step.title}</div>
+      <div class="cm-wizard-step-desc">${step.desc}</div>
+      ${fieldsHtml}
+    `;
+
+    // Footer
+    const isFirst = this.wizardStep === 0;
+    const isLast = this.wizardStep === total - 1;
+
+    footer.innerHTML = `
+      ${isFirst
+        ? '<button class="cm-wizard-skip" onclick="clientManagement.closeWizard()">Cancel</button>'
+        : '<button class="cm-btn cm-btn-outline" onclick="clientManagement.wizardPrev()">Back</button>'
+      }
+      <div style="display:flex; gap:0.5rem;">
+        ${!isLast ? '<button class="cm-wizard-skip" onclick="clientManagement.wizardNext(true)">Skip</button>' : ''}
+        <button class="cm-btn cm-btn-pink" onclick="${isLast ? 'clientManagement.wizardFinish()' : 'clientManagement.wizardNext()'}">${isLast ? 'Create Client' : 'Next'}</button>
+      </div>
+    `;
+
+    // Auto-focus first input
+    setTimeout(() => {
+      const first = body.querySelector('input, textarea');
+      if (first) first.focus();
+    }, 50);
+  },
+
+  wizardNext(skip = false) {
+    // Validate required on current step
+    if (!skip) {
+      const step = this.wizardSteps[this.wizardStep];
+      if (step.fields !== 'tools') {
+        for (const f of step.fields) {
+          if (f.required && !(this.wizardData[f.key] || '').trim()) {
+            const el = document.getElementById('wiz_' + f.key);
+            if (el) { el.style.borderColor = '#dc2626'; el.focus(); }
+            return;
+          }
+        }
+      }
+    }
+    if (this.wizardStep < this.wizardSteps.length - 1) {
+      this.wizardStep++;
+      this.renderWizardStep();
+    }
+  },
+
+  wizardPrev() {
+    if (this.wizardStep > 0) {
+      this.wizardStep--;
+      this.renderWizardStep();
+    }
+  },
+
+  async wizardFinish() {
+    const name = (this.wizardData.name || '').trim();
+    if (!name) {
+      // Jump back to step 0
+      this.wizardStep = 0;
+      this.renderWizardStep();
+      setTimeout(() => {
+        const el = document.getElementById('wiz_name');
+        if (el) { el.style.borderColor = '#dc2626'; el.focus(); }
+      }, 50);
+      return;
+    }
+
+    // Create the client
+    const client = await Storage.addClientAsync(name, false);
+    if (!client) {
+      alert('Failed to create client. Please try again.');
+      return;
+    }
+
+    // Apply additional data
+    const updates = {};
+
+    if (this.wizardData.vertical) updates.vertical = this.wizardData.vertical;
+    if (this.wizardData.logo) updates.logo = this.wizardData.logo;
+    if (this.wizardData.boilerplate) updates.boilerplate = this.wizardData.boilerplate;
+
+    // Company details
+    const contactFields = ['contactName', 'contactEmail', 'contactRole', 'contactPhone'];
+    const companyDetails = {};
+    let hasContact = false;
+    contactFields.forEach(k => {
+      if (this.wizardData[k]) { companyDetails[k] = this.wizardData[k]; hasContact = true; }
+    });
+    if (hasContact) updates.companyDetails = companyDetails;
+
+    // Tool access
+    const toolAccess = {};
+    this.tools.forEach(t => {
+      toolAccess[t.id] = this.wizardData['tool_' + t.id] !== false;
+    });
+    updates.toolAccess = toolAccess;
+
+    if (Object.keys(updates).length > 0) {
+      if (Storage.isSupabase()) {
+        await Storage.updateClientAsync(client.id, updates);
+      } else {
+        Storage.updateClient(client.id, updates);
+      }
+    }
+
+    this.closeWizard();
+    await this.renderTable();
   },
 };
 </script>
