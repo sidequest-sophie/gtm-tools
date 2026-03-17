@@ -602,9 +602,17 @@
             </div>
             <span style="font-size:0.68rem; color:#9ca3af;">Buttons, links, highlights</span>
           </div>
+          <div style="display:flex; flex-direction:column; gap:0.3rem;">
+            <label style="font-size:0.72rem; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em;">Text</label>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <input type="color" id="ccBrandText" value="#374151" style="width:36px; height:36px; border:1px solid #d1d5db; border-radius:8px; padding:2px; cursor:pointer;" />
+              <input type="text" id="ccBrandTextHex" class="cc-form-input" value="#374151" maxlength="7" style="width:90px; font-family:monospace; font-size:0.8rem;" />
+            </div>
+            <span style="font-size:0.68rem; color:#9ca3af;">Body text, headings</span>
+          </div>
           <div id="ccBrandPreview" style="display:flex; align-items:center; gap:0.75rem; padding:8px 14px; border-radius:10px; border:1px solid #e5e7eb; margin-top:0.2rem;">
             <div id="ccBrandPreviewBadge" style="width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff;"></div>
-            <span style="font-size:0.78rem; font-weight:600; color:#374151;">Preview</span>
+            <span id="ccBrandPreviewText" style="font-size:0.78rem; font-weight:600;">Preview</span>
           </div>
         </div>
       </div>
@@ -843,6 +851,7 @@ window.clientConfig = {
     const pairs = [
       { picker: 'ccBrandBg', hex: 'ccBrandBgHex', key: 'brandBg' },
       { picker: 'ccBrandAccent', hex: 'ccBrandAccentHex', key: 'brandAccent' },
+      { picker: 'ccBrandText', hex: 'ccBrandTextHex', key: 'brandText' },
     ];
     pairs.forEach(({ picker, hex, key }) => {
       const pickerEl = document.getElementById(picker);
@@ -874,10 +883,13 @@ window.clientConfig = {
   updateBrandPreview() {
     const bg = document.getElementById('ccBrandBg').value;
     const accent = document.getElementById('ccBrandAccent').value;
+    const text = document.getElementById('ccBrandText').value;
     const preview = document.getElementById('ccBrandPreview');
     const badge = document.getElementById('ccBrandPreviewBadge');
+    const previewText = document.getElementById('ccBrandPreviewText');
     if (preview) preview.style.background = bg;
     if (badge) badge.style.background = accent;
+    if (previewText) previewText.style.color = text;
     const client = Storage.getActiveClient();
     if (badge && client) {
       const initials = (client.name || 'CL').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
@@ -896,6 +908,10 @@ window.clientConfig = {
     if (bgHex && document.activeElement !== bgHex) bgHex.value = client.brandBg || '#ffffff';
     if (accentPicker && document.activeElement !== accentPicker) accentPicker.value = client.brandAccent || '#6366f1';
     if (accentHex && document.activeElement !== accentHex) accentHex.value = client.brandAccent || '#6366f1';
+    const textPicker = document.getElementById('ccBrandText');
+    const textHex = document.getElementById('ccBrandTextHex');
+    if (textPicker && document.activeElement !== textPicker) textPicker.value = client.brandText || '#374151';
+    if (textHex && document.activeElement !== textHex) textHex.value = client.brandText || '#374151';
     this.updateBrandPreview();
   },
 
