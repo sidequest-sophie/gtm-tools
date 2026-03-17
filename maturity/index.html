@@ -287,13 +287,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <!-- Lead Gate Overlay -->
 <div class="gate-overlay" id="gate-overlay" onclick="if(event.target===this)closeGate()">
   <div class="gate-modal">
-    <h3>Unlock your full report</h3>
-    <p>Enter your details to see the complete maturity breakdown, dimension-level scores, and personalised recommendations.</p>
+    <h3 id="gate-heading">Unlock your full report</h3>
+    <p id="gate-desc">Enter your details to see the complete maturity breakdown, dimension-level scores, and personalised recommendations.</p>
     <div class="gate-field"><label>Full Name</label><input id="gate-name" placeholder="Your name"></div>
-    <div class="gate-field"><label>Email</label><input id="gate-email" type="email" placeholder="you@company.com"></div>
+    <div class="gate-field"><label>Email <span style="color:#ef4444">*</span></label><input id="gate-email" type="email" placeholder="you@company.com" required></div>
+    <div class="gate-field" id="gate-email-error" style="display:none;color:#ef4444;font-size:0.75rem;margin-top:-0.5rem;"></div>
     <div class="gate-field"><label>Company</label><input id="gate-company" placeholder="Company name"></div>
     <div class="gate-field"><label>Job Title</label><input id="gate-title" placeholder="Your role"></div>
-    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="submitGate()">See my full report →</button>
+    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" id="gate-submit-btn" onclick="submitGate()">See my full report →</button>
   </div>
 </div>
 
@@ -317,6 +318,7 @@ let S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null };
 let SUBMISSION_ID = null;
 let radarChart = null;
 let IS_PREVIEW = false;
+let GATE_PASSED = false;
 
 // =============================================
 //  LOAD MODEL
@@ -636,21 +638,25 @@ async function showResults() {
   if (IS_PREVIEW) {
     // Preview mode — show full results, no gate
     renderFullResults(scores);
+  } else if (gate === 'before_any_results') {
+    // Gate everything — must submit details before seeing any results
+    openGate();
   } else if (gate === 'before_full_report') {
     // Show headline (radar + findings), blur the rest
     const gated = document.getElementById('r-gated-section');
     gated.classList.add('gated-blur');
     gated.style.position = 'relative';
-    // Add prompt overlay
     const prompt = document.createElement('div');
     prompt.className = 'gate-prompt';
     prompt.innerHTML = `<h3>Unlock your full report</h3><p>Enter your details to see the complete dimension breakdown and personalised recommendations.</p><button class="btn btn-primary" onclick="openGate()">Unlock full report →</button>`;
     gated.parentElement.insertBefore(prompt, gated);
     prompt.style.cssText = 'text-align:center;background:rgba(255,255,255,0.95);padding:2rem;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);margin-bottom:1rem;';
-  } else if (gate === 'before_any_results') {
-    openGate();
+  } else if (gate === 'before_download') {
+    // Show full results freely, but gate the PDF download
+    renderFullResults(scores);
+    saveSubmission(overall, scores, null);
   } else {
-    // No gate — render full results
+    // No gate — render full results, no gating at all
     renderFullResults(scores);
     saveSubmission(overall, scores, null);
   }
@@ -664,11 +670,32 @@ async function showResults() {
 }
 
 function openGate() {
+  const gate = MODEL.lead_gate || 'before_full_report';
+  const heading = document.getElementById('gate-heading');
+  const desc = document.getElementById('gate-desc');
+  const submitBtn = document.getElementById('gate-submit-btn');
+  if (gate === 'before_download') {
+    heading.textContent = 'Download your PDF report';
+    desc.textContent = 'Enter your details to download a personalised PDF of your maturity assessment results.';
+    submitBtn.textContent = 'Download PDF →';
+  } else if (gate === 'before_any_results') {
+    heading.textContent = 'See your results';
+    desc.textContent = 'Enter your details to unlock your personalised maturity assessment results.';
+    submitBtn.textContent = 'See my results →';
+  } else {
+    heading.textContent = 'Unlock your full report';
+    desc.textContent = 'Enter your details to see the complete dimension breakdown and personalised recommendations.';
+    submitBtn.textContent = 'See my full report →';
+  }
   document.getElementById('gate-overlay').classList.add('open');
 }
 
 function closeGate() {
   document.getElementById('gate-overlay').classList.remove('open');
+}
+
+function isValidEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
 async function submitGate() {
@@ -677,22 +704,34 @@ async function submitGate() {
   const company = document.getElementById('gate-company').value.trim();
   const title = document.getElementById('gate-title').value.trim();
 
-  if (!email) { alert('Please enter your email address.'); return; }
+  const errEl = document.getElementById('gate-email-error');
+  if (!email) { errEl.textContent = 'Please enter your email address.'; errEl.style.display = 'block'; return; }
+  if (!isValidEmail(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
 
+  GATE_PASSED = true;
   closeGate();
 
+  const gate = MODEL.lead_gate || 'before_full_report';
   const scores = DIMS.map(d => dimScore(d.id));
   const overall = overallScore();
 
-  // Remove blur
-  const gated = document.getElementById('r-gated-section');
-  gated.classList.remove('gated-blur');
-  // Remove prompt overlay
-  const prompt = gated.parentElement.querySelector('.gate-prompt');
-  if (prompt) prompt.remove();
+  if (gate === 'before_download') {
+    // Results already shown — just save submission with lead info
+    await saveSubmission(overall, scores, { full_name: name, email, company, job_title: title });
+    // Now trigger the PDF download they were trying to get
+    downloadPDF();
+  } else {
+    // Remove blur
+    const gated = document.getElementById('r-gated-section');
+    gated.classList.remove('gated-blur');
+    // Remove prompt overlay
+    const prompt = gated.parentElement.querySelector('.gate-prompt');
+    if (prompt) prompt.remove();
 
-  renderFullResults(scores);
-  await saveSubmission(overall, scores, { full_name: name, email, company, job_title: title });
+    renderFullResults(scores);
+    await saveSubmission(overall, scores, { full_name: name, email, company, job_title: title });
+  }
 }
 
 function renderFullResults(scores) {
@@ -871,6 +910,13 @@ function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 //  PDF EXPORT
 // =============================================
 async function downloadPDF() {
+  // Check if download gate applies
+  const gate = MODEL.lead_gate || 'before_full_report';
+  if (gate === 'before_download' && !GATE_PASSED && !IS_PREVIEW) {
+    openGate();
+    return;
+  }
+
   const btn = document.getElementById('btn-download-pdf');
   const origText = btn.textContent;
   btn.textContent = '⏳ Generating PDF…';

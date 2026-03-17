@@ -351,11 +351,12 @@ Background about the client...
         <div class="mm-field">
           <label class="mm-label">Lead Capture Gate</label>
           <select class="mm-select" id="mm-lead-gate" onchange="mmDirty()">
-            <option value="before_full_report">Show headline scores, gate full report (recommended)</option>
-            <option value="before_any_results">Gate all results — capture before showing anything</option>
-            <option value="none">No gate — show full results freely</option>
+            <option value="before_any_results">Before final score — gate before showing any results</option>
+            <option value="before_full_report">Before full report — show headline, gate breakdown (recommended)</option>
+            <option value="before_download">Before PDF download — show full report, gate the PDF export</option>
+            <option value="none">No gate — show everything freely</option>
           </select>
-          <div class="mm-hint">Choose when prospects must provide their details</div>
+          <div class="mm-hint">Choose when prospects must provide their email to continue</div>
         </div>
         <div class="mm-field" style="border-top:1px solid var(--gray-200); padding-top:1rem; margin-top:0.5rem;">
           <label class="mm-label">CTA Button Text</label>
