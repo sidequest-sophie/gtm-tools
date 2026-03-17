@@ -137,6 +137,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .rec-group-hdr strong{color:var(--accent, #6366f1)}
 .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .rec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;border-left:4px solid var(--accent)}
+.rec-card.rec-prereq{opacity:.4;border-left-style:dashed}
 .rec-dim{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:6px;display:flex;align-items:center;gap:5px}
 .rec-text{font-size:13px;color:var(--text);line-height:1.55}
 
@@ -817,6 +818,7 @@ function renderFullResults(scores) {
   // Build groups: each tier group includes all dimensions below that tier
   // "Recommendations to reach Established" = all dims currently at tier 1 or 2
   let recHTML = '';
+  let isFirstGroup = true;
   for (let tier = lowestTier + 1; tier <= Math.min(highestTier + 1, 5); tier++) {
     const items = recs.filter(r => r.currentTier < tier);
     if (!items.length) continue;
@@ -824,12 +826,15 @@ function renderFullResults(scores) {
       <div class="rec-group-hdr">Recommendations to reach <strong>${tierNamesRec[tier]}</strong></div>
       <div class="rec-grid">`;
     items.forEach(r => {
-      recHTML += `<div class="rec-card" style="border-left-color:${r.color}">
+      // Grey out cards carried forward from a previous group (needs earlier tier completed first)
+      const isPrereq = !isFirstGroup && r.currentTier < tier - 1;
+      recHTML += `<div class="rec-card${isPrereq ? ' rec-prereq' : ''}" style="border-left-color:${r.color}">
         <div class="rec-dim">${r.dim.icon} ${esc(r.dim.name)} <span style="font-size:0.7rem;font-weight:500;color:#9ca3af;margin-left:4px;">${r.score.toFixed(1)}</span></div>
         <div class="rec-text">${esc(r.rec)}</div>
       </div>`;
     });
     recHTML += '</div></div>';
+    isFirstGroup = false;
   }
 
   const recSec = document.getElementById('rec-section');
