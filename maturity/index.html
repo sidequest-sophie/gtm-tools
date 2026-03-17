@@ -807,31 +807,30 @@ function renderFullResults(scores) {
     }
   });
 
-  // Sort by current tier (lowest first), then by score within tier
-  recs.sort((a, b) => a.currentTier - b.currentTier || a.score - b.score);
+  // Sort by score (lowest first)
+  recs.sort((a, b) => a.score - b.score);
 
-  // Group by target tier
-  const grouped = {};
-  recs.forEach(r => {
-    if (!grouped[r.targetTier]) grouped[r.targetTier] = [];
-    grouped[r.targetTier].push(r);
-  });
+  // Find the range of tiers we need groups for
+  const lowestTier = recs.length ? recs[0].currentTier : 5;
+  const highestTier = recs.length ? Math.max(...recs.map(r => r.currentTier)) : 1;
 
+  // Build groups: each tier group includes all dimensions below that tier
+  // "Recommendations to reach Established" = all dims currently at tier 1 or 2
   let recHTML = '';
-  const targetTiers = Object.keys(grouped).map(Number).sort((a, b) => a - b);
-  targetTiers.forEach(tier => {
-    const items = grouped[tier];
+  for (let tier = lowestTier + 1; tier <= Math.min(highestTier + 1, 5); tier++) {
+    const items = recs.filter(r => r.currentTier < tier);
+    if (!items.length) continue;
     recHTML += `<div class="rec-group">
       <div class="rec-group-hdr">Recommendations to reach <strong>${tierNamesRec[tier]}</strong></div>
       <div class="rec-grid">`;
-    items.forEach((r, idx) => {
+    items.forEach(r => {
       recHTML += `<div class="rec-card" style="border-left-color:${r.color}">
         <div class="rec-dim">${r.dim.icon} ${esc(r.dim.name)} <span style="font-size:0.7rem;font-weight:500;color:#9ca3af;margin-left:4px;">${r.score.toFixed(1)}</span></div>
         <div class="rec-text">${esc(r.rec)}</div>
       </div>`;
     });
     recHTML += '</div></div>';
-  });
+  }
 
   const recSec = document.getElementById('rec-section');
   if (recs.length) {
