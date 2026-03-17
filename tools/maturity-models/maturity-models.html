@@ -117,11 +117,77 @@
         <h2>Maturity Models</h2>
       </div>
       <div class="mm-topbar-actions">
+        <button class="mm-btn mm-btn-secondary" onclick="mmShowImportModal()">📄 Import Definition</button>
         <button class="mm-btn mm-btn-primary" onclick="mmCreateModel()">+ New Model</button>
       </div>
     </div>
     <div class="mm-body">
       <div class="mm-list" id="mm-model-list"></div>
+    </div>
+  </div>
+
+  <!-- IMPORT MODAL -->
+  <div id="mm-import-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:600; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:14px; padding:1.75rem; width:90%; max-width:680px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 12px 40px rgba(0,0,0,0.18);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 style="font-size:1.1rem; font-weight:700; color:var(--navy); margin:0;">Import Model Definition</h3>
+        <button class="mm-btn mm-btn-ghost" onclick="mmHideImportModal()" style="font-size:1.2rem; padding:0.25rem;">✕</button>
+      </div>
+      <p style="font-size:0.8rem; color:var(--gray-500); margin-bottom:0.75rem;">Paste a markdown model definition below. This will create a new model with all scoring areas, questions, response options, and recommendations.</p>
+      <textarea id="mm-import-md" class="mm-textarea" style="flex:1; min-height:300px; font-family:'SF Mono',SFMono-Regular,Consolas,monospace; font-size:0.78rem; line-height:1.6; resize:none;" placeholder="# Model Title
+
+## Model Settings
+
+- **Maturity Levels:** 5
+
+## Description
+
+Your model description here...
+
+## Client Context
+
+Background about the client...
+
+---
+
+## Scoring Area: Area Name
+
+- **Icon:** 📊
+- **Chart Label:** Short Label
+- **Colour:** #6366f1
+- **Description:** What this area measures.
+
+### Questions
+
+#### Q1: Your question here?
+
+| Score | Response |
+|-------|----------|
+| 1 | Low maturity response |
+| 2 | ... |
+| 3 | ... |
+| 4 | ... |
+| 5 | High maturity response |
+
+### Recommendations
+
+#### Low Score (1-2)
+**Industry:** Guidance text...
+**Vendor-Aligned:** Vendor text...
+
+#### Mid Score (3)
+**Industry:** Guidance text...
+**Vendor-Aligned:** Vendor text...
+
+#### High Score (4-5)
+**Industry:** Guidance text...
+**Vendor-Aligned:** Vendor text..."></textarea>
+      <div id="mm-import-error" style="display:none; margin-top:0.5rem; padding:0.5rem 0.75rem; background:rgba(239,68,68,0.08); border-radius:8px; font-size:0.78rem; color:var(--error);"></div>
+      <div id="mm-import-preview" style="display:none; margin-top:0.5rem; padding:0.5rem 0.75rem; background:rgba(16,185,129,0.06); border-radius:8px; font-size:0.78rem; color:#059669;"></div>
+      <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem;">
+        <button class="mm-btn mm-btn-secondary" onclick="mmPreviewImport()">Validate</button>
+        <button class="mm-btn mm-btn-primary" id="mm-import-btn" onclick="mmExecuteImport()">Import Model</button>
+      </div>
     </div>
   </div>
 
@@ -133,6 +199,7 @@
         <h2 id="mm-editor-title">Edit Model</h2>
       </div>
       <div class="mm-topbar-actions">
+        <button class="mm-btn mm-btn-secondary" onclick="mmExportSpec()">📤 Export Spec</button>
         <button class="mm-btn mm-btn-secondary" onclick="mmPreview()">👁 Preview</button>
         <button class="mm-btn mm-btn-primary" onclick="mmSaveModel()">Save</button>
       </div>
@@ -1141,6 +1208,467 @@ function mmTimeAgo(dateStr) {
 
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escAttr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// =============================================
+//  IMPORT / EXPORT
+// =============================================
+
+function mmShowImportModal() {
+  const overlay = document.getElementById('mm-import-overlay');
+  overlay.style.display = 'flex';
+  document.getElementById('mm-import-md').value = '';
+  document.getElementById('mm-import-error').style.display = 'none';
+  document.getElementById('mm-import-preview').style.display = 'none';
+}
+
+function mmHideImportModal() {
+  document.getElementById('mm-import-overlay').style.display = 'none';
+}
+
+// Close on overlay click
+document.getElementById('mm-import-overlay').addEventListener('click', function(e) {
+  if (e.target === this) mmHideImportModal();
+});
+
+function mmParseSpec(md) {
+  const spec = { title: '', description: '', clientContext: '', maturityLevels: 5, vaDimensions: 0.5, vaQuestions: 0.5, vaRecommendations: 0.5, areas: [] };
+  const lines = md.split('\n');
+  let i = 0;
+
+  function skipBlanks() { while (i < lines.length && !lines[i].trim()) i++; }
+  function currentLine() { return i < lines.length ? lines[i].trim() : null; }
+  function readParagraph() {
+    const parts = [];
+    while (i < lines.length && lines[i].trim() && !lines[i].trim().startsWith('#') && !lines[i].trim().startsWith('---') && !lines[i].trim().startsWith('- **')) {
+      parts.push(lines[i].trim());
+      i++;
+    }
+    return parts.join(' ');
+  }
+
+  // Title (# line)
+  skipBlanks();
+  if (currentLine()?.startsWith('# ')) {
+    spec.title = currentLine().replace(/^#\s+/, '');
+    i++;
+  }
+
+  // Parse sections
+  while (i < lines.length) {
+    skipBlanks();
+    const line = currentLine();
+    if (line === null) break;
+
+    // Model Settings
+    if (line.match(/^##\s+Model Settings/i)) {
+      i++;
+      skipBlanks();
+      while (i < lines.length && currentLine()?.startsWith('- **')) {
+        const settingLine = currentLine();
+        const lvlMatch = settingLine.match(/Maturity Levels.*?(\d+)/i);
+        if (lvlMatch) spec.maturityLevels = parseInt(lvlMatch[1]);
+        const vaDimMatch = settingLine.match(/Vendor Alignment \(Dimensions?\).*?(\d+)/i);
+        if (vaDimMatch) spec.vaDimensions = parseInt(vaDimMatch[1]) / 100;
+        const vaQMatch = settingLine.match(/Vendor Alignment \(Questions?\).*?(\d+)/i);
+        if (vaQMatch) spec.vaQuestions = parseInt(vaQMatch[1]) / 100;
+        const vaRecMatch = settingLine.match(/Vendor Alignment \(Recommendations?\).*?(\d+)/i);
+        if (vaRecMatch) spec.vaRecommendations = parseInt(vaRecMatch[1]) / 100;
+        i++;
+        skipBlanks();
+      }
+      continue;
+    }
+
+    // Description
+    if (line.match(/^##\s+Description/i)) {
+      i++;
+      skipBlanks();
+      spec.description = readParagraph();
+      continue;
+    }
+
+    // Client Context
+    if (line.match(/^##\s+Client Context/i)) {
+      i++;
+      skipBlanks();
+      spec.clientContext = readParagraph();
+      continue;
+    }
+
+    // Scoring Area
+    if (line.match(/^##\s+Scoring Area:\s*/i)) {
+      const areaName = line.replace(/^##\s+Scoring Area:\s*/i, '');
+      i++;
+      const area = { name: areaName, icon: '📊', chartLabel: '', colour: '#6366f1', description: '', questions: [], recommendations: {} };
+
+      // Parse area metadata
+      skipBlanks();
+      while (i < lines.length && currentLine()?.startsWith('- **')) {
+        const metaLine = currentLine();
+        const iconMatch = metaLine.match(/Icon.*?([^\s*]+)\s*$/);
+        if (iconMatch) area.icon = iconMatch[1];
+        const labelMatch = metaLine.match(/Chart Label.*?\*\*\s*(.+)/i);
+        if (labelMatch) area.chartLabel = labelMatch[1].trim();
+        const colMatch = metaLine.match(/Colou?r.*?(#[0-9a-fA-F]{6})/i);
+        if (colMatch) area.colour = colMatch[1];
+        const descMatch = metaLine.match(/Description.*?\*\*\s*(.+)/i);
+        if (descMatch) area.description = descMatch[1].trim();
+        i++;
+        skipBlanks();
+      }
+
+      // Parse Questions and Recommendations subsections
+      while (i < lines.length) {
+        skipBlanks();
+        const subLine = currentLine();
+        if (subLine === null) break;
+        if (subLine.match(/^##\s+Scoring Area/i) || subLine === '---') break;
+
+        if (subLine.match(/^###\s+Questions/i)) {
+          i++;
+          // Parse questions
+          while (i < lines.length) {
+            skipBlanks();
+            const qLine = currentLine();
+            if (qLine === null) break;
+            if (qLine.match(/^###\s+/i) || qLine.match(/^##\s+/i) || qLine === '---') break;
+
+            if (qLine.match(/^####\s+Q\d+:/i)) {
+              const qText = qLine.replace(/^####\s+Q\d+:\s*/i, '');
+              i++;
+              const options = [];
+
+              // Skip to table body
+              skipBlanks();
+              // Skip table header row and separator
+              if (currentLine()?.startsWith('|')) { i++; skipBlanks(); }
+              if (currentLine()?.match(/^\|[\s-|]+$/)) { i++; skipBlanks(); }
+
+              // Parse table rows
+              while (i < lines.length && currentLine()?.startsWith('|')) {
+                const cells = currentLine().split('|').map(c => c.trim()).filter(Boolean);
+                if (cells.length >= 2) {
+                  const score = parseInt(cells[0]);
+                  const text = cells[1];
+                  if (!isNaN(score) && text) {
+                    options.push({ score, text });
+                  }
+                }
+                i++;
+              }
+
+              area.questions.push({ text: qText, options });
+            } else {
+              i++;
+            }
+          }
+          continue;
+        }
+
+        if (subLine.match(/^###\s+Recommendations/i)) {
+          i++;
+          let currentBand = null;
+
+          while (i < lines.length) {
+            skipBlanks();
+            const recLine = currentLine();
+            if (recLine === null) break;
+            if (recLine.match(/^###\s+Questions/i) || recLine.match(/^##\s+/i) || recLine === '---') break;
+
+            if (recLine.match(/^####\s+Low Score/i)) { currentBand = 'low'; i++; continue; }
+            if (recLine.match(/^####\s+Mid Score/i)) { currentBand = 'mid'; i++; continue; }
+            if (recLine.match(/^####\s+High Score/i)) { currentBand = 'high'; i++; continue; }
+
+            if (currentBand && recLine.match(/^\*\*Industry[:\*]*/i)) {
+              let text = recLine.replace(/^\*\*Industry[:\*]*\s*/i, '').replace(/\*\*\s*/, '');
+              i++;
+              // Continue reading paragraph
+              while (i < lines.length && currentLine() && !currentLine().startsWith('**') && !currentLine().startsWith('#') && !currentLine().startsWith('---')) {
+                text += ' ' + currentLine();
+                i++;
+              }
+              area.recommendations[`${currentBand}_industry`] = text.trim();
+              continue;
+            }
+
+            if (currentBand && recLine.match(/^\*\*Vendor[- ]?Aligned[:\*]*/i)) {
+              let text = recLine.replace(/^\*\*Vendor[- ]?Aligned[:\*]*\s*/i, '').replace(/\*\*\s*/, '');
+              i++;
+              while (i < lines.length && currentLine() && !currentLine().startsWith('**') && !currentLine().startsWith('#') && !currentLine().startsWith('---')) {
+                text += ' ' + currentLine();
+                i++;
+              }
+              area.recommendations[`${currentBand}_vendor`] = text.trim();
+              continue;
+            }
+
+            i++;
+          }
+          continue;
+        }
+
+        // Horizontal rule — might separate scoring areas
+        if (subLine === '---') { i++; break; }
+
+        i++;
+      }
+
+      spec.areas.push(area);
+      continue;
+    }
+
+    // Skip horizontal rules and unrecognised lines
+    i++;
+  }
+
+  return spec;
+}
+
+function mmPreviewImport() {
+  const md = document.getElementById('mm-import-md').value;
+  const errEl = document.getElementById('mm-import-error');
+  const prevEl = document.getElementById('mm-import-preview');
+  errEl.style.display = 'none';
+  prevEl.style.display = 'none';
+
+  if (!md.trim()) {
+    errEl.textContent = 'Please paste a markdown model definition.';
+    errEl.style.display = 'block';
+    return null;
+  }
+
+  try {
+    const spec = mmParseSpec(md);
+    const errors = [];
+
+    if (!spec.title) errors.push('Missing model title (expected # Title at the top)');
+    if (!spec.areas.length) errors.push('No scoring areas found (expected ## Scoring Area: Name)');
+    if (spec.maturityLevels < 3 || spec.maturityLevels > 6) errors.push('Maturity levels must be between 3 and 6');
+
+    spec.areas.forEach((a, ai) => {
+      if (!a.questions.length) errors.push(`"${a.name}" has no questions`);
+      a.questions.forEach((q, qi) => {
+        if (!q.text) errors.push(`${a.name} Q${qi+1}: missing question text`);
+        if (q.options.length !== spec.maturityLevels) {
+          errors.push(`${a.name} Q${qi+1}: has ${q.options.length} options, expected ${spec.maturityLevels}`);
+        }
+      });
+    });
+
+    if (errors.length) {
+      errEl.innerHTML = '<strong>Validation issues:</strong><br>' + errors.map(e => '• ' + escHtml(e)).join('<br>');
+      errEl.style.display = 'block';
+      return null;
+    }
+
+    const totalQs = spec.areas.reduce((sum, a) => sum + a.questions.length, 0);
+    prevEl.innerHTML = `<strong>✓ Valid definition:</strong> "${escHtml(spec.title)}" — ${spec.areas.length} scoring area${spec.areas.length !== 1 ? 's' : ''}, ${totalQs} question${totalQs !== 1 ? 's' : ''}, ${spec.maturityLevels} maturity levels`;
+    prevEl.style.display = 'block';
+    return spec;
+  } catch (e) {
+    errEl.textContent = 'Parse error: ' + e.message;
+    errEl.style.display = 'block';
+    return null;
+  }
+}
+
+async function mmExecuteImport() {
+  const spec = mmPreviewImport();
+  if (!spec) return;
+
+  const clientId = mmClientId();
+  if (!clientId) { alert('Please select a client first.'); return; }
+
+  const btn = document.getElementById('mm-import-btn');
+  btn.disabled = true;
+  btn.textContent = 'Importing…';
+
+  try {
+    // 1. Create model
+    const { data: model, error: modelErr } = await mmSupa()
+      .from('maturity_models')
+      .insert({
+        client_id: clientId,
+        title: spec.title,
+        slug: '',
+        description: spec.description,
+        client_context: spec.clientContext,
+        status: 'draft',
+        va_dimensions: spec.vaDimensions,
+        va_questions: spec.vaQuestions,
+        va_recommendations: spec.vaRecommendations,
+        created_by: Auth.getUser()?.id,
+      })
+      .select()
+      .single();
+
+    if (modelErr) throw new Error('Failed to create model: ' + modelErr.message);
+
+    // 2. Create dimensions
+    for (let di = 0; di < spec.areas.length; di++) {
+      const area = spec.areas[di];
+      const dimInsert = {
+        model_id: model.id,
+        name: area.name,
+        icon: area.icon,
+        chart_label: area.chartLabel || area.name.substring(0, 15),
+        color: area.colour,
+        description: area.description,
+        sort_order: di,
+      };
+
+      // Add recommendations
+      if (area.recommendations.low_industry) dimInsert.rec_low_industry = area.recommendations.low_industry;
+      if (area.recommendations.low_vendor) dimInsert.rec_low_vendor = area.recommendations.low_vendor;
+      if (area.recommendations.mid_industry) dimInsert.rec_mid_industry = area.recommendations.mid_industry;
+      if (area.recommendations.mid_vendor) dimInsert.rec_mid_vendor = area.recommendations.mid_vendor;
+      if (area.recommendations.high_industry) dimInsert.rec_high_industry = area.recommendations.high_industry;
+      if (area.recommendations.high_vendor) dimInsert.rec_high_vendor = area.recommendations.high_vendor;
+
+      const { data: dim, error: dimErr } = await mmSupa()
+        .from('maturity_dimensions')
+        .insert(dimInsert)
+        .select()
+        .single();
+
+      if (dimErr) throw new Error(`Failed to create dimension "${area.name}": ${dimErr.message}`);
+
+      // 3. Create questions and options
+      for (let qi = 0; qi < area.questions.length; qi++) {
+        const q = area.questions[qi];
+        const { data: question, error: qErr } = await mmSupa()
+          .from('maturity_questions')
+          .insert({
+            dimension_id: dim.id,
+            text: q.text,
+            sort_order: qi,
+          })
+          .select()
+          .single();
+
+        if (qErr) throw new Error(`Failed to create question: ${qErr.message}`);
+
+        // Create options
+        if (q.options.length) {
+          const optInserts = q.options.map((o, oi) => ({
+            question_id: question.id,
+            text: o.text,
+            score: o.score,
+            sort_order: oi,
+          }));
+
+          const { error: optErr } = await mmSupa()
+            .from('maturity_options')
+            .insert(optInserts);
+
+          if (optErr) throw new Error(`Failed to create options: ${optErr.message}`);
+        }
+      }
+    }
+
+    // Done
+    mmHideImportModal();
+    await mmEditModel(model.id);
+
+  } catch (e) {
+    console.error('[MM] Import error:', e);
+    const errEl = document.getElementById('mm-import-error');
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Import Model';
+  }
+}
+
+// ── Export ──
+function mmExportSpec() {
+  if (!MM.current) return;
+  const m = MM.current;
+  let md = '';
+
+  md += `# ${m.title || 'Untitled Assessment'}\n\n`;
+  md += `## Model Settings\n\n`;
+
+  // Figure out maturity levels from first question's options
+  let levels = 5;
+  for (const dimId in MM.questions) {
+    const qs = MM.questions[dimId];
+    if (qs?.length) {
+      const opts = MM.options[qs[0].id] || [];
+      if (opts.length >= 3 && opts.length <= 6) { levels = opts.length; break; }
+    }
+  }
+
+  md += `- **Maturity Levels:** ${levels}\n`;
+  md += `- **Vendor Alignment (Dimensions):** ${Math.round((m.va_dimensions ?? 0.5) * 100)}%\n`;
+  md += `- **Vendor Alignment (Questions):** ${Math.round((m.va_questions ?? 0.5) * 100)}%\n`;
+  md += `- **Vendor Alignment (Recommendations):** ${Math.round((m.va_recommendations ?? 0.5) * 100)}%\n\n`;
+
+  if (m.description) {
+    md += `## Description\n\n${m.description}\n\n`;
+  }
+
+  if (m.client_context) {
+    md += `## Client Context\n\n${m.client_context}\n\n`;
+  }
+
+  MM.dimensions.forEach((dim) => {
+    md += `---\n\n`;
+    md += `## Scoring Area: ${dim.name}\n\n`;
+    md += `- **Icon:** ${dim.icon || '📊'}\n`;
+    md += `- **Chart Label:** ${dim.chart_label || dim.name}\n`;
+    md += `- **Colour:** ${dim.color || '#6366f1'}\n`;
+    md += `- **Description:** ${dim.description || ''}\n\n`;
+
+    const qs = MM.questions[dim.id] || [];
+    if (qs.length) {
+      md += `### Questions\n\n`;
+      qs.forEach((q, qi) => {
+        md += `#### Q${qi + 1}: ${q.text || '(no question text)'}\n\n`;
+        md += `| Score | Response |\n`;
+        md += `|-------|----------|\n`;
+        const opts = (MM.options[q.id] || []).sort((a, b) => a.score - b.score);
+        opts.forEach(o => {
+          md += `| ${o.score} | ${o.text || ''} |\n`;
+        });
+        md += `\n`;
+      });
+    }
+
+    // Recommendations
+    const hasRecs = dim.rec_low_industry || dim.rec_low_vendor || dim.rec_mid_industry || dim.rec_mid_vendor || dim.rec_high_industry || dim.rec_high_vendor;
+    if (hasRecs) {
+      md += `### Recommendations\n\n`;
+      if (dim.rec_low_industry || dim.rec_low_vendor) {
+        md += `#### Low Score (1-2)\n\n`;
+        if (dim.rec_low_industry) md += `**Industry:** ${dim.rec_low_industry}\n\n`;
+        if (dim.rec_low_vendor) md += `**Vendor-Aligned:** ${dim.rec_low_vendor}\n\n`;
+      }
+      if (dim.rec_mid_industry || dim.rec_mid_vendor) {
+        md += `#### Mid Score (3)\n\n`;
+        if (dim.rec_mid_industry) md += `**Industry:** ${dim.rec_mid_industry}\n\n`;
+        if (dim.rec_mid_vendor) md += `**Vendor-Aligned:** ${dim.rec_mid_vendor}\n\n`;
+      }
+      if (dim.rec_high_industry || dim.rec_high_vendor) {
+        md += `#### High Score (4-5)\n\n`;
+        if (dim.rec_high_industry) md += `**Industry:** ${dim.rec_high_industry}\n\n`;
+        if (dim.rec_high_vendor) md += `**Vendor-Aligned:** ${dim.rec_high_vendor}\n\n`;
+      }
+    }
+  });
+
+  // Download as file
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (m.slug || m.title || 'model').replace(/[^a-z0-9-]/gi, '-').toLowerCase() + '-spec.md';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 // =============================================
 //  INIT
