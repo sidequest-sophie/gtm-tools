@@ -292,22 +292,50 @@ Background about the client...
 
       <!-- TAB: Branding -->
       <div class="mm-tab-panel mm-editor" id="tab-branding">
-        <div class="mm-field">
-          <label class="mm-label">Company Name (on assessment page)</label>
-          <input class="mm-input" id="mm-brand-company" placeholder="Your company name" oninput="mmDirty()">
-          <div class="mm-hint">Shown in the header of the published assessment</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <span class="mm-label" style="margin:0;">Colours &amp; Identity</span>
+          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmResetBrandToClient()" title="Reset all branding to match client config">↻ Reset to client defaults</button>
         </div>
-        <div class="mm-row">
-          <div class="mm-field">
-            <label class="mm-label">Accent Colour</label>
-            <div style="display:flex; gap:0.5rem; align-items:center;">
-              <input type="color" id="mm-brand-color" value="#6366f1" style="width:38px;height:38px;border:1px solid var(--gray-200);border-radius:8px;cursor:pointer;padding:2px;background:none" oninput="mmDirty()">
-              <input class="mm-input" id="mm-brand-color-hex" value="#6366f1" style="flex:1" oninput="mmSyncColor(this.value)">
+        <div class="mm-field">
+          <label class="mm-label">Company Name</label>
+          <input class="mm-input" id="mm-brand-company" placeholder="Your company name" oninput="mmDirty()">
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">Logo URL</label>
+          <input class="mm-input" id="mm-brand-logo" placeholder="https://..." oninput="mmDirty()">
+        </div>
+        <div class="mm-field">
+          <label class="mm-label">Report Colours</label>
+          <div class="mm-hint" style="margin-bottom:0.5rem;">Defaults from Client Configuration. Override per-model if needed.</div>
+          <div style="display:flex; gap:1.25rem; flex-wrap:wrap;">
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+              <label style="font-size:0.65rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.04em;">Accent</label>
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <input type="color" id="mm-brand-color" value="#6366f1" style="width:34px;height:34px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:2px;background:none" oninput="mmSyncColor('accent',this.value)">
+                <input class="mm-input" id="mm-brand-color-hex" value="#6366f1" style="width:82px;font-family:monospace;font-size:0.75rem" oninput="mmSyncColor('accent',this.value)">
+              </div>
             </div>
-          </div>
-          <div class="mm-field">
-            <label class="mm-label">Logo URL</label>
-            <input class="mm-input" id="mm-brand-logo" placeholder="https://..." oninput="mmDirty()">
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+              <label style="font-size:0.65rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.04em;">Header</label>
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <input type="color" id="mm-brand-header" value="#134461" style="width:34px;height:34px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:2px;background:none" oninput="mmSyncColor('header',this.value)">
+                <input class="mm-input" id="mm-brand-header-hex" value="#134461" style="width:82px;font-family:monospace;font-size:0.75rem" oninput="mmSyncColor('header',this.value)">
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+              <label style="font-size:0.65rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.04em;">Background</label>
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <input type="color" id="mm-brand-bg" value="#ffffff" style="width:34px;height:34px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:2px;background:none" oninput="mmSyncColor('bg',this.value)">
+                <input class="mm-input" id="mm-brand-bg-hex" value="#ffffff" style="width:82px;font-family:monospace;font-size:0.75rem" oninput="mmSyncColor('bg',this.value)">
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.25rem;">
+              <label style="font-size:0.65rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.04em;">Text</label>
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <input type="color" id="mm-brand-text" value="#374151" style="width:34px;height:34px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:2px;background:none" oninput="mmSyncColor('text',this.value)">
+                <input class="mm-input" id="mm-brand-text-hex" value="#374151" style="width:82px;font-family:monospace;font-size:0.75rem" oninput="mmSyncColor('text',this.value)">
+              </div>
+            </div>
           </div>
         </div>
         <div class="mm-field">
@@ -591,13 +619,23 @@ function mmPopulateEditor() {
   document.getElementById('mm-va-rec-val').textContent = Math.round(vaRec.value * 100) + '%';
   document.getElementById('mm-client-context').value = m.client_context || '';
 
-  // Branding — default company name & logo from client config
+  // Branding — default from client config, allow per-model override
   const brand = m.brand || {};
   const activeClient = Storage.getActiveClient();
   document.getElementById('mm-brand-company').value = brand.companyName || activeClient?.name || '';
-  document.getElementById('mm-brand-color').value = brand.accentColor || '#6366f1';
-  document.getElementById('mm-brand-color-hex').value = brand.accentColor || '#6366f1';
   document.getElementById('mm-brand-logo').value = brand.logoUrl || activeClient?.logo || '';
+  const accentVal = brand.accentColor || activeClient?.brandAccent || '#6366f1';
+  const headerVal = brand.headerColor || activeClient?.brandHeader || '#134461';
+  const bgVal = brand.bgColor || activeClient?.brandBg || '#ffffff';
+  const textVal = brand.textColor || activeClient?.brandText || '#374151';
+  document.getElementById('mm-brand-color').value = accentVal;
+  document.getElementById('mm-brand-color-hex').value = accentVal;
+  document.getElementById('mm-brand-header').value = headerVal;
+  document.getElementById('mm-brand-header-hex').value = headerVal;
+  document.getElementById('mm-brand-bg').value = bgVal;
+  document.getElementById('mm-brand-bg-hex').value = bgVal;
+  document.getElementById('mm-brand-text').value = textVal;
+  document.getElementById('mm-brand-text-hex').value = textVal;
   document.getElementById('mm-brand-wl').checked = !!brand.whiteLabel;
 
   // Access
@@ -649,6 +687,9 @@ async function mmSaveModel() {
     brand: {
       companyName: document.getElementById('mm-brand-company').value.trim(),
       accentColor: document.getElementById('mm-brand-color').value,
+      headerColor: document.getElementById('mm-brand-header').value,
+      bgColor: document.getElementById('mm-brand-bg').value,
+      textColor: document.getElementById('mm-brand-text').value,
       logoUrl: document.getElementById('mm-brand-logo').value.trim(),
       whiteLabel: document.getElementById('mm-brand-wl').checked,
     },
@@ -1193,18 +1234,52 @@ function mmUpdateSlugPreview() {
 
 document.getElementById('mm-slug').addEventListener('input', mmUpdateSlugPreview);
 
-function mmSyncColor(val) {
+function mmSyncColor(type, val) {
+  const map = {
+    accent:  { picker: 'mm-brand-color',   hex: 'mm-brand-color-hex' },
+    header:  { picker: 'mm-brand-header',   hex: 'mm-brand-header-hex' },
+    bg:      { picker: 'mm-brand-bg',       hex: 'mm-brand-bg-hex' },
+    text:    { picker: 'mm-brand-text',     hex: 'mm-brand-text-hex' },
+  };
+  const m = map[type];
+  if (!m) return;
   if (/^#[0-9a-fA-F]{6}$/.test(val)) {
-    document.getElementById('mm-brand-color').value = val;
+    document.getElementById(m.picker).value = val;
   }
-  document.getElementById('mm-brand-color-hex').value = val;
+  document.getElementById(m.hex).value = val;
   mmDirty();
 }
 
-document.getElementById('mm-brand-color').addEventListener('input', function() {
-  document.getElementById('mm-brand-color-hex').value = this.value;
-  mmDirty();
+// Sync colour pickers → hex inputs
+['mm-brand-color','mm-brand-header','mm-brand-bg','mm-brand-text'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', function() {
+    const hexId = id + '-hex';
+    const hexEl = document.getElementById(hexId);
+    if (hexEl) hexEl.value = this.value;
+    mmDirty();
+  });
 });
+
+function mmResetBrandToClient() {
+  const client = Storage.getActiveClient();
+  if (!client) { alert('No active client selected.'); return; }
+  document.getElementById('mm-brand-company').value = client.name || '';
+  document.getElementById('mm-brand-logo').value = client.logo || '';
+  const accent = client.brandAccent || '#6366f1';
+  const header = client.brandHeader || '#134461';
+  const bg = client.brandBg || '#ffffff';
+  const text = client.brandText || '#374151';
+  document.getElementById('mm-brand-color').value = accent;
+  document.getElementById('mm-brand-color-hex').value = accent;
+  document.getElementById('mm-brand-header').value = header;
+  document.getElementById('mm-brand-header-hex').value = header;
+  document.getElementById('mm-brand-bg').value = bg;
+  document.getElementById('mm-brand-bg-hex').value = bg;
+  document.getElementById('mm-brand-text').value = text;
+  document.getElementById('mm-brand-text-hex').value = text;
+  mmDirty();
+}
 
 function mmDirty() { MM.dirty = true; }
 
