@@ -674,16 +674,32 @@ function renderFullResults(scores) {
       if (!y || !chartArea) return;
       const { left, right } = chartArea;
       const bands = [
-        { min:0, max:2, color:'rgba(239,68,68,.05)', label:'Developing' },
-        { min:2, max:3, color:'rgba(245,158,11,.06)', label:'Established' },
-        { min:3, max:4, color:'rgba(16,185,129,.06)', label:'Advanced' },
-        { min:4, max:5, color:'rgba(16,185,129,.12)', label:'Optimising' }
+        { min:0, max:1, color:'rgba(239,68,68,.05)' },
+        { min:1, max:2, color:'rgba(239,68,68,.05)' },
+        { min:2, max:3, color:'rgba(245,158,11,.06)' },
+        { min:3, max:4, color:'rgba(16,185,129,.06)' },
+        { min:4, max:5, color:'rgba(16,185,129,.12)' }
       ];
       bands.forEach(b => {
         const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
-        ctx.save(); ctx.fillStyle = b.color; ctx.fillRect(left, yTop, right-left, yBottom-yTop);
-        ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.font = '600 10px Inter,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-        ctx.fillText(b.label, right-6, (yTop+yBottom)/2); ctx.restore();
+        ctx.save(); ctx.fillStyle = b.color; ctx.fillRect(left, yTop, right-left, yBottom-yTop); ctx.restore();
+      });
+    },
+    afterDraw(chart) {
+      const { ctx, chartArea, scales: { y } } = chart;
+      if (!y || !chartArea) return;
+      const right = chartArea.right;
+      const labels = [
+        { min:0, max:1, label:'Learning' },
+        { min:1, max:2, label:'Developing' },
+        { min:2, max:3, label:'Established' },
+        { min:3, max:4, label:'Advanced' },
+        { min:4, max:5, label:'Optimising' }
+      ];
+      labels.forEach(b => {
+        const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
+        ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.font = '600 10px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(b.label, right + 8, (yTop+yBottom)/2); ctx.restore();
       });
     }
   };
@@ -708,7 +724,7 @@ function renderFullResults(scores) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 24, right: 72 } },
+      layout: { padding: { top: 24, right: 80 } },
       scales: { y: { min:0, max:5, ticks:{stepSize:1,font:{size:11},color:'#9ca3af'}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} }, x: { grid:{display:false}, ticks:{font:{size:11,weight:'600'},color:'#6b7280'}, border:{display:false} } },
       plugins: { legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw.toFixed(1)} / 5`}} }
     }
