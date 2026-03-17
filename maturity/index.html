@@ -674,11 +674,11 @@ function renderFullResults(scores) {
       if (!y || !chartArea) return;
       const { left, right } = chartArea;
       const bands = [
-        { min:0, max:1, color:'rgba(239,68,68,.05)' },
-        { min:1, max:2, color:'rgba(239,68,68,.05)' },
-        { min:2, max:3, color:'rgba(245,158,11,.06)' },
+        { min:0, max:1, color:'rgba(239,68,68,.07)' },
+        { min:1, max:2, color:'rgba(245,158,11,.06)' },
+        { min:2, max:3, color:'rgba(245,158,11,.04)' },
         { min:3, max:4, color:'rgba(16,185,129,.06)' },
-        { min:4, max:5, color:'rgba(16,185,129,.12)' }
+        { min:4, max:5, color:'rgba(16,185,129,.10)' }
       ];
       bands.forEach(b => {
         const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
@@ -690,16 +690,24 @@ function renderFullResults(scores) {
       if (!y || !chartArea) return;
       const right = chartArea.right;
       const labels = [
-        { min:0, max:1, label:'1 – Learning' },
-        { min:1, max:2, label:'2 – Developing' },
-        { min:2, max:3, label:'3 – Established' },
-        { min:3, max:4, label:'4 – Advanced' },
-        { min:4, max:5, label:'5 – Optimising' }
+        { min:0, max:1, num:'1', name:'Learning' },
+        { min:1, max:2, num:'2', name:'Developing' },
+        { min:2, max:3, num:'3', name:'Established' },
+        { min:3, max:4, num:'4', name:'Advanced' },
+        { min:4, max:5, num:'5', name:'Optimising' }
       ];
-      labels.forEach(b => {
+      labels.forEach((b, idx) => {
         const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
-        ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.font = '600 10px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-        ctx.fillText(b.label, right + 8, (yTop+yBottom)/2); ctx.restore();
+        const midY = (yTop + yBottom) / 2;
+        const x = right + 14;
+        ctx.save();
+        // Number
+        ctx.fillStyle = '#374151'; ctx.font = '800 15px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+        ctx.fillText(b.num, x, midY - 1);
+        // Name
+        ctx.fillStyle = '#6b7280'; ctx.font = '700 10px Inter,sans-serif'; ctx.textBaseline = 'top';
+        ctx.fillText(b.name, x, midY + 2);
+        ctx.restore();
       });
     }
   };
@@ -724,7 +732,7 @@ function renderFullResults(scores) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 24, right: 100 } },
+      layout: { padding: { top: 24, right: 110 } },
       scales: { y: { min:0, max:5, ticks:{stepSize:1,font:{size:11},color:'#9ca3af'}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} }, x: { grid:{display:false}, ticks:{font:{size:11,weight:'600'},color:'#374151'}, border:{display:false} } },
       plugins: { legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw.toFixed(1)} / 5`}} }
     }
