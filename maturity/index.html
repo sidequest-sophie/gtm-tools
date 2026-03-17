@@ -585,7 +585,7 @@ async function showResults() {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      scales: { r: { min: 0, max: 5, ticks: { display: false, stepSize: 1 }, grid: { color: 'rgba(0,0,0,.06)' }, angleLines: { color: 'rgba(0,0,0,.06)' }, pointLabels: { font: { size: 12, weight: '600' }, color: '#6b7280' } } },
+      scales: { r: { min: 0, max: 5, ticks: { display: true, stepSize: 1, font: { size: 9, weight: '600' }, color: 'rgba(0,0,0,.3)', backdropColor: 'rgba(255,255,255,.7)', callback: v => v === 0 ? '' : v }, grid: { color: 'rgba(0,0,0,.06)' }, angleLines: { color: 'rgba(0,0,0,.06)' }, pointLabels: { font: { size: 12, weight: '600' }, color: '#6b7280' } } },
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw.toFixed(1)} / 5` } } }
     }
   });
@@ -690,15 +690,15 @@ function renderFullResults(scores) {
       if (!y || !chartArea) return;
       const right = chartArea.right;
       const labels = [
-        { min:0, max:1, label:'Learning' },
-        { min:1, max:2, label:'Developing' },
-        { min:2, max:3, label:'Established' },
-        { min:3, max:4, label:'Advanced' },
-        { min:4, max:5, label:'Optimising' }
+        { min:0, max:1, label:'1 – Learning' },
+        { min:1, max:2, label:'2 – Developing' },
+        { min:2, max:3, label:'3 – Established' },
+        { min:3, max:4, label:'4 – Advanced' },
+        { min:4, max:5, label:'5 – Optimising' }
       ];
       labels.forEach(b => {
         const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
-        ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.font = '600 10px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.font = '600 10px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
         ctx.fillText(b.label, right + 8, (yTop+yBottom)/2); ctx.restore();
       });
     }
@@ -724,8 +724,8 @@ function renderFullResults(scores) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 24, right: 80 } },
-      scales: { y: { min:0, max:5, ticks:{stepSize:1,font:{size:11},color:'#9ca3af'}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} }, x: { grid:{display:false}, ticks:{font:{size:11,weight:'600'},color:'#6b7280'}, border:{display:false} } },
+      layout: { padding: { top: 24, right: 100 } },
+      scales: { y: { min:0, max:5, ticks:{stepSize:1,font:{size:11},color:'#9ca3af'}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} }, x: { grid:{display:false}, ticks:{font:{size:11,weight:'600'},color:'#374151'}, border:{display:false} } },
       plugins: { legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw.toFixed(1)} / 5`}} }
     }
   });
@@ -754,8 +754,10 @@ function renderFullResults(scores) {
     }
 
     if (rec) {
-      const bandLabel = band === 'low' ? 'Needs attention' : band === 'mid' ? 'Developing' : 'Strong';
-      const bandColor = band === 'low' ? '#ef4444' : band === 'mid' ? '#d97706' : '#16a34a';
+      const tierNum = sc < 1.5 ? 1 : sc < 2.5 ? 2 : sc < 3.5 ? 3 : sc < 4.5 ? 4 : 5;
+      const tierNames = { 1:'Learning', 2:'Developing', 3:'Established', 4:'Advanced', 5:'Optimising' };
+      const bandLabel = `Level ${tierNum} – ${tierNames[tierNum]}`;
+      const bandColor = tierNum <= 2 ? '#ef4444' : tierNum === 3 ? '#d97706' : '#16a34a';
       recCards.push(`
         <div class="rec-card" style="border-left-color:${d.color||accent}">
           <div class="rec-dim">${d.icon} ${esc(d.name)} <span style="font-size:0.7rem;font-weight:500;color:${bandColor};margin-left:6px;">${bandLabel}</span></div>
