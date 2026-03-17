@@ -104,6 +104,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .score-num{font-size:52px;font-weight:900;color:var(--accent);line-height:1}
 .score-lbl{font-size:14px;color:var(--text-muted);font-weight:600}
 
+.tier-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.tier-col{display:flex;flex-direction:column;align-items:center;gap:0}
+.tier-hdr{text-align:center;padding:10px 4px 8px;width:100%}
+.tier-num{font-size:22px;font-weight:900;color:#374151;line-height:1.1}
+.tier-name{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.tier-body{width:100%;flex:1;border-radius:10px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:60px}
+.tier-tag{width:100%;padding:8px 6px;border-radius:8px;text-align:center;font-size:11px;font-weight:700;line-height:1.3;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tier-tag .tag-score{display:block;font-size:16px;font-weight:900;margin-bottom:1px}
+.tier-tag .tag-label{display:block;font-size:10px;font-weight:600;opacity:.92}
 .findings-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
 @media(max-width:680px){.findings-row{grid-template-columns:1fr}}
 .finding{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:8px}
@@ -252,7 +261,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div id="r-gated-section">
       <div class="card" id="r-col-chart-card">
         <div class="card-h">Maturity by dimension</div>
-        <div style="position:relative;height:340px;padding-top:8px"><canvas id="colChart"></canvas></div>
+        <div id="tierGrid"></div>
       </div>
       <div id="rec-section" style="display:none">
         <div class="recs-h">🎯 Recommendations</div>
@@ -297,7 +306,7 @@ let DIMS = [];       // maturity_dimensions rows (ordered)
 let QS = {};         // { dimId: [questions with opts] }
 let S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null };
 let SUBMISSION_ID = null;
-let radarChart = null, colChart = null;
+let radarChart = null;
 let IS_PREVIEW = false;
 
 // =============================================
@@ -464,7 +473,7 @@ function startAssessment() {
 
 function restartAssessment() {
   if (radarChart) { radarChart.destroy(); radarChart = null; }
-  if (colChart) { colChart.destroy(); colChart = null; }
+  document.getElementById('tierGrid').innerHTML = '';
   startAssessment();
 }
 
@@ -665,78 +674,36 @@ async function submitGate() {
 function renderFullResults(scores) {
   const accent = (MODEL.brand || {}).accentColor || '#6366f1';
 
-  // Horizontal bar chart with maturity tier columns
-  if (colChart) colChart.destroy();
-  const tierBands = [
-    { min:0, max:1, color:'rgba(239,68,68,.07)', num:'1', name:'Learning' },
-    { min:1, max:2, color:'rgba(245,158,11,.06)', num:'2', name:'Developing' },
-    { min:2, max:3, color:'rgba(245,158,11,.04)', num:'3', name:'Established' },
-    { min:3, max:4, color:'rgba(16,185,129,.06)', num:'4', name:'Advanced' },
-    { min:4, max:5, color:'rgba(16,185,129,.10)', num:'5', name:'Optimising' }
+  // Tier placement grid — 5 columns, stickers for each dimension
+  const tiers = [
+    { num:1, name:'Learning',     bg:'rgba(239,68,68,.06)' },
+    { num:2, name:'Developing',   bg:'rgba(245,158,11,.06)' },
+    { num:3, name:'Established',  bg:'rgba(245,158,11,.04)' },
+    { num:4, name:'Advanced',     bg:'rgba(16,185,129,.06)' },
+    { num:5, name:'Optimising',   bg:'rgba(16,185,129,.10)' }
   ];
-  const maturityBandsPlugin = {
-    id: 'maturityBands',
-    beforeDatasetsDraw(chart) {
-      const { ctx, chartArea, scales: { x } } = chart;
-      if (!x || !chartArea) return;
-      const { top, bottom } = chartArea;
-      tierBands.forEach(b => {
-        const xLeft = x.getPixelForValue(b.min), xRight = x.getPixelForValue(b.max);
-        ctx.save(); ctx.fillStyle = b.color; ctx.fillRect(xLeft, top, xRight - xLeft, bottom - top); ctx.restore();
-      });
-    },
-    afterDraw(chart) {
-      const { ctx, chartArea, scales: { x } } = chart;
-      if (!x || !chartArea) return;
-      const top = chartArea.top;
-      tierBands.forEach(b => {
-        const xLeft = x.getPixelForValue(b.min), xRight = x.getPixelForValue(b.max);
-        const midX = (xLeft + xRight) / 2;
-        ctx.save(); ctx.textAlign = 'center';
-        // Number
-        ctx.fillStyle = '#374151'; ctx.font = '800 15px Inter,sans-serif'; ctx.textBaseline = 'bottom';
-        ctx.fillText(b.num, midX, top - 6);
-        // Name
-        ctx.fillStyle = '#6b7280'; ctx.font = '700 9px Inter,sans-serif'; ctx.textBaseline = 'bottom';
-        ctx.fillText(b.name, midX, top - 20);
-        ctx.restore();
-      });
-    }
-  };
-  const scoreLabelsPlugin = {
-    id: 'scoreLabels',
-    afterDatasetsDraw(chart) {
-      const { ctx } = chart;
-      chart.getDatasetMeta(0).data.forEach((bar,i) => {
-        const val = chart.data.datasets[0].data[i];
-        ctx.save(); ctx.fillStyle = '#374151'; ctx.font = '700 12px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-        ctx.fillText(val.toFixed(1), bar.x + 6, bar.y); ctx.restore();
-      });
-    }
-  };
-
-  const dimCount = DIMS.length;
-  const chartH = Math.max(240, dimCount * 52 + 60);
-  document.getElementById('colChart').parentElement.style.height = chartH + 'px';
-
-  colChart = new Chart(document.getElementById('colChart').getContext('2d'), {
-    type: 'bar',
-    plugins: [maturityBandsPlugin, scoreLabelsPlugin],
-    data: {
-      labels: DIMS.map(d => d.chart_label || d.name),
-      datasets: [{ data: scores, backgroundColor: DIMS.map(d => (d.color||accent)+'bb'), borderColor: DIMS.map(d => d.color||accent), borderWidth: 1.5, borderRadius: 6, borderSkipped: false }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 36, right: 40 } },
-      scales: {
-        x: { min:0, max:5, ticks:{stepSize:1, display:false}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} },
-        y: { grid:{display:false}, ticks:{font:{size:12, weight:'600'}, color:'#374151', padding:8}, border:{display:false} }
-      },
-      plugins: { legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw.toFixed(1)} / 5`}} }
-    }
+  // Bucket each dimension into a tier (round score to nearest int, clamp 1-5)
+  const buckets = { 1:[], 2:[], 3:[], 4:[], 5:[] };
+  DIMS.forEach((d, i) => {
+    const tier = Math.max(1, Math.min(5, Math.round(scores[i])));
+    buckets[tier].push({ dim: d, score: scores[i] });
   });
+  let gridHTML = '<div class="tier-grid">';
+  tiers.forEach(t => {
+    gridHTML += `<div class="tier-col">
+      <div class="tier-hdr"><div class="tier-num">${t.num}</div><div class="tier-name">${t.name}</div></div>
+      <div class="tier-body" style="background:${t.bg}">`;
+    buckets[t.num].forEach(b => {
+      const c = b.dim.color || accent;
+      gridHTML += `<div class="tier-tag" style="background:${c}">
+        <span class="tag-score">${b.score.toFixed(1)}</span>
+        <span class="tag-label">${esc(b.dim.chart_label || b.dim.name)}</span>
+      </div>`;
+    });
+    gridHTML += '</div></div>';
+  });
+  gridHTML += '</div>';
+  document.getElementById('tierGrid').innerHTML = gridHTML;
 
   // Recommendations — tiered by score band, blended by va_recommendations
   const va = MODEL.va_recommendations != null ? MODEL.va_recommendations : 0.5;
