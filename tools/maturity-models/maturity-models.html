@@ -524,6 +524,18 @@ async function mmCreateModel() {
   const clientId = mmClientId();
   if (!clientId) return alert('Please select a client first.');
 
+  // Pre-populate brand from client config
+  const client = Storage.getActiveClient();
+  const defaultBrand = {
+    companyName: client?.name || '',
+    accentColor: client?.brandAccent || '#6366f1',
+    headerColor: client?.brandHeader || '#134461',
+    bgColor: client?.brandBg || '#ffffff',
+    textColor: client?.brandText || '#374151',
+    logoUrl: client?.logo || '',
+    whiteLabel: false,
+  };
+
   const { data: model, error } = await mmSupa()
     .from('maturity_models')
     .insert({
@@ -532,6 +544,7 @@ async function mmCreateModel() {
       slug: '',
       description: '',
       status: 'draft',
+      brand: defaultBrand,
       created_by: Auth.getUser()?.id,
     })
     .select()
@@ -1583,7 +1596,17 @@ async function mmExecuteImport() {
   btn.textContent = 'Importing…';
 
   try {
-    // 1. Create model
+    // 1. Create model (with brand defaults from client config)
+    const client = Storage.getActiveClient();
+    const defaultBrand = {
+      companyName: client?.name || '',
+      accentColor: client?.brandAccent || '#6366f1',
+      headerColor: client?.brandHeader || '#134461',
+      bgColor: client?.brandBg || '#ffffff',
+      textColor: client?.brandText || '#374151',
+      logoUrl: client?.logo || '',
+      whiteLabel: false,
+    };
     const { data: model, error: modelErr } = await mmSupa()
       .from('maturity_models')
       .insert({
@@ -1593,6 +1616,7 @@ async function mmExecuteImport() {
         description: spec.description,
         client_context: spec.clientContext,
         status: 'draft',
+        brand: defaultBrand,
         va_dimensions: spec.vaDimensions,
         va_questions: spec.vaQuestions,
         va_recommendations: spec.vaRecommendations,

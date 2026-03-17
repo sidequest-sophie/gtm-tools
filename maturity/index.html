@@ -415,7 +415,7 @@ function applyBranding() {
   const headerColor = brand.headerColor || '#134461';
   const bgColor = brand.bgColor || '#f9fafb';
   const textColor = brand.textColor || '#111827';
-  const companyName = brand.companyName || 'Assessment';
+  const companyName = brand.companyName || MODEL.title || 'Assessment';
   const whiteLabel = brand.whiteLabel;
 
   document.documentElement.style.setProperty('--accent', accent);
