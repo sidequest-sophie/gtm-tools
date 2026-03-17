@@ -665,48 +665,40 @@ async function submitGate() {
 function renderFullResults(scores) {
   const accent = (MODEL.brand || {}).accentColor || '#6366f1';
 
-  // Column chart with maturity bands
+  // Horizontal bar chart with maturity tier columns
   if (colChart) colChart.destroy();
+  const tierBands = [
+    { min:0, max:1, color:'rgba(239,68,68,.07)', num:'1', name:'Learning' },
+    { min:1, max:2, color:'rgba(245,158,11,.06)', num:'2', name:'Developing' },
+    { min:2, max:3, color:'rgba(245,158,11,.04)', num:'3', name:'Established' },
+    { min:3, max:4, color:'rgba(16,185,129,.06)', num:'4', name:'Advanced' },
+    { min:4, max:5, color:'rgba(16,185,129,.10)', num:'5', name:'Optimising' }
+  ];
   const maturityBandsPlugin = {
     id: 'maturityBands',
     beforeDatasetsDraw(chart) {
-      const { ctx, chartArea, scales: { y } } = chart;
-      if (!y || !chartArea) return;
-      const { left, right } = chartArea;
-      const bands = [
-        { min:0, max:1, color:'rgba(239,68,68,.07)' },
-        { min:1, max:2, color:'rgba(245,158,11,.06)' },
-        { min:2, max:3, color:'rgba(245,158,11,.04)' },
-        { min:3, max:4, color:'rgba(16,185,129,.06)' },
-        { min:4, max:5, color:'rgba(16,185,129,.10)' }
-      ];
-      bands.forEach(b => {
-        const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
-        ctx.save(); ctx.fillStyle = b.color; ctx.fillRect(left, yTop, right-left, yBottom-yTop); ctx.restore();
+      const { ctx, chartArea, scales: { x } } = chart;
+      if (!x || !chartArea) return;
+      const { top, bottom } = chartArea;
+      tierBands.forEach(b => {
+        const xLeft = x.getPixelForValue(b.min), xRight = x.getPixelForValue(b.max);
+        ctx.save(); ctx.fillStyle = b.color; ctx.fillRect(xLeft, top, xRight - xLeft, bottom - top); ctx.restore();
       });
     },
     afterDraw(chart) {
-      const { ctx, chartArea, scales: { y } } = chart;
-      if (!y || !chartArea) return;
-      const right = chartArea.right;
-      const labels = [
-        { min:0, max:1, num:'1', name:'Learning' },
-        { min:1, max:2, num:'2', name:'Developing' },
-        { min:2, max:3, num:'3', name:'Established' },
-        { min:3, max:4, num:'4', name:'Advanced' },
-        { min:4, max:5, num:'5', name:'Optimising' }
-      ];
-      labels.forEach((b, idx) => {
-        const yTop = y.getPixelForValue(b.max), yBottom = y.getPixelForValue(b.min);
-        const midY = (yTop + yBottom) / 2;
-        const x = right + 14;
-        ctx.save();
+      const { ctx, chartArea, scales: { x } } = chart;
+      if (!x || !chartArea) return;
+      const top = chartArea.top;
+      tierBands.forEach(b => {
+        const xLeft = x.getPixelForValue(b.min), xRight = x.getPixelForValue(b.max);
+        const midX = (xLeft + xRight) / 2;
+        ctx.save(); ctx.textAlign = 'center';
         // Number
-        ctx.fillStyle = '#374151'; ctx.font = '800 15px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
-        ctx.fillText(b.num, x, midY - 1);
+        ctx.fillStyle = '#374151'; ctx.font = '800 15px Inter,sans-serif'; ctx.textBaseline = 'bottom';
+        ctx.fillText(b.num, midX, top - 6);
         // Name
-        ctx.fillStyle = '#6b7280'; ctx.font = '700 10px Inter,sans-serif'; ctx.textBaseline = 'top';
-        ctx.fillText(b.name, x, midY + 2);
+        ctx.fillStyle = '#6b7280'; ctx.font = '700 9px Inter,sans-serif'; ctx.textBaseline = 'bottom';
+        ctx.fillText(b.name, midX, top - 20);
         ctx.restore();
       });
     }
@@ -717,11 +709,15 @@ function renderFullResults(scores) {
       const { ctx } = chart;
       chart.getDatasetMeta(0).data.forEach((bar,i) => {
         const val = chart.data.datasets[0].data[i];
-        ctx.save(); ctx.fillStyle = '#374151'; ctx.font = '700 13px Inter,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-        ctx.fillText(val.toFixed(1), bar.x, bar.y - 5); ctx.restore();
+        ctx.save(); ctx.fillStyle = '#374151'; ctx.font = '700 12px Inter,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(val.toFixed(1), bar.x + 6, bar.y); ctx.restore();
       });
     }
   };
+
+  const dimCount = DIMS.length;
+  const chartH = Math.max(240, dimCount * 52 + 60);
+  document.getElementById('colChart').parentElement.style.height = chartH + 'px';
 
   colChart = new Chart(document.getElementById('colChart').getContext('2d'), {
     type: 'bar',
@@ -731,9 +727,13 @@ function renderFullResults(scores) {
       datasets: [{ data: scores, backgroundColor: DIMS.map(d => (d.color||accent)+'bb'), borderColor: DIMS.map(d => d.color||accent), borderWidth: 1.5, borderRadius: 6, borderSkipped: false }]
     },
     options: {
+      indexAxis: 'y',
       responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 24, right: 110 } },
-      scales: { y: { min:0, max:5, ticks:{stepSize:1,font:{size:11},color:'#9ca3af'}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} }, x: { grid:{display:false}, ticks:{font:{size:11,weight:'600'},color:'#374151'}, border:{display:false} } },
+      layout: { padding: { top: 36, right: 40 } },
+      scales: {
+        x: { min:0, max:5, ticks:{stepSize:1, display:false}, grid:{color:'rgba(0,0,0,.04)'}, border:{display:false} },
+        y: { grid:{display:false}, ticks:{font:{size:12, weight:'600'}, color:'#374151', padding:8}, border:{display:false} }
+      },
       plugins: { legend:{display:false}, tooltip:{callbacks:{label:c=>` ${c.raw.toFixed(1)} / 5`}} }
     }
   });
