@@ -682,10 +682,10 @@ function renderFullResults(scores) {
     { num:4, name:'Advanced',     bg:'rgba(16,185,129,.06)' },
     { num:5, name:'Optimising',   bg:'rgba(16,185,129,.10)' }
   ];
-  // Bucket each dimension into a tier (round score to nearest int, clamp 1-5)
+  // Bucket each dimension into a tier (truncate score, clamp 1-5)
   const buckets = { 1:[], 2:[], 3:[], 4:[], 5:[] };
   DIMS.forEach((d, i) => {
-    const tier = Math.max(1, Math.min(5, Math.round(scores[i])));
+    const tier = Math.max(1, Math.min(5, Math.floor(scores[i]) || 1));
     buckets[tier].push({ dim: d, score: scores[i] });
   });
   let gridHTML = '<div class="tier-grid">';
