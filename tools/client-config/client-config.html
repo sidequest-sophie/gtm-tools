@@ -582,6 +582,33 @@
         </div>
       </div>
 
+      <!-- Brand Colours -->
+      <div class="cc-form-group">
+        <label class="cc-form-label">Brand Colours</label>
+        <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+          <div style="display:flex; flex-direction:column; gap:0.3rem;">
+            <label style="font-size:0.72rem; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em;">Background</label>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <input type="color" id="ccBrandBg" value="#ffffff" style="width:36px; height:36px; border:1px solid #d1d5db; border-radius:8px; padding:2px; cursor:pointer;" />
+              <input type="text" id="ccBrandBgHex" class="cc-form-input" value="#ffffff" maxlength="7" style="width:90px; font-family:monospace; font-size:0.8rem;" />
+            </div>
+            <span style="font-size:0.68rem; color:#9ca3af;">Logo background / header fill</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.3rem;">
+            <label style="font-size:0.72rem; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.04em;">Accent</label>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <input type="color" id="ccBrandAccent" value="#6366f1" style="width:36px; height:36px; border:1px solid #d1d5db; border-radius:8px; padding:2px; cursor:pointer;" />
+              <input type="text" id="ccBrandAccentHex" class="cc-form-input" value="#6366f1" maxlength="7" style="width:90px; font-family:monospace; font-size:0.8rem;" />
+            </div>
+            <span style="font-size:0.68rem; color:#9ca3af;">Buttons, links, highlights</span>
+          </div>
+          <div id="ccBrandPreview" style="display:flex; align-items:center; gap:0.75rem; padding:8px 14px; border-radius:10px; border:1px solid #e5e7eb; margin-top:0.2rem;">
+            <div id="ccBrandPreviewBadge" style="width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff;"></div>
+            <span style="font-size:0.78rem; font-weight:600; color:#374151;">Preview</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Vertical -->
       <div class="cc-form-group">
         <label class="cc-form-label">Vertical / Industry</label>
@@ -753,6 +780,7 @@ window.clientConfig = {
     this.setupOntologyListeners();
     this.setupBoilerplateListeners();
     this.setupLogoUpload();
+    this.setupBrandColours();
     this.renderAll();
   },
 
@@ -808,6 +836,67 @@ window.clientConfig = {
         }, 400);
       });
     });
+  },
+
+  // ── Brand Colours ──
+  setupBrandColours() {
+    const pairs = [
+      { picker: 'ccBrandBg', hex: 'ccBrandBgHex', key: 'brandBg' },
+      { picker: 'ccBrandAccent', hex: 'ccBrandAccentHex', key: 'brandAccent' },
+    ];
+    pairs.forEach(({ picker, hex, key }) => {
+      const pickerEl = document.getElementById(picker);
+      const hexEl = document.getElementById(hex);
+      if (!pickerEl || !hexEl) return;
+
+      pickerEl.addEventListener('input', () => {
+        hexEl.value = pickerEl.value;
+        this.saveBrandColour(key, pickerEl.value);
+        this.updateBrandPreview();
+      });
+      hexEl.addEventListener('input', () => {
+        const val = hexEl.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+          pickerEl.value = val;
+          this.saveBrandColour(key, val);
+          this.updateBrandPreview();
+        }
+      });
+    });
+  },
+
+  saveBrandColour(key, value) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    Storage.updateClient(client.id, { [key]: value });
+  },
+
+  updateBrandPreview() {
+    const bg = document.getElementById('ccBrandBg').value;
+    const accent = document.getElementById('ccBrandAccent').value;
+    const preview = document.getElementById('ccBrandPreview');
+    const badge = document.getElementById('ccBrandPreviewBadge');
+    if (preview) preview.style.background = bg;
+    if (badge) badge.style.background = accent;
+    const client = Storage.getActiveClient();
+    if (badge && client) {
+      const initials = (client.name || 'CL').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      badge.textContent = initials;
+    }
+  },
+
+  renderBrandColours() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    const bgPicker = document.getElementById('ccBrandBg');
+    const bgHex = document.getElementById('ccBrandBgHex');
+    const accentPicker = document.getElementById('ccBrandAccent');
+    const accentHex = document.getElementById('ccBrandAccentHex');
+    if (bgPicker && document.activeElement !== bgPicker) bgPicker.value = client.brandBg || '#ffffff';
+    if (bgHex && document.activeElement !== bgHex) bgHex.value = client.brandBg || '#ffffff';
+    if (accentPicker && document.activeElement !== accentPicker) accentPicker.value = client.brandAccent || '#6366f1';
+    if (accentHex && document.activeElement !== accentHex) accentHex.value = client.brandAccent || '#6366f1';
+    this.updateBrandPreview();
   },
 
   // ── Logo Upload ──
@@ -1042,6 +1131,7 @@ window.clientConfig = {
     setIfNotFocused('ccContactRole', details.contactRole);
 
     this.renderLogoPreview();
+    this.renderBrandColours();
   },
 
   toggleEntity(entityId) {

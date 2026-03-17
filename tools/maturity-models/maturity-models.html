@@ -641,6 +641,7 @@ async function mmSaveModel() {
     cta_text: document.getElementById('mm-cta-text').value.trim(),
     cta_url: document.getElementById('mm-cta-url').value.trim(),
     include_boilerplate: document.getElementById('mm-include-boilerplate').checked,
+    boilerplate_text: document.getElementById('mm-include-boilerplate').checked ? (Storage.getActiveClient()?.boilerplate || '') : '',
     va_dimensions: parseFloat(document.getElementById('mm-va-dimensions').value),
     va_questions: parseFloat(document.getElementById('mm-va-questions').value),
     va_recommendations: parseFloat(document.getElementById('mm-va-recommendations').value),
