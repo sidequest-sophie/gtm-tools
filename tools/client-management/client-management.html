@@ -43,7 +43,7 @@
     padding: 0.25rem 0.6rem;
     border-radius: 5px;
     background: rgba(208, 32, 144, 0.08);
-    color: #d02090;
+    color: #d92b96;
   }
 
   /* ── Table ── */
@@ -217,7 +217,7 @@
   .cm-empty-icon svg {
     width: 24px;
     height: 24px;
-    stroke: #d02090;
+    stroke: #d92b96;
     fill: none;
     stroke-width: 1.8;
   }
@@ -397,10 +397,10 @@
   }
 
   .cm-btn-pink {
-    background: #d02090;
+    background: #d92b96;
     color: #fff;
   }
-  .cm-btn-pink:hover { background: #b01c7a; }
+  .cm-btn-pink:hover { background: #c02585; }
 
   .cm-btn-outline {
     background: #fff;
@@ -433,7 +433,7 @@
     outline: none;
     transition: border-color 0.15s;
   }
-  .cm-quick-add input:focus { border-color: #d02090; }
+  .cm-quick-add input:focus { border-color: #d92b96; }
 
   /* ── Onboarding Wizard Overlay ── */
   .cm-wizard-overlay {
@@ -503,7 +503,7 @@
     transition: background 0.2s;
   }
   .cm-wizard-step-bar.done { background: #059669; }
-  .cm-wizard-step-bar.active { background: #d02090; }
+  .cm-wizard-step-bar.active { background: #d92b96; }
 
   .cm-wizard-step-title {
     font-size: 0.9rem;
@@ -546,7 +546,7 @@
     transition: border-color 0.15s;
   }
   .cm-wizard-field input:focus,
-  .cm-wizard-field textarea:focus { border-color: #d02090; }
+  .cm-wizard-field textarea:focus { border-color: #d92b96; }
 
   .cm-wizard-field textarea { resize: vertical; min-height: 60px; }
 
@@ -912,7 +912,7 @@ window.clientManagement = {
             <option value="member">Member</option>
             <option value="admin">Admin</option>
           </select>
-          <button onclick="clientManagement.inviteUser('${client.id}')" style="padding:0.45rem 0.75rem; background:#d02090; color:#fff; border:none; border-radius:6px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:Inter,sans-serif; white-space:nowrap;">Invite</button>
+          <button onclick="clientManagement.inviteUser('${client.id}')" style="padding:0.45rem 0.75rem; background:#d92b96; color:#fff; border:none; border-radius:6px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:Inter,sans-serif; white-space:nowrap;">Invite</button>
         </div>
       </div>
 
@@ -1053,7 +1053,7 @@ window.clientManagement = {
     }
 
     const roleBadge = (role) => {
-      const colours = { owner: '#104060', admin: '#d02090', member: '#059669' };
+      const colours = { owner: '#104060', admin: '#d92b96', member: '#059669' };
       const bg = { owner: 'rgba(16,64,96,0.08)', admin: 'rgba(208,32,144,0.08)', member: 'rgba(5,150,105,0.08)' };
       return `<span style="font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; padding:0.15rem 0.45rem; border-radius:4px; background:${bg[role]||bg.member}; color:${colours[role]||colours.member};">${this.esc(role)}</span>`;
     };
