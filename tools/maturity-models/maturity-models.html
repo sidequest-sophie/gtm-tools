@@ -359,6 +359,21 @@ Background about the client...
           <div class="mm-hint">Choose when prospects must provide their email to continue</div>
         </div>
         <div class="mm-field" style="border-top:1px solid var(--gray-200); padding-top:1rem; margin-top:0.5rem;">
+          <label class="mm-label">HubSpot Integration</label>
+          <div class="mm-hint" style="margin-bottom:0.5rem;">Send captured leads directly into HubSpot. Create a form in HubSpot and paste the Portal ID and Form GUID here.</div>
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <div style="flex:1; min-width:140px;">
+              <label style="font-size:0.68rem; font-weight:600; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.04em; display:block; margin-bottom:0.25rem;">Portal ID</label>
+              <input class="mm-input" id="mm-hs-portal" placeholder="e.g. 12345678" oninput="mmDirty()" style="font-family:monospace;">
+            </div>
+            <div style="flex:2; min-width:200px;">
+              <label style="font-size:0.68rem; font-weight:600; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.04em; display:block; margin-bottom:0.25rem;">Form GUID</label>
+              <input class="mm-input" id="mm-hs-form" placeholder="e.g. a1b2c3d4-e5f6-7890-abcd-ef1234567890" oninput="mmDirty()" style="font-family:monospace;">
+            </div>
+          </div>
+          <div class="mm-hint" style="margin-top:0.35rem;">Leave blank to disable. Find these in HubSpot → Marketing → Forms → your form → Share → Embed code.</div>
+        </div>
+        <div class="mm-field" style="border-top:1px solid var(--gray-200); padding-top:1rem; margin-top:0.5rem;">
           <label class="mm-label">CTA Button Text</label>
           <input class="mm-input" id="mm-cta-text" placeholder="Get your personalised improvement plan" oninput="mmDirty()">
         </div>
@@ -589,6 +604,8 @@ function mmPopulateEditor() {
   document.getElementById('mm-access-mode').value = m.access_mode;
   document.getElementById('mm-allowed-emails').value = (m.allowed_emails || []).join('\n');
   document.getElementById('mm-lead-gate').value = m.lead_gate;
+  document.getElementById('mm-hs-portal').value = m.hubspot_portal_id || '';
+  document.getElementById('mm-hs-form').value = m.hubspot_form_guid || '';
   mmToggleEmailList();
 
   // CTA
@@ -638,6 +655,8 @@ async function mmSaveModel() {
     access_mode: document.getElementById('mm-access-mode').value,
     allowed_emails: document.getElementById('mm-allowed-emails').value.split('\n').map(e => e.trim()).filter(Boolean),
     lead_gate: document.getElementById('mm-lead-gate').value,
+    hubspot_portal_id: document.getElementById('mm-hs-portal').value.trim(),
+    hubspot_form_guid: document.getElementById('mm-hs-form').value.trim(),
     cta_text: document.getElementById('mm-cta-text').value.trim(),
     cta_url: document.getElementById('mm-cta-url').value.trim(),
     include_boilerplate: document.getElementById('mm-include-boilerplate').checked,

@@ -699,6 +699,36 @@ function isValidEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
+async function pushToHubSpot(leadInfo) {
+  const portalId = MODEL.hubspot_portal_id;
+  const formGuid = MODEL.hubspot_form_guid;
+  if (!portalId || !formGuid) return; // HubSpot not configured
+
+  const fields = [
+    { name: 'email', value: leadInfo.email || '' },
+    { name: 'firstname', value: (leadInfo.full_name || '').split(' ')[0] },
+    { name: 'lastname', value: (leadInfo.full_name || '').split(' ').slice(1).join(' ') },
+    { name: 'company', value: leadInfo.company || '' },
+    { name: 'jobtitle', value: leadInfo.job_title || '' },
+  ];
+
+  try {
+    await fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formGuid}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields,
+        context: {
+          pageUri: window.location.href,
+          pageName: MODEL.title || 'Maturity Assessment',
+        },
+      }),
+    });
+  } catch (err) {
+    console.warn('[HubSpot] Form submission failed:', err);
+  }
+}
+
 async function submitGate() {
   const name = document.getElementById('gate-name').value.trim();
   const email = document.getElementById('gate-email').value.trim();
@@ -717,9 +747,12 @@ async function submitGate() {
   const scores = DIMS.map(d => dimScore(d.id));
   const overall = overallScore();
 
+  const leadInfo = { full_name: name, email, company, job_title: title };
+
   if (gate === 'before_download') {
     // Results already shown — just save submission with lead info
-    await saveSubmission(overall, scores, { full_name: name, email, company, job_title: title });
+    await saveSubmission(overall, scores, leadInfo);
+    pushToHubSpot(leadInfo); // fire-and-forget
     // Now trigger the PDF download they were trying to get
     downloadPDF();
   } else {
@@ -731,7 +764,8 @@ async function submitGate() {
     if (prompt) prompt.remove();
 
     renderFullResults(scores);
-    await saveSubmission(overall, scores, { full_name: name, email, company, job_title: title });
+    await saveSubmission(overall, scores, leadInfo);
+    pushToHubSpot(leadInfo); // fire-and-forget
   }
 }
 
