@@ -132,6 +132,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 .recs{margin-top:20px}
 .recs-h{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.rec-group{margin-bottom:20px}
+.rec-group-hdr{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;padding:6px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.rec-group-hdr strong{color:var(--accent, #6366f1)}
 .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .rec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;border-left:4px solid var(--accent)}
 .rec-dim{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:6px;display:flex;align-items:center;gap:5px}
@@ -721,11 +724,16 @@ function renderFullResults(scores) {
   gridHTML += '</div>';
   document.getElementById('tierGrid').innerHTML = gridHTML;
 
-  // Recommendations — tiered by score band, blended by va_recommendations
+  // Recommendations — grouped by target tier, lowest first
   const va = MODEL.va_recommendations != null ? MODEL.va_recommendations : 0.5;
-  const recCards = [];
+  const tierNamesRec = { 1:'Learning', 2:'Developing', 3:'Established', 4:'Advanced', 5:'Optimising' };
+
+  // Build list of recommendations with their current tier and target tier
+  const recs = [];
   DIMS.forEach((d, i) => {
     const sc = scores[i];
+    const currentTier = Math.max(1, Math.min(5, Math.floor(sc) || 1));
+    const targetTier = Math.min(5, currentTier + 1);
     let band;
     if (sc < 2.5) band = 'low';
     else if (sc < 3.5) band = 'mid';
@@ -735,33 +743,47 @@ function renderFullResults(scores) {
     const venKey = 'rec_' + band + '_vendor';
     const indRec = d[indKey] || '';
     const venRec = d[venKey] || '';
-
-    // Pick the recommendation: if both exist, prefer vendor at high alignment, else industry; fallback to whichever exists
     let rec = '';
     if (indRec && venRec) {
       rec = va >= 0.5 ? venRec : indRec;
     } else {
       rec = venRec || indRec || d.recommendation || '';
     }
-
     if (rec) {
-      const tierNum = sc < 1.5 ? 1 : sc < 2.5 ? 2 : sc < 3.5 ? 3 : sc < 4.5 ? 4 : 5;
-      const tierNames = { 1:'Learning', 2:'Developing', 3:'Established', 4:'Advanced', 5:'Optimising' };
-      const bandLabel = `Level ${tierNum} – ${tierNames[tierNum]}`;
-      const bandColor = tierNum <= 2 ? '#ef4444' : tierNum === 3 ? '#d97706' : '#16a34a';
-      recCards.push(`
-        <div class="rec-card" style="border-left-color:${d.color||accent}">
-          <div class="rec-dim">${d.icon} ${esc(d.name)} <span style="font-size:0.7rem;font-weight:500;color:${bandColor};margin-left:6px;">${bandLabel}</span></div>
-          <div class="rec-text">${esc(rec)}</div>
-        </div>
-      `);
+      recs.push({ dim: d, score: sc, currentTier, targetTier, rec, color: d.color || accent });
     }
   });
 
+  // Sort by current tier (lowest first), then by score within tier
+  recs.sort((a, b) => a.currentTier - b.currentTier || a.score - b.score);
+
+  // Group by target tier
+  const grouped = {};
+  recs.forEach(r => {
+    if (!grouped[r.targetTier]) grouped[r.targetTier] = [];
+    grouped[r.targetTier].push(r);
+  });
+
+  let recHTML = '';
+  const targetTiers = Object.keys(grouped).map(Number).sort((a, b) => a - b);
+  targetTiers.forEach(tier => {
+    const items = grouped[tier];
+    recHTML += `<div class="rec-group">
+      <div class="rec-group-hdr">Recommendations to reach <strong>${tierNamesRec[tier]}</strong></div>
+      <div class="rec-grid">`;
+    items.forEach((r, idx) => {
+      recHTML += `<div class="rec-card" style="border-left-color:${r.color}">
+        <div class="rec-dim">${r.dim.icon} ${esc(r.dim.name)} <span style="font-size:0.7rem;font-weight:500;color:#9ca3af;margin-left:4px;">${r.score.toFixed(1)}</span></div>
+        <div class="rec-text">${esc(r.rec)}</div>
+      </div>`;
+    });
+    recHTML += '</div></div>';
+  });
+
   const recSec = document.getElementById('rec-section');
-  if (recCards.length) {
+  if (recs.length) {
     recSec.style.display = 'block';
-    document.getElementById('rec-grid').innerHTML = recCards.join('');
+    document.getElementById('rec-grid').innerHTML = recHTML;
   }
 }
 
