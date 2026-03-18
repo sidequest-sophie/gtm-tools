@@ -636,8 +636,10 @@ function mmPopulateEditor() {
   document.getElementById('mm-client-context').value = m.client_context || '';
 
   // Branding — default from client config, allow per-model override
+  // If brand is incomplete, auto-fill from client config and mark dirty so next save writes it
   const brand = m.brand || {};
   const activeClient = Storage.getActiveClient();
+  const brandIncomplete = !brand.companyName || !brand.headerColor || !brand.bgColor || !brand.textColor;
   document.getElementById('mm-brand-company').value = brand.companyName || activeClient?.name || '';
   document.getElementById('mm-brand-logo').value = brand.logoUrl || activeClient?.logo || '';
   const accentVal = brand.accentColor || activeClient?.brandAccent || '#6366f1';
@@ -686,6 +688,11 @@ function mmPopulateEditor() {
   mmRenderDimensions();
 
   MM.dirty = false;
+
+  // Auto-save if brand was incomplete (backfills client config defaults into DB)
+  if (brandIncomplete) {
+    mmSaveModel();
+  }
 }
 
 // =============================================
