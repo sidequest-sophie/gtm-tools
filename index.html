@@ -462,6 +462,30 @@
     /* Hide admin items for non-admin users */
     .sidebar-admin.hidden-role { display: none; }
 
+    /* ── Company info section (above Tools) ── */
+    .sidebar-co-section {
+      padding: 0 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* ── User avatar (distinct from company/client avatar) ── */
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--white);
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      text-transform: uppercase;
+    }
+
     .sidebar-footer {
       padding: 0 0.75rem 0.75rem;
     }
@@ -1078,6 +1102,23 @@
         <img src="logo.png" alt="Category Leaders" />
       </div>
 
+      <!-- Company Information section -->
+      <div class="sidebar-co-section">
+        <div class="sidebar-label">Company Information</div>
+        <button class="settings-btn" id="clientFooterBtn" onclick="loadTool('client-config'); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('current'));">
+          <div class="client-avatar" id="footerAvatar">
+            <span id="footerInitial">?</span>
+          </div>
+          <div class="client-meta">
+            <div class="client-meta-name" id="footerClientName">No client</div>
+            <div class="client-meta-sub">Brand &amp; Settings</div>
+          </div>
+          <div class="chevron-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </button>
+      </div>
+
       <div class="sidebar-label">Tools</div>
 
       <nav class="sidebar-nav">
@@ -1148,20 +1189,17 @@
       </div>
 
       <div class="sidebar-footer">
-        <div class="sidebar-label">Account &amp; Company</div>
-        <button class="settings-btn" id="clientFooterBtn" onclick="loadTool('client-config'); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('current'));">
-          <div class="client-avatar" id="footerAvatar">
-            <span id="footerInitial">?</span>
+        <div class="sidebar-label">Account</div>
+        <div class="settings-btn" id="userFooterBtn" style="cursor:default;">
+          <div class="user-avatar" id="userAvatar">
+            <span id="userInitial">?</span>
           </div>
           <div class="client-meta">
-            <div class="client-meta-name" id="footerClientName">No client</div>
-            <div class="client-meta-sub">Account &amp; Settings</div>
+            <div class="client-meta-name" id="userDisplayName">Loading…</div>
+            <div class="client-meta-sub" id="userEmail" style="font-size:0.64rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
           </div>
-          <div class="chevron-icon">
-            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
-          </div>
-        </button>
-        <button class="settings-btn" id="signOutBtn" onclick="handleSignOut()" style="margin-top:0.25rem; opacity:0.6; font-size:0.75rem;">
+        </div>
+        <button class="settings-btn" id="signOutBtn" onclick="handleSignOut()" style="margin-top:0.15rem; opacity:0.6; font-size:0.75rem;">
           <div class="icon" style="width:16px;height:16px;margin-right:0.4rem;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           </div>
@@ -1454,30 +1492,37 @@
 
     // ── Sidebar Footer — Avatar & Name ──
     function updateFooter() {
+      // ── Company section (top of sidebar) ──
       const client = Storage.getActiveClient();
-      const nameEl = document.getElementById('footerClientName');
-      const avatarEl = document.getElementById('footerAvatar');
+      const nameEl    = document.getElementById('footerClientName');
+      const avatarEl  = document.getElementById('footerAvatar');
       const initialEl = document.getElementById('footerInitial');
 
-      if (!client || !nameEl) return;
-
-      const name = client.name || 'New Client';
-      nameEl.textContent = name;
-
-      // Avatar: logo or first letter
-      if (client.logo) {
-        avatarEl.innerHTML = `<img src="${client.logo}" alt="" />`;
-      } else {
-        const letter = name.charAt(0) || '?';
-        avatarEl.innerHTML = '';
-        if (!initialEl || !avatarEl.contains(initialEl)) {
+      if (client && nameEl) {
+        const name = client.name || 'New Client';
+        nameEl.textContent = name;
+        if (client.logo) {
+          avatarEl.innerHTML = `<img src="${client.logo}" alt="" />`;
+        } else {
+          const letter = name.charAt(0) || '?';
+          avatarEl.innerHTML = '';
           const span = document.createElement('span');
           span.id = 'footerInitial';
           span.textContent = letter;
           avatarEl.appendChild(span);
-        } else {
-          initialEl.textContent = letter;
         }
+      }
+
+      // ── User section (bottom of sidebar) ──
+      const profile = Auth.getProfile();
+      if (profile) {
+        const displayEl  = document.getElementById('userDisplayName');
+        const emailEl    = document.getElementById('userEmail');
+        const uInitialEl = document.getElementById('userInitial');
+        if (displayEl)  displayEl.textContent  = profile.name || profile.email || 'User';
+        if (emailEl)    emailEl.textContent    = profile.email || '';
+        const letter = (profile.name || profile.email || 'U').charAt(0).toUpperCase();
+        if (uInitialEl) uInitialEl.textContent = letter;
       }
     }
 
