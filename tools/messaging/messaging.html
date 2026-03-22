@@ -23,7 +23,7 @@
 .mh-btn-danger:hover { background:var(--error,#ef4444); color:#fff; }
 
 /* ── Body ── */
-.mh-body { flex:1; overflow-y:auto; padding:1.5rem; }
+.mh-body { flex:1; overflow-y:auto; padding:2rem; }
 
 /* ── List cards ── */
 .mh-list { display:flex; flex-direction:column; gap:0.75rem; max-width:700px; }
@@ -48,92 +48,95 @@
 .mh-status-sel:focus { outline:none; border-color:var(--pink); }
 
 /* ══════════════════════════════════════════════
-   VISUAL HOUSE TABLE
+   VISUAL HOUSE — CANVAS STYLE
    ══════════════════════════════════════════════ */
-.mh-house-wrap { max-width:900px; }
-.mh-house-table { width:100%; border:1.5px solid var(--gray-200); border-radius:14px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); background:var(--white); }
+.mh-house-wrap { max-width:920px; }
+.mh-house-table { width:100%; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.07); background:#F5F3EF; }
 
-/* Rows */
-.mh-row { display:flex; border-bottom:1.5px solid var(--gray-200); }
-.mh-row:last-child { border-bottom:none; }
-.mh-row-label { flex:0 0 88px; padding:0.85rem 0.75rem; background:var(--gray-50); border-right:1.5px solid var(--gray-200); display:flex; align-items:flex-start; justify-content:flex-end; }
-.mh-row-label span { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--gray-400); text-align:right; line-height:1.3; }
+/* ── Canvas header (dark full-bleed) ── */
+.mh-canvas-header { background:#0F172A; padding:1.35rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.mh-brand-name { font-size:1.25rem; font-weight:800; color:#fff !important; letter-spacing:-0.01em; }
+.mh-brand-name:empty::before { color:rgba(255,255,255,0.35); }
+.mh-brand-name[contenteditable="true"] { outline:none; border-radius:6px; padding:4px 8px; margin:-4px -8px; background:transparent; transition:background 0.15s; }
+.mh-brand-name[contenteditable="true"]:hover { background:rgba(255,255,255,0.08); }
+.mh-brand-name[contenteditable="true"]:focus { background:rgba(255,255,255,0.12); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.2); }
+.mh-type-badge { display:inline-block; font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; padding:0.2rem 0.6rem; border-radius:20px; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.75); white-space:nowrap; flex-shrink:0; }
 
-/* Cells */
-.mh-cell { flex:1; padding:0.85rem 1.1rem; border-right:1.5px solid var(--gray-200); position:relative; transition:background 0.12s; min-width:0; }
-.mh-cell:last-child { border-right:none; }
-.mh-cell.mh-cell-full { flex:none; width:100%; }
-.mh-cell.mh-cell-no-pad { padding:0; }
-.mh-cell.mh-cell-center { display:flex; align-items:center; justify-content:center; text-align:center; }
-.mh-cell.mh-cell-header { background:#134461; }
-.mh-cell.mh-cell-header:hover { background:#0f3550; }
+/* ── Canvas body (warm off-white) ── */
+.mh-canvas-body { padding:2rem; display:flex; flex-direction:column; gap:1.25rem; }
 
-/* Editable text */
-.mh-text { display:block; font-size:0.85rem; line-height:1.5; color:var(--gray-700); min-height:1.2em; }
-.mh-text[contenteditable="true"] { outline:2px solid var(--pink); border-radius:4px; padding:2px 4px; margin:-2px -4px; background:#fff; }
-.mh-text[contenteditable="true"]:focus { outline:2px solid var(--pink); }
-.mh-text:empty::before { content:attr(data-ph); color:var(--gray-300); font-style:italic; pointer-events:none; }
-.mh-text[contenteditable="true"]:empty::before { color:var(--gray-300); }
+/* ── Editable text — NO BORDERS, tint on focus ── */
+.mh-text { display:block; font-size:0.85rem; line-height:1.55; color:var(--gray-700); min-height:1.2em; }
+.mh-text[contenteditable="true"] { outline:none; border:none; border-radius:6px; padding:4px 8px; margin:-4px -8px; background:transparent; transition:background 0.15s, box-shadow 0.15s; }
+.mh-text[contenteditable="true"]:hover { background:rgba(0,0,0,0.03); }
+.mh-text[contenteditable="true"]:focus { background:rgba(255,255,255,0.85); box-shadow:inset 0 0 0 2px rgba(219,39,119,0.2); }
+.mh-text:empty::before { content:attr(data-ph); color:var(--gray-400); font-style:italic; pointer-events:none; }
+.mh-text[contenteditable="true"]:empty::before { color:rgba(0,0,0,0.2); }
 
-/* Header row specifics */
-.mh-brand-name { font-size:1.3rem; font-weight:800; color:#fff !important; letter-spacing:-0.01em; }
-.mh-brand-name:empty::before { color:rgba(255,255,255,0.4); }
-.mh-brand-name[contenteditable="true"] { background:rgba(255,255,255,0.1); }
-.mh-type-badge { display:inline-block; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; padding:0.2rem 0.55rem; border-radius:20px; background:rgba(255,255,255,0.18); color:rgba(255,255,255,0.9); white-space:nowrap; }
+/* ── Section containers ── */
+.mh-canvas-section { background:#fff; border-radius:12px; padding:1.25rem 1.5rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.05); }
+.mh-canvas-section-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-400); margin-bottom:0.5rem; }
 
-/* Tagline */
-.mh-tagline-main { font-size:1rem; font-weight:600; color:var(--navy); font-style:italic; }
-.mh-tagline-secondary { font-size:0.82rem; color:var(--gray-500); font-style:italic; margin-top:4px; }
-.mh-tagline-add { font-size:0.72rem; color:var(--pink); background:none; border:none; cursor:pointer; padding:0.15rem 0; margin-top:4px; display:inline-block; font-family:inherit; font-weight:600; }
-.mh-tagline-add:hover { opacity:0.75; }
+/* Tagline section — warm amber tint */
+.mh-canvas-tagline { background:#FFFBEB; border:1px solid #FDE68A; }
+.mh-tagline-main { font-size:1.05rem; font-weight:600; color:#92400E; font-style:italic; }
+.mh-tagline-main:empty::before { color:rgba(146,64,14,0.3); }
+.mh-tagline-secondary { font-size:0.85rem; color:#B45309; font-style:italic; margin-top:4px; opacity:0.7; }
+.mh-tagline-add { font-size:0.72rem; color:#B45309; background:none; border:none; cursor:pointer; padding:0.15rem 0; margin-top:6px; display:inline-block; font-family:inherit; font-weight:600; opacity:0.6; }
+.mh-tagline-add:hover { opacity:1; }
 .mh-tagline-row-wrap { display:flex; align-items:baseline; gap:0.4rem; }
-.mh-tagline-rm { background:none; border:none; color:var(--gray-300); cursor:pointer; font-size:0.8rem; padding:0; line-height:1; }
+.mh-tagline-rm { background:none; border:none; color:rgba(146,64,14,0.3); cursor:pointer; font-size:0.8rem; padding:0; line-height:1; }
 .mh-tagline-rm:hover { color:var(--error,#ef4444); }
 
-/* Outcome */
-.mh-outcome-text { font-size:0.95rem; font-weight:600; color:var(--navy); line-height:1.5; }
-.mh-outcome-text:empty::before { font-weight:400; }
+/* Outcome / Core message — soft blue */
+.mh-canvas-outcome { background:#EFF6FF; border:1px solid #BFDBFE; }
+.mh-outcome-text { font-size:0.95rem; font-weight:600; color:#1E40AF; line-height:1.55; }
+.mh-outcome-text:empty::before { font-weight:400; color:rgba(30,64,175,0.3); }
 
-/* Pillars */
-.mh-pillar-name { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:0.5rem; }
+/* ── Positioning row (FOR / WHO / WE) — full-width above pillars ── */
+.mh-canvas-pos-row { display:grid; grid-template-columns:repeat(3, 1fr); gap:0.85rem; }
+.mh-pos-card { border-radius:12px; padding:1rem 1.15rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+.mh-pos-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem; }
+.mh-pos-text { font-size:0.82rem; line-height:1.5; }
+
+/* ── Pillar grid ── */
+.mh-canvas-pillars { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0.85rem; }
+.mh-pillar-card { border-radius:12px; padding:1.1rem 1.15rem; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+.mh-pillar-name { font-size:0.85rem; font-weight:700; margin-bottom:0.6rem; }
 .mh-pillar-name:empty::before { font-weight:400; }
-.mh-pillar-divider { height:2px; background:var(--pink); border-radius:1px; margin-bottom:0.6rem; opacity:0.35; }
-.mh-point-row { display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.3rem; }
-.mh-point-bullet { color:var(--pink); font-size:0.8rem; flex-shrink:0; line-height:1.5; }
-.mh-point-text { flex:1; font-size:0.8rem; color:var(--gray-600); line-height:1.4; }
+.mh-point-row { display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.35rem; }
+.mh-point-bullet { font-size:0.8rem; flex-shrink:0; line-height:1.5; }
+.mh-point-text { flex:1; font-size:0.8rem; line-height:1.45; }
 .mh-point-rm { background:none; border:none; color:transparent; cursor:pointer; font-size:0.75rem; padding:0; line-height:1; flex-shrink:0; }
-.mh-point-row:hover .mh-point-rm { color:var(--gray-300); }
+.mh-point-row:hover .mh-point-rm { color:rgba(0,0,0,0.2); }
 .mh-point-row:hover .mh-point-rm:hover { color:var(--error,#ef4444); }
-.mh-pillar-add-pt { font-size:0.7rem; color:var(--pink); background:none; border:none; cursor:pointer; padding:0.1rem 0; font-family:inherit; font-weight:600; margin-top:0.2rem; opacity:0.7; }
-.mh-pillar-add-pt:hover { opacity:1; }
+.mh-pillar-add-pt { font-size:0.7rem; background:none; border:none; cursor:pointer; padding:0.1rem 0; font-family:inherit; font-weight:600; margin-top:0.25rem; opacity:0.5; }
+.mh-pillar-add-pt:hover { opacity:0.9; }
 
-/* Positioning */
-.mh-pos-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--pink); margin-bottom:0.3rem; }
-.mh-pos-text { font-size:0.82rem; color:var(--gray-700); line-height:1.45; }
-
-/* Context / Purpose */
-.mh-wide-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--gray-400); margin-bottom:0.25rem; }
-.mh-wide-text { font-size:0.83rem; color:var(--gray-600); line-height:1.5; }
+/* ── Optional sections (white cards) ── */
+.mh-wide-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-400); margin-bottom:0.3rem; }
+.mh-wide-text { font-size:0.83rem; color:var(--gray-600); line-height:1.55; }
 
 /* Elevator */
 .mh-elevator-length { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.6rem; }
 .mh-elevator-length:last-child { margin-bottom:0; }
-.mh-elev-toggle { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray-400); background:var(--gray-100); border:none; border-radius:6px; padding:0.2rem 0.55rem; cursor:pointer; font-family:inherit; flex-shrink:0; }
-.mh-elev-toggle.on { background:rgba(217,43,150,0.1); color:var(--pink); }
-.mh-elev-text { flex:1; font-size:0.8rem; color:var(--gray-600); line-height:1.45; }
+.mh-elev-toggle { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray-400); background:rgba(0,0,0,0.04); border:none; border-radius:6px; padding:0.2rem 0.55rem; cursor:pointer; font-family:inherit; flex-shrink:0; transition:all 0.15s; }
+.mh-elev-toggle.on { background:rgba(219,39,119,0.1); color:var(--pink); }
+.mh-elev-text { flex:1; font-size:0.8rem; color:var(--gray-600); line-height:1.5; }
 
 /* Lead/Avoid */
-.mh-chip-list { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.35rem; }
-.mh-chip { display:inline-flex; align-items:center; gap:0.25rem; padding:0.2rem 0.55rem; background:var(--gray-100); border-radius:6px; font-size:0.76rem; color:var(--gray-700); }
+.mh-chip-list { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.4rem; }
+.mh-chip { display:inline-flex; align-items:center; gap:0.25rem; padding:0.22rem 0.6rem; background:rgba(0,0,0,0.04); border-radius:6px; font-size:0.76rem; color:var(--gray-700); }
 .mh-chip-avoid { background:rgba(239,68,68,0.07); color:#dc2626; }
 .mh-chip-rm { background:none; border:none; color:var(--gray-400); cursor:pointer; font-size:0.75rem; padding:0; line-height:1; }
 .mh-chip-rm:hover { color:var(--error,#ef4444); }
-.mh-chip-add-row { display:flex; gap:0.4rem; margin-top:0.4rem; }
-.mh-chip-input { flex:1; padding:0.3rem 0.5rem; border:1px solid var(--gray-200); border-radius:6px; font-size:0.78rem; font-family:inherit; }
-.mh-chip-input:focus { outline:none; border-color:var(--pink); }
+.mh-chip-add-row { display:flex; gap:0.4rem; margin-top:0.5rem; }
+.mh-chip-input { flex:1; padding:0.35rem 0.6rem; border:1px solid rgba(0,0,0,0.08); border-radius:8px; font-size:0.78rem; font-family:inherit; background:#fff; transition:border-color 0.15s; }
+.mh-chip-input:focus { outline:none; border-color:var(--pink); box-shadow:0 0 0 3px rgba(219,39,119,0.08); }
 
-/* Pillar controls */
-.mh-pillar-controls { display:flex; gap:0.4rem; padding:0.75rem 1.1rem; border-top:1.5px solid var(--gray-200); background:var(--gray-50); }
+/* Canvas two-col optional section */
+.mh-canvas-two-col { display:grid; grid-template-columns:1fr 1fr; gap:0.85rem; }
+.mh-canvas-two-col > div { background:#fff; border-radius:12px; padding:1.1rem 1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.05); }
 
 /* ══════════════════════════════════════════════
    SETUP VIEW
@@ -547,28 +550,49 @@
   /* ════════════════════════════════════════════════════
      VISUAL HOUSE RENDERER
      ════════════════════════════════════════════════════ */
+  /* ═══════════════════════════════════════════════
+     VISUAL HOUSE RENDERER — CANVAS STYLE
+     ═══════════════════════════════════════════════ */
+
+  // Colour palettes for pillar cards
+  const PILLAR_COLORS = [
+    { bg:'#FDF2F8', border:'#FCE7F3', text:'#9D174D', bullet:'#DB2777' },
+    { bg:'#F5F3FF', border:'#EDE9FE', text:'#5B21B6', bullet:'#7C3AED' },
+    { bg:'#F0FDF4', border:'#DCFCE7', text:'#166534', bullet:'#059669' },
+    { bg:'#FFF7ED', border:'#FFEDD5', text:'#9A3412', bullet:'#EA580C' },
+    { bg:'#EFF6FF', border:'#BFDBFE', text:'#1D4ED8', bullet:'#3B82F6' },
+    { bg:'#FEF2F2', border:'#FECACA', text:'#991B1B', bullet:'#EF4444' }
+  ];
+
+  // Colours for positioning cards
+  const POS_COLORS = [
+    { bg:'#FFF7ED', border:'#FFEDD5', text:'#9A3412' },
+    { bg:'#F0F9FF', border:'#E0F2FE', text:'#075985' },
+    { bg:'#F7FEE7', border:'#ECFCCB', text:'#365314' }
+  ];
+
   function mhRenderHouse() {
-    const d   = mhData;
-    const sec = d.enabled_sections || {};
+    const d    = mhData;
+    const sec  = d.enabled_sections || {};
     const name = d.entity_name || d.title || '';
     const type = TYPE_LABELS[d.type] || d.type;
     let html = '';
 
-    // ── Header row ──
-    html += `<div class="mh-row">
-      <div class="mh-cell mh-cell-header" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 1.4rem;">
-        <div ${edit('_entity_name','mh-text mh-brand-name')} data-ph="Your Client's Finest Brand™">${esc(name)}</div>
-        <span class="mh-type-badge">${esc(type)} Messaging House</span>
-      </div>
+    // ── Dark header ──
+    html += `<div class="mh-canvas-header">
+      <div ${edit('_entity_name','mh-text mh-brand-name')} data-ph="Company Name">${esc(name)}</div>
+      <span class="mh-type-badge">${esc(type)} Messaging House</span>
     </div>`;
 
-    // ── Tagline row ──
+    html += `<div class="mh-canvas-body">`;
+
+    // ── Taglines (warm amber card) ──
     if (sec.taglines !== false) {
       const tls = d.taglines || [];
       let tlHtml = '';
       tls.forEach((t, i) => {
         const cls = i === 0 ? 'mh-tagline-main' : 'mh-tagline-secondary';
-        const ph  = i === 0 ? 'The phrase that makes people nod slowly and say \'yes, that.\'' : 'Secondary tagline…';
+        const ph  = i === 0 ? "The phrase that makes people nod slowly and say 'yes, that.'" : 'Secondary tagline…';
         const rm  = i > 0 ? `<button class="mh-tagline-rm" onclick="mhRemoveTagline(${i})" title="Remove">✕</button>` : '';
         tlHtml += `<div class="mh-tagline-row-wrap">
           <div ${editTagline(i,'mh-text '+cls)} data-ph="${ph}">${esc(t.text)}</div>
@@ -576,60 +600,67 @@
         </div>`;
       });
       tlHtml += `<button class="mh-tagline-add" onclick="mhAddTagline()">+ add tagline</button>`;
-      html += row('Tagline', tlHtml);
+      html += `<div class="mh-canvas-section mh-canvas-tagline">${tlHtml}</div>`;
     }
 
-    // ── Core outcome ──
+    // ── Core Message (soft blue card) ──
     if (sec.outcome !== false) {
-      html += row('Core Message',
-        `<div ${edit('outcome','mh-text mh-outcome-text')} data-ph="We help [specific humans] achieve [the thing that matters] without [the painful part].">
-          ${esc(d.outcome||'')}</div>`);
+      html += `<div class="mh-canvas-section mh-canvas-outcome">
+        <div class="mh-canvas-section-label">Core Message</div>
+        <div ${edit('outcome','mh-text mh-outcome-text')} data-ph="We help [specific humans] achieve [the thing that matters] without [the painful part].">${esc(d.outcome||'')}</div>
+      </div>`;
     }
 
-    // ── Pillars ──
+    // ── Positioning (FOR / WHO / WE) — ABOVE pillars, clearly company-level ──
+    if (sec.positioning !== false) {
+      const p = d.positioning || {};
+      const posFields = [
+        { key: 'target_audience', label: 'For…',  ph: 'People with a specific, solvable problem' },
+        { key: 'problem',         label: 'Who…',  ph: 'Struggle with the thing keeping them up at night' },
+        { key: 'solution',        label: 'We…',   ph: 'Make that problem go away, differently' }
+      ];
+      const posCards = posFields.map((f, i) => {
+        const c = POS_COLORS[i];
+        return `<div class="mh-pos-card" style="background:${c.bg};border:1px solid ${c.border};">
+          <div class="mh-pos-label" style="color:${c.text};">${f.label}</div>
+          <div ${editPos(f.key,'mh-text mh-pos-text')} style="color:${c.text};" data-ph="${f.ph}">${esc(p[f.key]||'')}</div>
+        </div>`;
+      }).join('');
+      html += `<div class="mh-canvas-pos-row">${posCards}</div>`;
+    }
+
+    // ── Pillars (colour-coded cards) ──
     if (sec.pillars !== false) {
       const pillars = d.pillars || [];
-      const pillarCells = pillars.map((p, pi) => {
+      const pillarCards = pillars.map((p, pi) => {
+        const c      = PILLAR_COLORS[pi % PILLAR_COLORS.length];
         const pName  = esc(p.name || '');
         const phName = `Compelling Pillar ${pi + 1}`;
         const pts    = p.points || [];
         let ptsHtml  = pts.map((pt, pti) =>
           `<div class="mh-point-row">
-            <span class="mh-point-bullet">•</span>
-            <div ${editPoint(pi, pti, 'mh-text mh-point-text')} data-ph="Evidence that this pillar exists and isn't made up">${esc(pt)}</div>
+            <span class="mh-point-bullet" style="color:${c.bullet};">•</span>
+            <div ${editPoint(pi, pti, 'mh-text mh-point-text')} style="color:${c.text};opacity:0.75;" data-ph="Evidence that this pillar exists and isn't made up">${esc(pt)}</div>
             <button class="mh-point-rm" onclick="mhRemovePoint(${pi},${pti})" title="Remove">✕</button>
           </div>`).join('');
-        ptsHtml += `<button class="mh-pillar-add-pt" onclick="mhAddPoint(${pi})">+ point</button>`;
-        return `<div class="mh-cell" style="vertical-align:top;">
-          <div ${editPillarName(pi,'mh-text mh-pillar-name')} data-ph="${phName}">${pName}</div>
-          <div class="mh-pillar-divider"></div>
+        ptsHtml += `<button class="mh-pillar-add-pt" style="color:${c.text};" onclick="mhAddPoint(${pi})">+ point</button>`;
+        return `<div class="mh-pillar-card" style="background:${c.bg};border:1px solid ${c.border};">
+          <div ${editPillarName(pi,'mh-text mh-pillar-name')} style="color:${c.text};" data-ph="${phName}">${pName}</div>
           ${ptsHtml}
         </div>`;
       }).join('');
-      html += `<div class="mh-row">${pillarCells}</div>`;
+      html += `<div class="mh-canvas-pillars">${pillarCards}</div>`;
     }
 
-    // ── Positioning ──
-    if (sec.positioning !== false) {
-      const p = d.positioning || {};
-      const posRow = [
-        { key: 'target_audience', label: 'For…',   ph: 'People with a specific, solvable problem' },
-        { key: 'problem',         label: 'Who…',    ph: 'Struggle with the thing keeping them up at night' },
-        { key: 'solution',        label: 'We…',     ph: 'Solve it in plain English, without the jargon' }
-      ].map(f => `<div class="mh-cell">
-        <div class="mh-pos-label">${f.label}</div>
-        <div ${editPos(f.key,'mh-text mh-pos-text')} data-ph="${f.ph}">${esc(p[f.key]||'')}</div>
-      </div>`).join('');
-      html += `<div class="mh-row">${posRow}</div>`;
-    }
-
-    // ── Context / Why Now ──
+    // ── Context / Why Now (white card) ──
     if (sec.context) {
-      html += row('Why Now',
-        `<div ${edit('context','mh-text mh-wide-text')} data-ph="The market shift that makes this the perfect moment to care.">${esc(d.context||'')}</div>`);
+      html += `<div class="mh-canvas-section">
+        <div class="mh-canvas-section-label">Why Now</div>
+        <div ${edit('context','mh-text mh-wide-text')} data-ph="The market shift that makes this the perfect moment to care.">${esc(d.context||'')}</div>
+      </div>`;
     }
 
-    // ── Elevator Pitch ──
+    // ── Elevator Pitch (white card) ──
     if (sec.elevator) {
       const elev = d.elevator || {};
       const lengths = [
@@ -644,60 +675,58 @@
           <button class="mh-elev-toggle${onCls}" onclick="mhToggleElev('${l.key}')">${l.label}</button>
           ${item.enabled
             ? `<div ${editElev(l.key,'mh-text mh-elev-text')} data-ph="Your ${l.label.toLowerCase()} pitch goes here…">${esc(item.text||'')}</div>`
-            : `<span class="mh-elev-text" style="color:var(--gray-300);font-style:italic;font-size:0.8rem;">Hidden — click to enable</span>`}
+            : `<span class="mh-elev-text" style="color:rgba(0,0,0,0.2);font-style:italic;font-size:0.8rem;">Hidden — click to enable</span>`}
         </div>`;
       }).join('');
-      html += row('Elevator', eHtml);
+      html += `<div class="mh-canvas-section">
+        <div class="mh-canvas-section-label">Elevator Pitch</div>
+        ${eHtml}
+      </div>`;
     }
 
-    // ── Lead With / Avoid ──
+    // ── Lead With / Avoid (two-col cards) ──
     if (sec.lead_avoid) {
       const lw = d.lead_with || [];
       const av = d.avoid    || [];
-      const leadHtml = `<div>
-        <div class="mh-pos-label">Lead With</div>
-        <div class="mh-chip-list">${lw.map((w,i) => `<span class="mh-chip">${esc(w)}<button class="mh-chip-rm" onclick="mhRemoveChip('lead_with',${i})">✕</button></span>`).join('')}</div>
-        <div class="mh-chip-add-row">
-          <input class="mh-chip-input" id="mh-lead-in" placeholder="Add phrase…" onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('lead_with','mh-lead-in');}">
-          <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('lead_with','mh-lead-in')">Add</button>
+      html += `<div class="mh-canvas-two-col">
+        <div>
+          <div class="mh-wide-label" style="color:#059669;">Lead With</div>
+          <div class="mh-chip-list">${lw.map((w,i) => `<span class="mh-chip">${esc(w)}<button class="mh-chip-rm" onclick="mhRemoveChip('lead_with',${i})">✕</button></span>`).join('')}</div>
+          <div class="mh-chip-add-row">
+            <input class="mh-chip-input" id="mh-lead-in" placeholder="Add phrase…" onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('lead_with','mh-lead-in');}">
+            <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('lead_with','mh-lead-in')">Add</button>
+          </div>
         </div>
-      </div>`;
-      const avoidHtml = `<div>
-        <div class="mh-pos-label" style="color:#dc2626;">Avoid</div>
-        <div class="mh-chip-list">${av.map((w,i) => `<span class="mh-chip mh-chip-avoid">${esc(w)}<button class="mh-chip-rm" onclick="mhRemoveChip('avoid',${i})">✕</button></span>`).join('')}</div>
-        <div class="mh-chip-add-row">
-          <input class="mh-chip-input" id="mh-avoid-in" placeholder="Add phrase…" onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('avoid','mh-avoid-in');}">
-          <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('avoid','mh-avoid-in')">Add</button>
+        <div>
+          <div class="mh-wide-label" style="color:#dc2626;">Avoid</div>
+          <div class="mh-chip-list">${av.map((w,i) => `<span class="mh-chip mh-chip-avoid">${esc(w)}<button class="mh-chip-rm" onclick="mhRemoveChip('avoid',${i})">✕</button></span>`).join('')}</div>
+          <div class="mh-chip-add-row">
+            <input class="mh-chip-input" id="mh-avoid-in" placeholder="Add phrase…" onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('avoid','mh-avoid-in');}">
+            <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('avoid','mh-avoid-in')">Add</button>
+          </div>
         </div>
-      </div>`;
-      html += `<div class="mh-row">
-        <div class="mh-cell">${leadHtml}</div>
-        <div class="mh-cell">${avoidHtml}</div>
       </div>`;
     }
 
-    // ── Purpose & Vision ──
+    // ── Purpose & Vision (two-col cards) ──
     if (sec.purpose_vision) {
       const pv = d.purpose_vision || {};
-      const pvRow = [
-        { key: 'purpose', label: 'Purpose', ph: 'To make our category at least 20% less frustrating for everyone in it.' },
-        { key: 'vision',  label: 'Vision',  ph: 'A world where this problem no longer has to exist.' }
-      ].map(f => `<div class="mh-cell">
-        <div class="mh-wide-label">${f.label}</div>
-        <div ${editPV(f.key,'mh-text mh-wide-text')} data-ph="${f.ph}">${esc(pv[f.key]||'')}</div>
-      </div>`).join('');
-      html += `<div class="mh-row">${pvRow}</div>`;
+      html += `<div class="mh-canvas-two-col">
+        <div>
+          <div class="mh-wide-label">Purpose</div>
+          <div ${editPV('purpose','mh-text mh-wide-text')} data-ph="To make our category at least 20% less frustrating for everyone in it.">${esc(pv.purpose||'')}</div>
+        </div>
+        <div>
+          <div class="mh-wide-label">Vision</div>
+          <div ${editPV('vision','mh-text mh-wide-text')} data-ph="A world where this problem no longer has to exist.">${esc(pv.vision||'')}</div>
+        </div>
+      </div>`;
     }
+
+    html += `</div>`; // close .mh-canvas-body
 
     document.getElementById('mh-house-table').innerHTML = html;
     mhBindEditable();
-  }
-
-  /* ── HTML helpers ── */
-  function row(label, inner) {
-    return `<div class="mh-row">
-      <div class="mh-cell mh-cell-full">${inner}</div>
-    </div>`;
   }
   // We pass the attribute string, so we can use data-field + class
   function edit(field, cls) { return `class="${cls}" contenteditable="true" data-type="field" data-field="${field}"`; }
