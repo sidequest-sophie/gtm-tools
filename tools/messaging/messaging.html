@@ -1,153 +1,218 @@
 <!-- ────────────────────────────────────────────────────────────────────────────
-     MESSAGING HOUSE — Multi-house Supabase-backed tool (v2)
+     MESSAGING HOUSE — v3 · Multi-house · Supabase · Visual Table Layout
      ──────────────────────────────────────────────────────────────────────────── -->
-
 <style>
-.mh-tool { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+.mh-tool { width:100%; height:100%; display:flex; flex-direction:column; background:var(--bg); overflow:hidden; font-family:inherit; }
 
-/* ── Top Bar ── */
-.mh-topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; background: var(--white); border-bottom: 1px solid var(--gray-200); flex-shrink: 0; gap: 1rem; }
-.mh-topbar-left { display: flex; align-items: center; gap: 0.75rem; }
-.mh-topbar h2 { font-size: 1.25rem; font-weight: 700; color: var(--navy); margin: 0; }
-.mh-topbar-actions { display: flex; gap: 0.5rem; align-items: center; }
+/* ── Topbar ── */
+.mh-topbar { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem; background:var(--white); border-bottom:1px solid var(--gray-200); flex-shrink:0; gap:1rem; }
+.mh-topbar-left { display:flex; align-items:center; gap:0.75rem; min-width:0; }
+.mh-topbar h2 { font-size:1.2rem; font-weight:700; color:var(--navy); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mh-topbar-right { display:flex; gap:0.5rem; align-items:center; flex-shrink:0; }
 
 /* ── Buttons ── */
-.mh-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; font-family: inherit; }
-.mh-btn-primary { background: var(--pink); color: white; }
-.mh-btn-primary:hover { background: var(--pink-hover); }
-.mh-btn-secondary { background: var(--white); color: var(--gray-700); border: 1px solid var(--gray-200); }
-.mh-btn-secondary:hover { border-color: var(--pink); color: var(--pink); }
-.mh-btn-ghost { background: none; color: var(--gray-500); border: none; padding: 0.4rem 0.6rem; }
-.mh-btn-ghost:hover { color: var(--pink); }
-.mh-btn-sm { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
-.mh-btn-danger { background: none; color: var(--error); border: 1px solid var(--error); }
-.mh-btn-danger:hover { background: var(--error); color: white; }
-.mh-btn-success { background: rgba(5,150,105,0.1); color: #059669; border: 1px solid rgba(5,150,105,0.2); }
-.mh-btn-success:hover { background: #059669; color: white; }
+.mh-btn { display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 1rem; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; border:none; font-family:inherit; transition:all 0.15s; white-space:nowrap; }
+.mh-btn-primary { background:var(--pink); color:#fff; }
+.mh-btn-primary:hover { background:var(--pink-hover,#c02585); }
+.mh-btn-secondary { background:var(--white); color:var(--gray-700); border:1px solid var(--gray-200); }
+.mh-btn-secondary:hover { border-color:var(--pink); color:var(--pink); }
+.mh-btn-ghost { background:none; color:var(--gray-500); border:none; padding:0.4rem 0.6rem; }
+.mh-btn-ghost:hover { color:var(--pink); }
+.mh-btn-sm { padding:0.35rem 0.65rem; font-size:0.75rem; }
+.mh-btn-danger { background:none; color:var(--error,#ef4444); border:1px solid var(--error,#ef4444); }
+.mh-btn-danger:hover { background:var(--error,#ef4444); color:#fff; }
 
-/* ── Scrollable body ── */
-.mh-body { flex: 1; overflow-y: auto; padding: 1.5rem; }
+/* ── Body ── */
+.mh-body { flex:1; overflow-y:auto; padding:1.5rem; }
 
-/* ── List View ── */
-.mh-list { display: flex; flex-direction: column; gap: 0.75rem; max-width: 720px; }
-.mh-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.15s; }
-.mh-card:hover { border-color: var(--pink); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.mh-card-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(208,32,144,0.08); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-.mh-card-body { flex: 1; min-width: 0; }
-.mh-card-title { font-size: 0.95rem; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
-.mh-card-meta { font-size: 0.75rem; color: var(--gray-500); display: flex; gap: 1rem; align-items: center; }
-.mh-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.15rem 0.5rem; border-radius: 4px; }
-.mh-badge-draft { background: var(--gray-100); color: var(--gray-500); }
-.mh-badge-active { background: rgba(16,185,129,0.1); color: #059669; }
-.mh-badge-archived { background: rgba(239,68,68,0.08); color: var(--error); }
-.mh-card-arrow { color: var(--gray-300); font-size: 1.2rem; }
-
-.mh-empty { text-align: center; padding: 3rem 1rem; color: var(--gray-500); }
-.mh-empty p { margin-bottom: 1rem; font-size: 0.9rem; }
-
-/* ── Editor ── */
-.mh-editor { max-width: 780px; }
-.mh-meta-bar { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; }
-.mh-meta-row { display: flex; gap: 1rem; margin-bottom: 0.75rem; }
-.mh-meta-row:last-child { margin-bottom: 0; }
-.mh-meta-row > .mh-field { flex: 1; }
-
-/* ── Form fields ── */
-.mh-field { margin-bottom: 1rem; }
-.mh-field:last-child { margin-bottom: 0; }
-.mh-label { display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 0.4rem; }
-.mh-input, .mh-textarea, .mh-select { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 0.85rem; font-family: inherit; color: var(--gray-700); background: var(--white); transition: border-color 0.15s; box-sizing: border-box; }
-.mh-input:focus, .mh-textarea:focus, .mh-select:focus { outline: none; border-color: var(--pink); }
-.mh-textarea { min-height: 80px; resize: vertical; }
-.mh-hint { font-size: 0.7rem; color: var(--gray-400); margin-top: 0.25rem; }
-
-/* ── Section cards ── */
-.mh-section { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
-.mh-section-header { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; cursor: pointer; user-select: none; }
-.mh-section-header:hover { background: var(--gray-50); }
-.mh-section-left { display: flex; align-items: center; gap: 0.5rem; }
-.mh-section-title { font-size: 0.85rem; font-weight: 700; color: var(--navy); }
-.mh-section-badge { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 4px; }
-.mh-badge-core { background: rgba(5,150,105,0.1); color: #059669; }
-.mh-badge-optional { background: rgba(217,43,150,0.08); color: var(--pink); }
-.mh-section-chevron { color: var(--gray-400); transition: transform 0.2s; font-size: 0.85rem; }
-.mh-section.open .mh-section-chevron { transform: rotate(180deg); }
-.mh-section-body { display: none; padding: 1.25rem; border-top: 1px solid var(--gray-100); }
-.mh-section.open .mh-section-body { display: block; }
-
-/* ── Tagline rows ── */
-.mh-tagline-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
-.mh-tagline-row input { flex: 1; }
-.mh-tagline-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--gray-400); min-width: 70px; }
-.mh-tagline-remove { background: none; border: none; color: var(--gray-300); cursor: pointer; font-size: 1rem; padding: 0.2rem; }
-.mh-tagline-remove:hover { color: var(--error); }
-
-/* ── Elevator toggles ── */
-.mh-elevator-item { margin-bottom: 1rem; }
-.mh-elevator-toggle { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; cursor: pointer; }
-.mh-elevator-toggle input[type="checkbox"] { accent-color: var(--pink); }
-.mh-elevator-toggle label { font-size: 0.8rem; font-weight: 600; color: var(--gray-600); cursor: pointer; }
-
-/* ── Pillars ── */
-.mh-pillar { background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
-.mh-pillar-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
-.mh-pillar-num { width: 24px; height: 24px; border-radius: 6px; background: var(--pink); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
-.mh-pillar-header input { flex: 1; }
-.mh-pillar-remove { background: none; border: none; color: var(--gray-300); cursor: pointer; font-size: 1rem; padding: 0.2rem; }
-.mh-pillar-remove:hover { color: var(--error); }
-
-/* ── Lead with / Avoid chips ── */
-.mh-chip-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
-.mh-chip { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; background: var(--gray-100); border-radius: 6px; font-size: 0.78rem; color: var(--gray-700); }
-.mh-chip-remove { background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 0.8rem; padding: 0; line-height: 1; }
-.mh-chip-remove:hover { color: var(--error); }
-.mh-chip-input-row { display: flex; gap: 0.4rem; }
-.mh-chip-input-row input { flex: 1; }
-
-/* ── Proof assets ── */
-.mh-proof-item { display: flex; gap: 0.5rem; align-items: start; margin-bottom: 0.5rem; padding: 0.75rem; background: var(--gray-50); border-radius: 8px; border: 1px solid var(--gray-100); }
-.mh-proof-item .mh-field { flex: 1; margin-bottom: 0; }
-.mh-proof-remove { background: none; border: none; color: var(--gray-300); cursor: pointer; font-size: 1rem; padding: 0.2rem; margin-top: 1.2rem; }
-.mh-proof-remove:hover { color: var(--error); }
+/* ── List cards ── */
+.mh-list { display:flex; flex-direction:column; gap:0.75rem; max-width:700px; }
+.mh-card { background:var(--white); border:1px solid var(--gray-200); border-radius:12px; padding:1.1rem 1.4rem; display:flex; align-items:center; gap:1rem; cursor:pointer; transition:all 0.15s; }
+.mh-card:hover { border-color:var(--pink); box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+.mh-card-icon { width:38px; height:38px; border-radius:9px; background:rgba(217,43,150,0.08); display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0; }
+.mh-card-body { flex:1; min-width:0; }
+.mh-card-title { font-size:0.9rem; font-weight:600; color:var(--navy); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mh-card-meta { font-size:0.73rem; color:var(--gray-500); display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
+.mh-badge { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:0.12rem 0.45rem; border-radius:4px; }
+.mh-badge-draft { background:var(--gray-100); color:var(--gray-500); }
+.mh-badge-active { background:rgba(16,185,129,0.1); color:#059669; }
+.mh-badge-archived { background:rgba(239,68,68,0.08); color:var(--error,#ef4444); }
+.mh-card-arrow { color:var(--gray-300); font-size:1.1rem; }
+.mh-empty { text-align:center; padding:3rem 1rem; color:var(--gray-500); }
+.mh-empty p { margin-bottom:1.25rem; font-size:0.88rem; }
 
 /* ── Status bar ── */
-.mh-status-bar { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem; background: var(--white); border-top: 1px solid var(--gray-200); flex-shrink: 0; }
-.mh-status-text { flex: 1; font-size: 0.8rem; color: var(--gray-500); }
-.mh-status-text strong { color: var(--navy); }
+.mh-status-bar { display:flex; align-items:center; gap:1rem; padding:0.6rem 1.5rem; background:var(--white); border-top:1px solid var(--gray-200); flex-shrink:0; }
+.mh-save-status { font-size:0.77rem; color:var(--gray-400); }
+.mh-status-sel { padding:0.35rem 0.55rem; border:1px solid var(--gray-200); border-radius:6px; font-size:0.75rem; font-family:inherit; color:var(--gray-600); background:var(--white); cursor:pointer; }
+.mh-status-sel:focus { outline:none; border-color:var(--pink); }
 
-/* ── Responsive ── */
-@media (max-width: 640px) {
-  .mh-meta-row { flex-direction: column; gap: 0; }
-  .mh-topbar { padding: 0.75rem 1rem; }
-  .mh-body { padding: 1rem; }
-}
+/* ══════════════════════════════════════════════
+   VISUAL HOUSE TABLE
+   ══════════════════════════════════════════════ */
+.mh-house-wrap { max-width:900px; }
+.mh-house-table { width:100%; border:1.5px solid var(--gray-200); border-radius:14px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); background:var(--white); }
+
+/* Rows */
+.mh-row { display:flex; border-bottom:1.5px solid var(--gray-200); }
+.mh-row:last-child { border-bottom:none; }
+.mh-row-label { flex:0 0 88px; padding:0.85rem 0.75rem; background:var(--gray-50); border-right:1.5px solid var(--gray-200); display:flex; align-items:flex-start; justify-content:flex-end; }
+.mh-row-label span { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--gray-400); text-align:right; line-height:1.3; }
+
+/* Cells */
+.mh-cell { flex:1; padding:0.85rem 1.1rem; border-right:1.5px solid var(--gray-200); position:relative; transition:background 0.12s; min-width:0; }
+.mh-cell:last-child { border-right:none; }
+.mh-cell.mh-cell-full { flex:none; width:100%; }
+.mh-cell.mh-cell-no-pad { padding:0; }
+.mh-cell.mh-cell-center { display:flex; align-items:center; justify-content:center; text-align:center; }
+.mh-cell.mh-cell-header { background:#134461; }
+.mh-cell.mh-cell-header:hover { background:#0f3550; }
+
+/* Editable text */
+.mh-text { display:block; font-size:0.85rem; line-height:1.5; color:var(--gray-700); min-height:1.2em; }
+.mh-text[contenteditable="true"] { outline:2px solid var(--pink); border-radius:4px; padding:2px 4px; margin:-2px -4px; background:#fff; }
+.mh-text[contenteditable="true"]:focus { outline:2px solid var(--pink); }
+.mh-text:empty::before { content:attr(data-ph); color:var(--gray-300); font-style:italic; pointer-events:none; }
+.mh-text[contenteditable="true"]:empty::before { color:var(--gray-300); }
+
+/* Header row specifics */
+.mh-brand-name { font-size:1.3rem; font-weight:800; color:#fff !important; letter-spacing:-0.01em; }
+.mh-brand-name:empty::before { color:rgba(255,255,255,0.4); }
+.mh-brand-name[contenteditable="true"] { background:rgba(255,255,255,0.1); }
+.mh-type-badge { display:inline-block; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; padding:0.2rem 0.55rem; border-radius:20px; background:rgba(255,255,255,0.18); color:rgba(255,255,255,0.9); white-space:nowrap; }
+
+/* Tagline */
+.mh-tagline-main { font-size:1rem; font-weight:600; color:var(--navy); font-style:italic; }
+.mh-tagline-secondary { font-size:0.82rem; color:var(--gray-500); font-style:italic; margin-top:4px; }
+.mh-tagline-add { font-size:0.72rem; color:var(--pink); background:none; border:none; cursor:pointer; padding:0.15rem 0; margin-top:4px; display:inline-block; font-family:inherit; font-weight:600; }
+.mh-tagline-add:hover { opacity:0.75; }
+.mh-tagline-row-wrap { display:flex; align-items:baseline; gap:0.4rem; }
+.mh-tagline-rm { background:none; border:none; color:var(--gray-300); cursor:pointer; font-size:0.8rem; padding:0; line-height:1; }
+.mh-tagline-rm:hover { color:var(--error,#ef4444); }
+
+/* Outcome */
+.mh-outcome-text { font-size:0.95rem; font-weight:600; color:var(--navy); line-height:1.5; }
+.mh-outcome-text:empty::before { font-weight:400; }
+
+/* Pillars */
+.mh-pillar-name { font-size:0.85rem; font-weight:700; color:var(--navy); margin-bottom:0.5rem; }
+.mh-pillar-name:empty::before { font-weight:400; }
+.mh-pillar-divider { height:2px; background:var(--pink); border-radius:1px; margin-bottom:0.6rem; opacity:0.35; }
+.mh-point-row { display:flex; align-items:baseline; gap:0.3rem; margin-bottom:0.3rem; }
+.mh-point-bullet { color:var(--pink); font-size:0.8rem; flex-shrink:0; line-height:1.5; }
+.mh-point-text { flex:1; font-size:0.8rem; color:var(--gray-600); line-height:1.4; }
+.mh-point-rm { background:none; border:none; color:transparent; cursor:pointer; font-size:0.75rem; padding:0; line-height:1; flex-shrink:0; }
+.mh-point-row:hover .mh-point-rm { color:var(--gray-300); }
+.mh-point-row:hover .mh-point-rm:hover { color:var(--error,#ef4444); }
+.mh-pillar-add-pt { font-size:0.7rem; color:var(--pink); background:none; border:none; cursor:pointer; padding:0.1rem 0; font-family:inherit; font-weight:600; margin-top:0.2rem; opacity:0.7; }
+.mh-pillar-add-pt:hover { opacity:1; }
+
+/* Positioning */
+.mh-pos-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--pink); margin-bottom:0.3rem; }
+.mh-pos-text { font-size:0.82rem; color:var(--gray-700); line-height:1.45; }
+
+/* Context / Purpose */
+.mh-wide-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--gray-400); margin-bottom:0.25rem; }
+.mh-wide-text { font-size:0.83rem; color:var(--gray-600); line-height:1.5; }
+
+/* Elevator */
+.mh-elevator-length { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.6rem; }
+.mh-elevator-length:last-child { margin-bottom:0; }
+.mh-elev-toggle { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray-400); background:var(--gray-100); border:none; border-radius:6px; padding:0.2rem 0.55rem; cursor:pointer; font-family:inherit; flex-shrink:0; }
+.mh-elev-toggle.on { background:rgba(217,43,150,0.1); color:var(--pink); }
+.mh-elev-text { flex:1; font-size:0.8rem; color:var(--gray-600); line-height:1.45; }
+
+/* Lead/Avoid */
+.mh-chip-list { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.35rem; }
+.mh-chip { display:inline-flex; align-items:center; gap:0.25rem; padding:0.2rem 0.55rem; background:var(--gray-100); border-radius:6px; font-size:0.76rem; color:var(--gray-700); }
+.mh-chip-avoid { background:rgba(239,68,68,0.07); color:#dc2626; }
+.mh-chip-rm { background:none; border:none; color:var(--gray-400); cursor:pointer; font-size:0.75rem; padding:0; line-height:1; }
+.mh-chip-rm:hover { color:var(--error,#ef4444); }
+.mh-chip-add-row { display:flex; gap:0.4rem; margin-top:0.4rem; }
+.mh-chip-input { flex:1; padding:0.3rem 0.5rem; border:1px solid var(--gray-200); border-radius:6px; font-size:0.78rem; font-family:inherit; }
+.mh-chip-input:focus { outline:none; border-color:var(--pink); }
+
+/* Pillar controls */
+.mh-pillar-controls { display:flex; gap:0.4rem; padding:0.75rem 1.1rem; border-top:1.5px solid var(--gray-200); background:var(--gray-50); }
+
+/* ══════════════════════════════════════════════
+   SETUP VIEW
+   ══════════════════════════════════════════════ */
+.mh-setup-grid { display:flex; flex-direction:column; gap:0.75rem; max-width:680px; }
+.mh-setup-card { background:var(--white); border:1px solid var(--gray-200); border-radius:12px; padding:1rem 1.25rem; display:flex; align-items:center; gap:1rem; }
+.mh-setup-card-body { flex:1; }
+.mh-setup-card-title { font-size:0.88rem; font-weight:600; color:var(--navy); margin-bottom:2px; }
+.mh-setup-card-desc { font-size:0.75rem; color:var(--gray-500); }
+.mh-toggle-switch { position:relative; width:40px; height:22px; flex-shrink:0; }
+.mh-toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+.mh-toggle-track { position:absolute; inset:0; background:var(--gray-200); border-radius:11px; cursor:pointer; transition:background 0.2s; }
+.mh-toggle-switch input:checked + .mh-toggle-track { background:var(--pink); }
+.mh-toggle-track::after { content:''; position:absolute; left:3px; top:3px; width:16px; height:16px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.mh-toggle-switch input:checked + .mh-toggle-track::after { transform:translateX(18px); }
+.mh-setup-section-head { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray-400); padding:0.5rem 0 0.35rem; }
+.mh-pillars-count { display:flex; align-items:center; gap:0.5rem; }
+.mh-pillars-count button { width:28px; height:28px; border-radius:7px; border:1px solid var(--gray-200); background:var(--white); font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--gray-600); }
+.mh-pillars-count button:hover { border-color:var(--pink); color:var(--pink); }
+.mh-pillars-count span { font-size:0.88rem; font-weight:600; color:var(--navy); min-width:1.5rem; text-align:center; }
+
+/* ══════════════════════════════════════════════
+   MODALS
+   ══════════════════════════════════════════════ */
+.mh-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.38); z-index:700; align-items:center; justify-content:center; }
+.mh-overlay.open { display:flex; }
+.mh-modal { background:#fff; border-radius:16px; padding:1.75rem; width:90%; max-width:520px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 16px 48px rgba(0,0,0,0.18); overflow-y:auto; }
+.mh-modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
+.mh-modal-head h3 { font-size:1.05rem; font-weight:700; color:var(--navy); margin:0; }
+.mh-modal-close { background:none; border:none; color:var(--gray-400); cursor:pointer; font-size:1.2rem; padding:0.2rem; line-height:1; }
+.mh-modal-close:hover { color:var(--gray-700); }
+
+/* Type picker */
+.mh-type-grid { display:flex; flex-direction:column; gap:0.6rem; }
+.mh-type-option { display:flex; align-items:center; gap:1rem; padding:0.9rem 1.1rem; border:1.5px solid var(--gray-200); border-radius:10px; cursor:pointer; transition:all 0.15s; }
+.mh-type-option:hover:not(.disabled) { border-color:var(--pink); background:rgba(217,43,150,0.03); }
+.mh-type-option.disabled { opacity:0.45; cursor:default; }
+.mh-type-option-icon { width:36px; height:36px; border-radius:8px; background:rgba(217,43,150,0.08); display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0; }
+.mh-type-option-body { flex:1; }
+.mh-type-option-name { font-size:0.88rem; font-weight:600; color:var(--navy); }
+.mh-type-option-desc { font-size:0.75rem; color:var(--gray-500); margin-top:1px; }
+.mh-type-option-soon { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:0.12rem 0.45rem; background:var(--gray-100); color:var(--gray-400); border-radius:4px; flex-shrink:0; }
+
+/* Entity picker */
+.mh-entity-list { display:flex; flex-direction:column; gap:0.5rem; }
+.mh-entity-opt { display:flex; align-items:center; gap:0.75rem; padding:0.8rem 1rem; border:1.5px solid var(--gray-200); border-radius:10px; cursor:pointer; transition:all 0.15s; }
+.mh-entity-opt:hover { border-color:var(--pink); background:rgba(217,43,150,0.03); }
+.mh-entity-opt-icon { width:32px; height:32px; border-radius:7px; background:rgba(19,68,97,0.08); display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:700; color:var(--navy); flex-shrink:0; }
+.mh-entity-opt-body { flex:1; }
+.mh-entity-opt-name { font-size:0.88rem; font-weight:600; color:var(--navy); }
+.mh-entity-opt-type { font-size:0.72rem; color:var(--gray-500); margin-top:1px; }
+.mh-entity-none { font-size:0.85rem; color:var(--gray-500); text-align:center; padding:1.5rem 0; }
 </style>
 
 <div class="mh-tool" id="mhTool">
-  <!-- LIST VIEW -->
-  <div id="mh-view-list">
+
+  <!-- ══════════════════ LIST VIEW ══════════════════ -->
+  <div id="mh-v-list">
     <div class="mh-topbar">
-      <div class="mh-topbar-left">
-        <h2>Messaging Houses</h2>
-      </div>
-      <div class="mh-topbar-actions">
-        <button class="mh-btn mh-btn-primary" onclick="mhCreate()">+ New Messaging House</button>
+      <div class="mh-topbar-left"><h2>Messaging Houses</h2></div>
+      <div class="mh-topbar-right">
+        <button class="mh-btn mh-btn-primary" onclick="mhShowTypePicker()">+ New Messaging House</button>
       </div>
     </div>
     <div class="mh-body">
-      <div class="mh-list" id="mh-house-list"></div>
+      <div class="mh-list" id="mh-list-container"></div>
     </div>
   </div>
 
-  <!-- EDITOR VIEW -->
-  <div id="mh-view-editor" style="display:none;">
+  <!-- ══════════════════ HOUSE VIEW ══════════════════ -->
+  <div id="mh-v-house" style="display:none">
     <div class="mh-topbar">
       <div class="mh-topbar-left">
-        <button class="mh-btn mh-btn-ghost" onclick="mhBackToList()">← Back</button>
-        <h2 id="mh-editor-title">Messaging House</h2>
+        <button class="mh-btn mh-btn-ghost" onclick="mhGoList()">← Back</button>
+        <h2 id="mh-house-heading">Messaging House</h2>
       </div>
-      <div class="mh-topbar-actions">
-        <select id="mh-status-select" class="mh-select" style="width:auto;padding:0.4rem 0.6rem;font-size:0.75rem;" onchange="mhUpdateStatus(this.value)">
+      <div class="mh-topbar-right">
+        <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhGoSetup()">⚙ Setup</button>
+        <select id="mh-status-sel" class="mh-status-sel" onchange="mhSetStatus(this.value)">
           <option value="draft">Draft</option>
           <option value="active">Active</option>
           <option value="archived">Archived</option>
@@ -156,558 +221,649 @@
       </div>
     </div>
     <div class="mh-body">
-      <div class="mh-editor" id="mh-editor"></div>
+      <div class="mh-house-wrap">
+        <div class="mh-house-table" id="mh-house-table"></div>
+      </div>
     </div>
     <div class="mh-status-bar">
-      <span class="mh-status-text" id="mh-save-status">Ready</span>
+      <span class="mh-save-status" id="mh-save-status">Ready</span>
     </div>
   </div>
+
+  <!-- ══════════════════ SETUP VIEW ══════════════════ -->
+  <div id="mh-v-setup" style="display:none">
+    <div class="mh-topbar">
+      <div class="mh-topbar-left">
+        <button class="mh-btn mh-btn-ghost" onclick="mhGoHouse()">← Back to House</button>
+        <h2>Messaging House Setup</h2>
+      </div>
+    </div>
+    <div class="mh-body" id="mh-setup-body"></div>
+  </div>
+
+  <!-- ══════════════════ MODAL: TYPE PICKER ══════════════════ -->
+  <div class="mh-overlay" id="mh-modal-type">
+    <div class="mh-modal">
+      <div class="mh-modal-head">
+        <h3>New Messaging House</h3>
+        <button class="mh-modal-close" onclick="mhCloseModals()">✕</button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--gray-500);margin:0 0 1.25rem;">Choose what you're building messaging for.</p>
+      <div class="mh-type-grid">
+        <div class="mh-type-option" onclick="mhPickType('company')">
+          <div class="mh-type-option-icon">🏢</div>
+          <div class="mh-type-option-body">
+            <div class="mh-type-option-name">Company / Brand Messaging House</div>
+            <div class="mh-type-option-desc">Top-level positioning for the whole brand or company.</div>
+          </div>
+        </div>
+        <div class="mh-type-option disabled">
+          <div class="mh-type-option-icon">📦</div>
+          <div class="mh-type-option-body">
+            <div class="mh-type-option-name">Product Messaging House</div>
+            <div class="mh-type-option-desc">Messaging for a specific product or solution.</div>
+          </div>
+          <span class="mh-type-option-soon">Coming soon</span>
+        </div>
+        <div class="mh-type-option disabled">
+          <div class="mh-type-option-icon">🗂</div>
+          <div class="mh-type-option-body">
+            <div class="mh-type-option-name">Vertical Messaging House</div>
+            <div class="mh-type-option-desc">Tailored messaging for a specific industry or segment.</div>
+          </div>
+          <span class="mh-type-option-soon">Coming soon</span>
+        </div>
+        <div class="mh-type-option disabled">
+          <div class="mh-type-option-icon">📣</div>
+          <div class="mh-type-option-body">
+            <div class="mh-type-option-name">Campaign Messaging House</div>
+            <div class="mh-type-option-desc">Messaging for a specific campaign or launch.</div>
+          </div>
+          <span class="mh-type-option-soon">Coming soon</span>
+        </div>
+        <div class="mh-type-option disabled">
+          <div class="mh-type-option-icon">🎯</div>
+          <div class="mh-type-option-body">
+            <div class="mh-type-option-name">Event Messaging House</div>
+            <div class="mh-type-option-desc">Focused messaging for a specific event or conference.</div>
+          </div>
+          <span class="mh-type-option-soon">Coming soon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ MODAL: ENTITY PICKER ══════════════════ -->
+  <div class="mh-overlay" id="mh-modal-entity">
+    <div class="mh-modal">
+      <div class="mh-modal-head">
+        <h3>Select Company / Brand</h3>
+        <button class="mh-modal-close" onclick="mhCloseModals()">✕</button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--gray-500);margin:0 0 1.25rem;">Pick the brand this messaging house represents. Brands come from your client's Brand Ontology.</p>
+      <div class="mh-entity-list" id="mh-entity-list"></div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-(function() {
+(function () {
   'use strict';
 
-  /* ══════════════════════════════════════════════════════════════════════════
+  /* ════════════════════════════════════════════════════
      STATE
-     ══════════════════════════════════════════════════════════════════════════ */
-  let mhCurrentId = null;
-  let mhData = null;
-  let mhSaveTimer = null;
-  const MH_TYPES = { company: 'Company', product: 'Product', campaign: 'Campaign', event: 'Event', segment: 'Segment', other: 'Other' };
-  const MH_TYPE_ICONS = { company: '🏢', product: '📦', campaign: '📣', event: '🎯', segment: '👥', other: '📋' };
+     ════════════════════════════════════════════════════ */
+  let mhId   = null;  // active house ID
+  let mhData = null;  // active house data
+  let mhSave = null;  // debounce timer
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     SUPABASE HELPERS
-     ══════════════════════════════════════════════════════════════════════════ */
-  function sb() { return Auth.getClient(); }
+  const TYPE_ICONS = { company:'🏢', product:'📦', campaign:'📣', event:'🎯', segment:'👥', other:'📋' };
+  const TYPE_LABELS = { company:'Company', product:'Product', campaign:'Campaign', event:'Event', segment:'Segment', other:'Other' };
 
-  async function mhFetchAll() {
-    const clientId = Storage.getActiveClientId();
-    if (!clientId) return [];
-    const { data, error } = await sb().from('messaging_houses').select('*').eq('client_id', clientId).order('updated_at', { ascending: false });
-    if (error) { console.error('mhFetchAll error:', error); return []; }
+  /* ════════════════════════════════════════════════════
+     SUPABASE
+     ════════════════════════════════════════════════════ */
+  const sb = () => Auth.getClient();
+
+  async function dbAll() {
+    const cid = Storage.getActiveClientId();
+    if (!cid) return [];
+    const { data } = await sb().from('messaging_houses').select('*').eq('client_id', cid).order('updated_at', { ascending: false });
     return data || [];
   }
-
-  async function mhFetchOne(id) {
-    const { data, error } = await sb().from('messaging_houses').select('*').eq('id', id).single();
-    if (error) { console.error('mhFetchOne error:', error); return null; }
+  async function dbOne(id) {
+    const { data } = await sb().from('messaging_houses').select('*').eq('id', id).single();
     return data;
   }
-
-  async function mhInsert(house) {
-    const clientId = Storage.getActiveClientId();
-    const row = { client_id: clientId, ...house };
-    const { data, error } = await sb().from('messaging_houses').insert(row).select().single();
-    if (error) { console.error('mhInsert error:', error); return null; }
+  async function dbInsert(payload) {
+    const cid = Storage.getActiveClientId();
+    const { data } = await sb().from('messaging_houses').insert({ client_id: cid, ...payload }).select().single();
     return data;
   }
-
-  async function mhUpdate(id, updates) {
+  async function dbUpdate(id, updates) {
     updates.updated_at = new Date().toISOString();
-    const { data, error } = await sb().from('messaging_houses').update(updates).eq('id', id).select().single();
-    if (error) { console.error('mhUpdate error:', error); return null; }
+    const { data } = await sb().from('messaging_houses').update(updates).eq('id', id).select().single();
     return data;
   }
-
-  async function mhDeleteRow(id) {
-    const { error } = await sb().from('messaging_houses').delete().eq('id', id);
-    if (error) { console.error('mhDelete error:', error); return false; }
-    return true;
+  async function dbDelete(id) {
+    await sb().from('messaging_houses').delete().eq('id', id);
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     LIST VIEW
-     ══════════════════════════════════════════════════════════════════════════ */
-  window.mhInit = async function() {
-    document.getElementById('mh-view-list').style.display = '';
-    document.getElementById('mh-view-editor').style.display = 'none';
-    mhCurrentId = null;
-    mhData = null;
-    await mhRenderList();
-  };
+  /* ════════════════════════════════════════════════════
+     NAVIGATION
+     ════════════════════════════════════════════════════ */
+  function showOnly(id) {
+    ['mh-v-list','mh-v-house','mh-v-setup'].forEach(v => {
+      document.getElementById(v).style.display = v === id ? '' : 'none';
+    });
+  }
 
-  async function mhRenderList() {
-    const list = document.getElementById('mh-house-list');
-    list.innerHTML = '<p style="color:var(--gray-400);font-size:0.85rem;">Loading...</p>';
-    const houses = await mhFetchAll();
+  window.mhGoList  = async function () { if (mhSave) { clearTimeout(mhSave); mhSave=null; await mhFlush(); } mhInit(); };
+  window.mhGoHouse = function () { showOnly('mh-v-house'); };
+  window.mhGoSetup = function () { mhRenderSetup(); showOnly('mh-v-setup'); };
+
+  /* ════════════════════════════════════════════════════
+     BOOT
+     ════════════════════════════════════════════════════ */
+  window.mhInit = async function () {
+    showOnly('mh-v-list');
+    mhId = null; mhData = null;
+    const container = document.getElementById('mh-list-container');
+    container.innerHTML = '<p style="color:var(--gray-400);font-size:0.85rem;">Loading…</p>';
+    const houses = await dbAll();
     if (!houses.length) {
-      list.innerHTML = `
-        <div class="mh-empty">
-          <p>No messaging houses yet for this client.</p>
-          <button class="mh-btn mh-btn-primary" onclick="mhCreate()">+ Create First Messaging House</button>
-        </div>`;
+      container.innerHTML = `<div class="mh-empty">
+        <p>No messaging houses yet for this client.</p>
+        <button class="mh-btn mh-btn-primary" onclick="mhShowTypePicker()">+ Create First Messaging House</button>
+      </div>`;
       return;
     }
-    list.innerHTML = houses.map(h => {
-      const icon = MH_TYPE_ICONS[h.type] || '📋';
-      const typeName = MH_TYPES[h.type] || h.type;
-      const badgeClass = h.status === 'active' ? 'mh-badge-active' : h.status === 'archived' ? 'mh-badge-archived' : 'mh-badge-draft';
-      const tagline = (h.taglines && h.taglines[0] && h.taglines[0].text) ? h.taglines[0].text : '';
-      const meta = [typeName, tagline].filter(Boolean).join(' · ');
-      return `
-        <div class="mh-card" onclick="mhOpenEditor('${h.id}')">
-          <div class="mh-card-icon">${icon}</div>
-          <div class="mh-card-body">
-            <div class="mh-card-title">${esc(h.title)}</div>
-            <div class="mh-card-meta">
-              <span class="mh-badge ${badgeClass}">${h.status}</span>
-              <span>${esc(meta)}</span>
-            </div>
+    container.innerHTML = houses.map(h => {
+      const icon = TYPE_ICONS[h.type] || '📋';
+      const type = TYPE_LABELS[h.type] || h.type;
+      const bc   = h.status === 'active' ? 'mh-badge-active' : h.status === 'archived' ? 'mh-badge-archived' : 'mh-badge-draft';
+      const tl   = h.taglines && h.taglines[0] ? h.taglines[0].text : '';
+      return `<div class="mh-card" onclick="mhOpen('${h.id}')">
+        <div class="mh-card-icon">${icon}</div>
+        <div class="mh-card-body">
+          <div class="mh-card-title">${esc(h.title)}</div>
+          <div class="mh-card-meta">
+            <span class="mh-badge ${bc}">${h.status}</span>
+            <span>${esc(type)}${tl ? ' · ' + esc(tl) : ''}</span>
           </div>
-          <div class="mh-card-arrow">›</div>
-        </div>`;
+        </div>
+        <div class="mh-card-arrow">›</div>
+      </div>`;
     }).join('');
+  };
+
+  /* ════════════════════════════════════════════════════
+     TYPE + ENTITY PICKERS
+     ════════════════════════════════════════════════════ */
+  window.mhShowTypePicker = function () {
+    document.getElementById('mh-modal-type').classList.add('open');
+  };
+  window.mhCloseModals = function () {
+    document.querySelectorAll('.mh-overlay').forEach(el => el.classList.remove('open'));
+  };
+  // Close on backdrop click
+  document.querySelectorAll('.mh-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) mhCloseModals(); });
+  });
+
+  window.mhPickType = function (type) {
+    mhCloseModals();
+    if (type === 'company') {
+      mhShowEntityPicker();
+    }
+    // future types would branch here
+  };
+
+  function mhShowEntityPicker() {
+    const client = Storage.getActiveClient();
+    const list   = document.getElementById('mh-entity-list');
+    const entities = client ? (client.brandEntities || []) : [];
+
+    // Build options: the company itself + brand entities
+    let opts = [];
+    if (client && client.name) {
+      opts.push({ id: '__company__', name: client.name, type: 'Company', isCompany: true });
+    }
+    entities.forEach(e => opts.push({ id: e.id, name: e.name, type: e.type, isCompany: false }));
+
+    if (!opts.length) {
+      list.innerHTML = `<div class="mh-entity-none">No brand entities found.<br><small style="color:var(--gray-400);">Add brands in Client Config → Brand Ontology first.</small></div>`;
+    } else {
+      list.innerHTML = opts.map(o => {
+        const initial = (o.name || '?')[0].toUpperCase();
+        return `<div class="mh-entity-opt" onclick="mhCreateFromEntity('${o.id}','${esc(o.name)}','${esc(o.type)}')">
+          <div class="mh-entity-opt-icon">${initial}</div>
+          <div class="mh-entity-opt-body">
+            <div class="mh-entity-opt-name">${esc(o.name)}</div>
+            <div class="mh-entity-opt-type">${esc(o.type)}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    document.getElementById('mh-modal-entity').classList.add('open');
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     CREATE / OPEN / DELETE
-     ══════════════════════════════════════════════════════════════════════════ */
-  window.mhCreate = async function() {
-    const house = await mhInsert({
-      title: 'Untitled Messaging House',
-      type: 'company',
-      taglines: [{ label: 'Primary', text: '' }],
-      elevator: { '25_word': { enabled: true, text: '' }, '50_word': { enabled: false, text: '' }, '100_word': { enabled: false, text: '' } },
-      positioning: { target_audience: '', problem: '', solution: '', differentiator: '', value: '' },
-      pillars: [],
-      lead_with: [],
-      avoid: [],
-      purpose_vision: { purpose: '', vision: '' },
-      proof_assets: [],
-      enabled_sections: { taglines: true, context: true, elevator: true, outcome: true, positioning: true, pillars: true, lead_avoid: false, purpose_vision: false, proof_assets: false }
-    });
-    if (house) {
-      await mhOpenEditor(house.id);
-    }
+  window.mhCreateFromEntity = async function (entityId, entityName, entityType) {
+    mhCloseModals();
+    const title    = `${entityName} Messaging House`;
+    const newHouse = {
+      title,
+      type        : 'company',
+      entity_id   : entityId === '__company__' ? null : entityId,
+      description : '',
+      status      : 'draft',
+      taglines    : [{ label: 'Primary', text: '' }],
+      context     : '',
+      elevator    : { '25_word': { enabled: true, text: '' }, '50_word': { enabled: false, text: '' }, '100_word': { enabled: false, text: '' } },
+      outcome     : '',
+      positioning : { target_audience: '', problem: '', solution: '' },
+      pillars     : [
+        { name: '', points: ['', ''] },
+        { name: '', points: ['', ''] },
+        { name: '', points: ['', ''] }
+      ],
+      lead_with   : [],
+      avoid       : [],
+      purpose_vision : { purpose: '', vision: '' },
+      proof_assets   : [],
+      enabled_sections: {
+        taglines      : true,
+        outcome       : true,
+        elevator      : false,
+        pillars       : true,
+        positioning   : true,
+        context       : false,
+        lead_avoid    : false,
+        purpose_vision: false
+      },
+      // store entity name so we can display it
+      _entity_name: entityName,
+      _entity_type: entityType
+    };
+    const row = await dbInsert(newHouse);
+    if (row) { await mhOpen(row.id); }
   };
 
-  window.mhOpenEditor = async function(id) {
-    mhCurrentId = id;
-    mhData = await mhFetchOne(id);
+  /* ════════════════════════════════════════════════════
+     OPEN / DELETE
+     ════════════════════════════════════════════════════ */
+  window.mhOpen = async function (id) {
+    mhId   = id;
+    mhData = await dbOne(id);
     if (!mhData) { alert('Could not load messaging house.'); return; }
-    document.getElementById('mh-view-list').style.display = 'none';
-    document.getElementById('mh-view-editor').style.display = '';
-    document.getElementById('mh-editor-title').textContent = mhData.title || 'Messaging House';
-    document.getElementById('mh-status-select').value = mhData.status || 'draft';
-    mhRenderEditor();
+    document.getElementById('mh-house-heading').textContent = mhData.title || 'Messaging House';
+    document.getElementById('mh-status-sel').value = mhData.status || 'draft';
+    mhRenderHouse();
+    showOnly('mh-v-house');
   };
 
-  window.mhBackToList = function() {
-    if (mhSaveTimer) { clearTimeout(mhSaveTimer); mhSaveTimer = null; mhSaveNow(); }
-    mhInit();
+  window.mhDelete = async function () {
+    if (!confirm('Delete this messaging house permanently?')) return;
+    await dbDelete(mhId);
+    mhGoList();
   };
 
-  window.mhDelete = async function() {
-    if (!confirm('Delete this messaging house? This cannot be undone.')) return;
-    await mhDeleteRow(mhCurrentId);
-    mhInit();
-  };
-
-  window.mhUpdateStatus = function(val) {
+  window.mhSetStatus = function (val) {
     mhData.status = val;
     mhScheduleSave();
   };
 
-  /* ══════════════════════════════════════════════════════════════════════════
+  /* ════════════════════════════════════════════════════
      AUTO-SAVE
-     ══════════════════════════════════════════════════════════════════════════ */
+     ════════════════════════════════════════════════════ */
   function mhScheduleSave() {
-    document.getElementById('mh-save-status').innerHTML = 'Unsaved changes...';
-    if (mhSaveTimer) clearTimeout(mhSaveTimer);
-    mhSaveTimer = setTimeout(mhSaveNow, 1200);
+    setSaveStatus('Unsaved changes…');
+    if (mhSave) clearTimeout(mhSave);
+    mhSave = setTimeout(mhFlush, 1400);
   }
-
-  async function mhSaveNow() {
-    if (!mhCurrentId || !mhData) return;
-    mhSaveTimer = null;
-    document.getElementById('mh-save-status').innerHTML = 'Saving...';
+  async function mhFlush() {
+    if (!mhId || !mhData) return;
+    mhSave = null;
+    setSaveStatus('Saving…');
     const { id, client_id, created_at, updated_at, ...updates } = mhData;
-    const result = await mhUpdate(mhCurrentId, updates);
-    if (result) {
-      document.getElementById('mh-save-status').innerHTML = 'Saved <strong>' + new Date().toLocaleTimeString() + '</strong>';
-      document.getElementById('mh-editor-title').textContent = mhData.title || 'Messaging House';
+    const res = await dbUpdate(mhId, updates);
+    if (res) {
+      document.getElementById('mh-house-heading').textContent = mhData.title || 'Messaging House';
+      setSaveStatus('Saved ' + new Date().toLocaleTimeString());
     } else {
-      document.getElementById('mh-save-status').innerHTML = '<span style="color:var(--error)">Save failed — check console</span>';
+      setSaveStatus('⚠ Save failed');
     }
   }
+  function setSaveStatus(msg) {
+    const el = document.getElementById('mh-save-status');
+    if (el) el.textContent = msg;
+  }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     EDITOR RENDERER
-     ══════════════════════════════════════════════════════════════════════════ */
-  function mhRenderEditor() {
-    const ed = document.getElementById('mh-editor');
-    const d = mhData;
+  /* ════════════════════════════════════════════════════
+     VISUAL HOUSE RENDERER
+     ════════════════════════════════════════════════════ */
+  function mhRenderHouse() {
+    const d   = mhData;
     const sec = d.enabled_sections || {};
-
+    const name = d._entity_name || d.title || '';
+    const type = TYPE_LABELS[d.type] || d.type;
     let html = '';
 
-    // ── Meta bar ──
-    html += `<div class="mh-meta-bar">
-      <div class="mh-meta-row">
-        <div class="mh-field">
-          <label class="mh-label">Title</label>
-          <input class="mh-input" value="${esc(d.title)}" onchange="mhSet('title',this.value)" placeholder="e.g. Acme Corp Messaging House">
-        </div>
-        <div class="mh-field" style="max-width:180px;">
-          <label class="mh-label">Type</label>
-          <select class="mh-select" onchange="mhSet('type',this.value)">
-            ${Object.entries(MH_TYPES).map(([k,v]) => `<option value="${k}" ${d.type===k?'selected':''}>${v}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-      <div class="mh-meta-row">
-        <div class="mh-field">
-          <label class="mh-label">Description</label>
-          <input class="mh-input" value="${esc(d.description||'')}" onchange="mhSet('description',this.value)" placeholder="Brief description of what this messaging house covers">
-        </div>
+    // ── Header row ──
+    html += `<div class="mh-row">
+      <div class="mh-cell mh-cell-header" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 1.4rem;">
+        <div ${edit('_entity_name','mh-text mh-brand-name')} data-ph="Your Client's Finest Brand™">${esc(name)}</div>
+        <span class="mh-type-badge">${esc(type)} Messaging House</span>
       </div>
     </div>`;
 
-    // ── Sections ──
-    html += mhRenderTaglines(d, sec);
-    html += mhRenderContext(d, sec);
-    html += mhRenderElevator(d, sec);
-    html += mhRenderOutcome(d, sec);
-    html += mhRenderPositioning(d, sec);
-    html += mhRenderPillars(d, sec);
-    html += mhRenderLeadAvoid(d, sec);
-    html += mhRenderPurposeVision(d, sec);
-    html += mhRenderProofAssets(d, sec);
+    // ── Tagline row ──
+    if (sec.taglines !== false) {
+      const tls = d.taglines || [];
+      let tlHtml = '';
+      tls.forEach((t, i) => {
+        const cls = i === 0 ? 'mh-tagline-main' : 'mh-tagline-secondary';
+        const ph  = i === 0 ? 'The phrase that makes people nod slowly and say \'yes, that.\'' : 'Secondary tagline…';
+        const rm  = i > 0 ? `<button class="mh-tagline-rm" onclick="mhRemoveTagline(${i})" title="Remove">✕</button>` : '';
+        tlHtml += `<div class="mh-tagline-row-wrap">
+          <div ${editTagline(i,'mh-text '+cls)} data-ph="${ph}">${esc(t.text)}</div>
+          ${rm}
+        </div>`;
+      });
+      tlHtml += `<button class="mh-tagline-add" onclick="mhAddTagline()">+ add tagline</button>`;
+      html += row('Tagline', tlHtml);
+    }
 
-    // ── Optional section toggles ──
-    html += `<div style="margin-top:1.5rem; padding:1rem; background:var(--white); border:1px solid var(--gray-200); border-radius:12px;">
-      <div class="mh-label" style="margin-bottom:0.75rem;">Show / Hide Sections</div>
-      ${mhToggle('lead_avoid', 'Lead With & Avoid', sec)}
-      ${mhToggle('purpose_vision', 'Purpose & Vision', sec)}
-      ${mhToggle('proof_assets', 'Proof Point Assets', sec)}
-    </div>`;
+    // ── Core outcome ──
+    if (sec.outcome !== false) {
+      html += row('Core Message',
+        `<div ${edit('outcome','mh-text mh-outcome-text')} data-ph="We help [specific humans] achieve [the thing that matters] without [the painful part].">
+          ${esc(d.outcome||'')}</div>`);
+    }
 
-    ed.innerHTML = html;
-  }
+    // ── Pillars ──
+    if (sec.pillars !== false) {
+      const pillars = d.pillars || [];
+      const pillarCells = pillars.map((p, pi) => {
+        const pName  = esc(p.name || '');
+        const phName = `Compelling Pillar ${pi + 1}`;
+        const pts    = p.points || [];
+        let ptsHtml  = pts.map((pt, pti) =>
+          `<div class="mh-point-row">
+            <span class="mh-point-bullet">•</span>
+            <div ${editPoint(pi, pti, 'mh-text mh-point-text')} data-ph="Evidence that this pillar exists and isn't made up">${esc(pt)}</div>
+            <button class="mh-point-rm" onclick="mhRemovePoint(${pi},${pti})" title="Remove">✕</button>
+          </div>`).join('');
+        ptsHtml += `<button class="mh-pillar-add-pt" onclick="mhAddPoint(${pi})">+ point</button>`;
+        return `<div class="mh-cell" style="vertical-align:top;">
+          <div ${editPillarName(pi,'mh-text mh-pillar-name')} data-ph="${phName}">${pName}</div>
+          <div class="mh-pillar-divider"></div>
+          ${ptsHtml}
+        </div>`;
+      }).join('');
+      html += `<div class="mh-row">${pillarCells}</div>`;
+    }
 
-  function mhToggle(key, label, sec) {
-    const checked = sec[key] ? 'checked' : '';
-    return `<label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;cursor:pointer;font-size:0.82rem;color:var(--gray-600);">
-      <input type="checkbox" ${checked} onchange="mhToggleSection('${key}',this.checked)" style="accent-color:var(--pink);">
-      ${label}
-    </label>`;
-  }
+    // ── Positioning ──
+    if (sec.positioning !== false) {
+      const p = d.positioning || {};
+      const posRow = [
+        { key: 'target_audience', label: 'For…',   ph: 'People with a specific, solvable problem' },
+        { key: 'problem',         label: 'Who…',    ph: 'Struggle with the thing keeping them up at night' },
+        { key: 'solution',        label: 'We…',     ph: 'Solve it in plain English, without the jargon' }
+      ].map(f => `<div class="mh-cell">
+        <div class="mh-pos-label">${f.label}</div>
+        <div ${editPos(f.key,'mh-text mh-pos-text')} data-ph="${f.ph}">${esc(p[f.key]||'')}</div>
+      </div>`).join('');
+      html += `<div class="mh-row">${posRow}</div>`;
+    }
 
-  /* ── Section: Taglines ── */
-  function mhRenderTaglines(d, sec) {
-    if (!sec.taglines) return '';
-    const taglines = d.taglines || [];
-    let inner = '';
-    taglines.forEach((t, i) => {
-      const removable = i > 0;
-      inner += `<div class="mh-tagline-row">
-        <span class="mh-tagline-label">${esc(t.label || ('Tagline ' + (i+1)))}</span>
-        <input class="mh-input" value="${esc(t.text||'')}" onchange="mhSetTagline(${i},'text',this.value)" placeholder="Enter tagline...">
-        ${removable ? `<button class="mh-tagline-remove" onclick="mhRemoveTagline(${i})">✕</button>` : ''}
-      </div>`;
-    });
-    inner += `<button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddTagline()" style="margin-top:0.25rem;">+ Add Tagline</button>`;
-    return mhSection('taglines', 'Taglines', 'core', inner, true);
-  }
+    // ── Context / Why Now ──
+    if (sec.context) {
+      html += row('Why Now',
+        `<div ${edit('context','mh-text mh-wide-text')} data-ph="The market shift that makes this the perfect moment to care.">${esc(d.context||'')}</div>`);
+    }
 
-  /* ── Section: Context / Why ── */
-  function mhRenderContext(d, sec) {
-    if (!sec.context) return '';
-    const inner = `<div class="mh-field">
-      <label class="mh-label">Context / Why Now</label>
-      <textarea class="mh-textarea" onchange="mhSet('context',this.value)" placeholder="What market conditions, trends, or customer needs make this messaging relevant right now?">${esc(d.context||'')}</textarea>
-      <div class="mh-hint">The background that grounds all messaging in this house.</div>
-    </div>`;
-    return mhSection('context', 'Context / Why Now', 'core', inner);
-  }
+    // ── Elevator Pitch ──
+    if (sec.elevator) {
+      const elev = d.elevator || {};
+      const lengths = [
+        { key: '25_word',  label: '25w' },
+        { key: '50_word',  label: '50w' },
+        { key: '100_word', label: '100w' }
+      ];
+      let eHtml = lengths.map(l => {
+        const item  = elev[l.key] || { enabled: false, text: '' };
+        const onCls = item.enabled ? ' on' : '';
+        return `<div class="mh-elevator-length">
+          <button class="mh-elev-toggle${onCls}" onclick="mhToggleElev('${l.key}')">${l.label}</button>
+          ${item.enabled
+            ? `<div ${editElev(l.key,'mh-text mh-elev-text')} data-ph="Your ${l.label.toLowerCase()} pitch goes here…">${esc(item.text||'')}</div>`
+            : `<span class="mh-elev-text" style="color:var(--gray-300);font-style:italic;font-size:0.8rem;">Hidden — click to enable</span>`}
+        </div>`;
+      }).join('');
+      html += row('Elevator', eHtml);
+    }
 
-  /* ── Section: Elevator Pitch ── */
-  function mhRenderElevator(d, sec) {
-    if (!sec.elevator) return '';
-    const elev = d.elevator || {};
-    const lengths = [
-      { key: '25_word', label: '25-word (Tweet-length)' },
-      { key: '50_word', label: '50-word (Conversation)' },
-      { key: '100_word', label: '100-word (Full pitch)' }
-    ];
-    let inner = '';
-    lengths.forEach(l => {
-      const item = elev[l.key] || { enabled: false, text: '' };
-      inner += `<div class="mh-elevator-item">
-        <div class="mh-elevator-toggle">
-          <input type="checkbox" id="elev-${l.key}" ${item.enabled?'checked':''} onchange="mhSetElevator('${l.key}','enabled',this.checked)">
-          <label for="elev-${l.key}">${l.label}</label>
-        </div>
-        ${item.enabled ? `<textarea class="mh-textarea" style="min-height:60px;" onchange="mhSetElevator('${l.key}','text',this.value)" placeholder="Write the ${l.label.toLowerCase()} elevator pitch...">${esc(item.text||'')}</textarea>` : ''}
-      </div>`;
-    });
-    return mhSection('elevator', 'Elevator Pitch', 'core', inner);
-  }
-
-  /* ── Section: Outcome ── */
-  function mhRenderOutcome(d, sec) {
-    if (!sec.outcome) return '';
-    const inner = `<div class="mh-field">
-      <label class="mh-label">Core Outcome / Promise</label>
-      <textarea class="mh-textarea" onchange="mhSet('outcome',this.value)" placeholder="What is the single most important outcome or promise you deliver?">${esc(d.outcome||'')}</textarea>
-      <div class="mh-hint">The ultimate value your audience gets — their reason to care.</div>
-    </div>`;
-    return mhSection('outcome', 'Core Outcome', 'core', inner);
-  }
-
-  /* ── Section: Positioning ── */
-  function mhRenderPositioning(d, sec) {
-    if (!sec.positioning) return '';
-    const p = d.positioning || {};
-    const fields = [
-      { key: 'target_audience', label: 'Target Audience', placeholder: 'Who is this for? Be specific.' },
-      { key: 'problem', label: 'Problem', placeholder: 'What problem or unmet need do they face?' },
-      { key: 'solution', label: 'Solution', placeholder: 'How does your offering solve this problem?' },
-      { key: 'differentiator', label: 'Differentiator', placeholder: 'What makes you uniquely qualified / different?' },
-      { key: 'value', label: 'Value', placeholder: 'What is the measurable or emotional value delivered?' }
-    ];
-    let inner = '';
-    fields.forEach(f => {
-      inner += `<div class="mh-field">
-        <label class="mh-label">${f.label}</label>
-        <textarea class="mh-textarea" style="min-height:60px;" onchange="mhSetPositioning('${f.key}',this.value)" placeholder="${f.placeholder}">${esc(p[f.key]||'')}</textarea>
-      </div>`;
-    });
-    return mhSection('positioning', 'Positioning Framework', 'core', inner);
-  }
-
-  /* ── Section: Pillars ── */
-  function mhRenderPillars(d, sec) {
-    if (!sec.pillars) return '';
-    const pillars = d.pillars || [];
-    let inner = '';
-    pillars.forEach((p, i) => {
-      inner += `<div class="mh-pillar">
-        <div class="mh-pillar-header">
-          <span class="mh-pillar-num">${i+1}</span>
-          <input class="mh-input" value="${esc(p.name||'')}" onchange="mhSetPillar(${i},'name',this.value)" placeholder="Pillar name">
-          <button class="mh-pillar-remove" onclick="mhRemovePillar(${i})">✕</button>
-        </div>
-        <div class="mh-field" style="margin-bottom:0;">
-          <textarea class="mh-textarea" style="min-height:60px;" onchange="mhSetPillar(${i},'description',this.value)" placeholder="Describe this messaging pillar and its key themes...">${esc(p.description||'')}</textarea>
+    // ── Lead With / Avoid ──
+    if (sec.lead_avoid) {
+      const lw = d.lead_with || [];
+      const av = d.avoid    || [];
+      const leadHtml = `<div>
+        <div class="mh-pos-label">Lead With</div>
+        <div class="mh-chip-list">${lw.map((w,i) => `<span class="mh-chip">${esc(w)}<button class="mh-chip-rm" onclick="mhRemoveChip('lead_with',${i})">✕</button></span>`).join('')}</div>
+        <div class="mh-chip-add-row">
+          <input class="mh-chip-input" id="mh-lead-in" placeholder="Add phrase…" onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('lead_with','mh-lead-in');}">
+          <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('lead_with','mh-lead-in')">Add</button>
         </div>
       </div>`;
-    });
-    inner += `<button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddPillar()">+ Add Pillar</button>`;
-    return mhSection('pillars', 'Messaging Pillars', 'core', inner);
-  }
-
-  /* ── Section: Lead With / Avoid ── */
-  function mhRenderLeadAvoid(d, sec) {
-    if (!sec.lead_avoid) return '';
-    let inner = '';
-    inner += `<div class="mh-field">
-      <label class="mh-label">Lead With</label>
-      <div class="mh-hint" style="margin-bottom:0.5rem;">Words, phrases, and themes to emphasise.</div>
-      <div class="mh-chip-list" id="mh-lead-chips">
-        ${(d.lead_with||[]).map((w,i) => `<span class="mh-chip">${esc(w)} <button class="mh-chip-remove" onclick="mhRemoveChip('lead_with',${i})">✕</button></span>`).join('')}
-      </div>
-      <div class="mh-chip-input-row">
-        <input class="mh-input" id="mh-lead-input" placeholder="Type and press Enter..." onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('lead_with','mh-lead-input');}">
-        <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('lead_with','mh-lead-input')">Add</button>
-      </div>
-    </div>`;
-    inner += `<div class="mh-field" style="margin-top:1rem;">
-      <label class="mh-label">Avoid</label>
-      <div class="mh-hint" style="margin-bottom:0.5rem;">Words, phrases, and themes to steer away from.</div>
-      <div class="mh-chip-list" id="mh-avoid-chips">
-        ${(d.avoid||[]).map((w,i) => `<span class="mh-chip">${esc(w)} <button class="mh-chip-remove" onclick="mhRemoveChip('avoid',${i})">✕</button></span>`).join('')}
-      </div>
-      <div class="mh-chip-input-row">
-        <input class="mh-input" id="mh-avoid-input" placeholder="Type and press Enter..." onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('avoid','mh-avoid-input');}">
-        <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('avoid','mh-avoid-input')">Add</button>
-      </div>
-    </div>`;
-    return mhSection('lead_avoid', 'Lead With & Avoid', 'optional', inner);
-  }
-
-  /* ── Section: Purpose & Vision ── */
-  function mhRenderPurposeVision(d, sec) {
-    if (!sec.purpose_vision) return '';
-    const pv = d.purpose_vision || {};
-    const inner = `<div class="mh-field">
-      <label class="mh-label">Purpose</label>
-      <textarea class="mh-textarea" style="min-height:60px;" onchange="mhSetPV('purpose',this.value)" placeholder="Why does your company/product exist? What change do you want to make in the world?">${esc(pv.purpose||'')}</textarea>
-    </div>
-    <div class="mh-field">
-      <label class="mh-label">Vision</label>
-      <textarea class="mh-textarea" style="min-height:60px;" onchange="mhSetPV('vision',this.value)" placeholder="What does the future look like when you succeed?">${esc(pv.vision||'')}</textarea>
-    </div>`;
-    return mhSection('purpose_vision', 'Purpose & Vision', 'optional', inner);
-  }
-
-  /* ── Section: Proof Point Assets ── */
-  function mhRenderProofAssets(d, sec) {
-    if (!sec.proof_assets) return '';
-    const assets = d.proof_assets || [];
-    let inner = '';
-    assets.forEach((a, i) => {
-      inner += `<div class="mh-proof-item">
-        <div class="mh-field">
-          <label class="mh-label">Type</label>
-          <select class="mh-select" onchange="mhSetProof(${i},'type',this.value)">
-            <option value="stat" ${a.type==='stat'?'selected':''}>Statistic</option>
-            <option value="quote" ${a.type==='quote'?'selected':''}>Quote / Testimonial</option>
-            <option value="case_study" ${a.type==='case_study'?'selected':''}>Case Study</option>
-            <option value="award" ${a.type==='award'?'selected':''}>Award / Recognition</option>
-            <option value="other" ${a.type==='other'?'selected':''}>Other</option>
-          </select>
+      const avoidHtml = `<div>
+        <div class="mh-pos-label" style="color:#dc2626;">Avoid</div>
+        <div class="mh-chip-list">${av.map((w,i) => `<span class="mh-chip mh-chip-avoid">${esc(w)}<button class="mh-chip-rm" onclick="mhRemoveChip('avoid',${i})">✕</button></span>`).join('')}</div>
+        <div class="mh-chip-add-row">
+          <input class="mh-chip-input" id="mh-avoid-in" placeholder="Add phrase…" onkeydown="if(event.key==='Enter'){event.preventDefault();mhAddChip('avoid','mh-avoid-in');}">
+          <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddChip('avoid','mh-avoid-in')">Add</button>
         </div>
-        <div class="mh-field" style="flex:2;">
-          <label class="mh-label">Description</label>
-          <input class="mh-input" value="${esc(a.text||'')}" onchange="mhSetProof(${i},'text',this.value)" placeholder="e.g. 98% customer satisfaction rate">
-        </div>
-        <button class="mh-proof-remove" onclick="mhRemoveProof(${i})">✕</button>
       </div>`;
-    });
-    inner += `<button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhAddProof()">+ Add Proof Point</button>`;
-    return mhSection('proof_assets', 'Proof Point Assets', 'optional', inner);
+      html += `<div class="mh-row">
+        <div class="mh-cell">${leadHtml}</div>
+        <div class="mh-cell">${avoidHtml}</div>
+      </div>`;
+    }
+
+    // ── Purpose & Vision ──
+    if (sec.purpose_vision) {
+      const pv = d.purpose_vision || {};
+      const pvRow = [
+        { key: 'purpose', label: 'Purpose', ph: 'To make our category at least 20% less frustrating for everyone in it.' },
+        { key: 'vision',  label: 'Vision',  ph: 'A world where this problem no longer has to exist.' }
+      ].map(f => `<div class="mh-cell">
+        <div class="mh-wide-label">${f.label}</div>
+        <div ${editPV(f.key,'mh-text mh-wide-text')} data-ph="${f.ph}">${esc(pv[f.key]||'')}</div>
+      </div>`).join('');
+      html += `<div class="mh-row">${pvRow}</div>`;
+    }
+
+    document.getElementById('mh-house-table').innerHTML = html;
+    mhBindEditable();
   }
 
-  /* ── Section wrapper ── */
-  function mhSection(key, title, type, inner, startOpen) {
-    const openClass = startOpen ? ' open' : '';
-    const badgeClass = type === 'core' ? 'mh-badge-core' : 'mh-badge-optional';
-    return `<div class="mh-section${openClass}" id="mh-sec-${key}">
-      <div class="mh-section-header" onclick="this.parentElement.classList.toggle('open')">
-        <div class="mh-section-left">
-          <span class="mh-section-title">${title}</span>
-          <span class="mh-section-badge ${badgeClass}">${type}</span>
-        </div>
-        <span class="mh-section-chevron">▾</span>
-      </div>
-      <div class="mh-section-body">${inner}</div>
+  /* ── HTML helpers ── */
+  function row(label, inner) {
+    return `<div class="mh-row">
+      <div class="mh-cell mh-cell-full">${inner}</div>
     </div>`;
   }
+  // We pass the attribute string, so we can use data-field + class
+  function edit(field, cls) { return `class="${cls}" contenteditable="true" data-type="field" data-field="${field}"`; }
+  function editTagline(i, cls) { return `class="${cls}" contenteditable="true" data-type="tagline" data-idx="${i}"`; }
+  function editPillarName(pi, cls) { return `class="${cls}" contenteditable="true" data-type="pillar_name" data-pi="${pi}"`; }
+  function editPoint(pi, pti, cls) { return `class="${cls}" contenteditable="true" data-type="pillar_point" data-pi="${pi}" data-pti="${pti}"`; }
+  function editPos(key, cls) { return `class="${cls}" contenteditable="true" data-type="pos" data-key="${key}"`; }
+  function editElev(key, cls) { return `class="${cls}" contenteditable="true" data-type="elev" data-key="${key}"`; }
+  function editPV(key, cls) { return `class="${cls}" contenteditable="true" data-type="pv" data-key="${key}"`; }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     DATA SETTERS (mutate mhData + schedule save)
-     ══════════════════════════════════════════════════════════════════════════ */
-  window.mhSet = function(key, val) {
-    mhData[key] = val;
-    mhScheduleSave();
-  };
+  /* ── Bind blur → save on all editables ── */
+  function mhBindEditable() {
+    document.querySelectorAll('#mh-house-table [contenteditable="true"]').forEach(el => {
+      el.addEventListener('blur', () => {
+        const val = el.textContent || '';
+        const t   = el.dataset.type;
+        if (t === 'field')       mhData[el.dataset.field] = val;
+        else if (t === 'tagline') mhData.taglines[+el.dataset.idx].text = val;
+        else if (t === 'pillar_name') mhData.pillars[+el.dataset.pi].name = val;
+        else if (t === 'pillar_point') mhData.pillars[+el.dataset.pi].points[+el.dataset.pti] = val;
+        else if (t === 'pos')    { if (!mhData.positioning) mhData.positioning={}; mhData.positioning[el.dataset.key]=val; }
+        else if (t === 'elev')   { if (!mhData.elevator[el.dataset.key]) mhData.elevator[el.dataset.key]={enabled:true,text:''}; mhData.elevator[el.dataset.key].text=val; }
+        else if (t === 'pv')     { if (!mhData.purpose_vision) mhData.purpose_vision={}; mhData.purpose_vision[el.dataset.key]=val; }
+        mhScheduleSave();
+      });
+      // Enter → blur (single-line fields) — allow multiline for most
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey && !el.classList.contains('mh-wide-text') && !el.classList.contains('mh-point-text')) {
+          e.preventDefault();
+          el.blur();
+        }
+      });
+    });
+  }
 
-  window.mhToggleSection = function(key, enabled) {
-    if (!mhData.enabled_sections) mhData.enabled_sections = {};
-    mhData.enabled_sections[key] = enabled;
-    mhScheduleSave();
-    mhRenderEditor();
-  };
-
-  // Taglines
-  window.mhSetTagline = function(i, field, val) {
-    mhData.taglines[i][field] = val;
-    mhScheduleSave();
-  };
-  window.mhAddTagline = function() {
-    const labels = ['Primary', 'Secondary', 'Tertiary'];
+  /* ── Taglines ── */
+  window.mhAddTagline = function () {
+    const labels = ['Primary','Secondary','Tertiary'];
     const idx = mhData.taglines.length;
-    const label = labels[idx] || ('Tagline ' + (idx + 1));
-    mhData.taglines.push({ label, text: '' });
-    mhScheduleSave();
-    mhRenderEditor();
+    mhData.taglines.push({ label: labels[idx] || `Tagline ${idx+1}`, text: '' });
+    mhScheduleSave(); mhRenderHouse();
   };
-  window.mhRemoveTagline = function(i) {
+  window.mhRemoveTagline = function (i) {
     mhData.taglines.splice(i, 1);
-    mhScheduleSave();
-    mhRenderEditor();
+    mhScheduleSave(); mhRenderHouse();
   };
 
-  // Elevator
-  window.mhSetElevator = function(key, field, val) {
+  /* ── Pillar points ── */
+  window.mhAddPoint = function (pi) {
+    if (!mhData.pillars[pi].points) mhData.pillars[pi].points = [];
+    mhData.pillars[pi].points.push('');
+    mhScheduleSave(); mhRenderHouse();
+  };
+  window.mhRemovePoint = function (pi, pti) {
+    mhData.pillars[pi].points.splice(pti, 1);
+    mhScheduleSave(); mhRenderHouse();
+  };
+
+  /* ── Elevator toggle ── */
+  window.mhToggleElev = function (key) {
     if (!mhData.elevator) mhData.elevator = {};
     if (!mhData.elevator[key]) mhData.elevator[key] = { enabled: false, text: '' };
-    mhData.elevator[key][field] = val;
-    mhScheduleSave();
-    if (field === 'enabled') mhRenderEditor();
+    mhData.elevator[key].enabled = !mhData.elevator[key].enabled;
+    mhScheduleSave(); mhRenderHouse();
   };
 
-  // Positioning
-  window.mhSetPositioning = function(key, val) {
-    if (!mhData.positioning) mhData.positioning = {};
-    mhData.positioning[key] = val;
-    mhScheduleSave();
-  };
-
-  // Pillars
-  window.mhSetPillar = function(i, field, val) {
-    mhData.pillars[i][field] = val;
-    mhScheduleSave();
-  };
-  window.mhAddPillar = function() {
-    if (!mhData.pillars) mhData.pillars = [];
-    mhData.pillars.push({ name: '', description: '' });
-    mhScheduleSave();
-    mhRenderEditor();
-  };
-  window.mhRemovePillar = function(i) {
-    mhData.pillars.splice(i, 1);
-    mhScheduleSave();
-    mhRenderEditor();
-  };
-
-  // Lead with / Avoid chips
-  window.mhAddChip = function(field, inputId) {
+  /* ── Lead/Avoid chips ── */
+  window.mhAddChip = function (field, inputId) {
     const inp = document.getElementById(inputId);
     const val = (inp.value || '').trim();
     if (!val) return;
     if (!mhData[field]) mhData[field] = [];
     mhData[field].push(val);
     inp.value = '';
-    mhScheduleSave();
-    mhRenderEditor();
+    mhScheduleSave(); mhRenderHouse();
   };
-  window.mhRemoveChip = function(field, i) {
+  window.mhRemoveChip = function (field, i) {
     mhData[field].splice(i, 1);
-    mhScheduleSave();
-    mhRenderEditor();
+    mhScheduleSave(); mhRenderHouse();
   };
 
-  // Purpose & Vision
-  window.mhSetPV = function(key, val) {
-    if (!mhData.purpose_vision) mhData.purpose_vision = {};
-    mhData.purpose_vision[key] = val;
-    mhScheduleSave();
-  };
+  /* ════════════════════════════════════════════════════
+     SETUP VIEW
+     ════════════════════════════════════════════════════ */
+  function mhRenderSetup() {
+    const sec  = mhData.enabled_sections || {};
+    const pils = (mhData.pillars || []).length;
 
-  // Proof assets
-  window.mhSetProof = function(i, field, val) {
-    mhData.proof_assets[i][field] = val;
-    mhScheduleSave();
-  };
-  window.mhAddProof = function() {
-    if (!mhData.proof_assets) mhData.proof_assets = [];
-    mhData.proof_assets.push({ type: 'stat', text: '' });
-    mhScheduleSave();
-    mhRenderEditor();
-  };
-  window.mhRemoveProof = function(i) {
-    mhData.proof_assets.splice(i, 1);
-    mhScheduleSave();
-    mhRenderEditor();
-  };
+    const coreItems = [
+      { key: 'taglines',    label: 'Taglines',            desc: 'Primary tagline, with optional secondary and tertiary.',                          locked: true },
+      { key: 'outcome',     label: 'Core Message',        desc: 'The single most important thing you want people to understand.',                   locked: true },
+      { key: 'pillars',     label: 'Messaging Pillars',   desc: 'The strategic themes that support your core message.',                             locked: true },
+      { key: 'positioning', label: 'Positioning (For / Who / We)', desc: 'Audience, problem, and solution stated concisely.',                 locked: true }
+    ];
+    const optItems = [
+      { key: 'context',       label: 'Why Now',          desc: 'Market conditions and timing that make this messaging relevant.' },
+      { key: 'elevator',      label: 'Elevator Pitch',   desc: 'Toggleable 25-, 50-, and 100-word versions of your pitch.' },
+      { key: 'lead_avoid',    label: 'Lead With & Avoid', desc: 'Phrase libraries — what to emphasise and what to steer clear of.' },
+      { key: 'purpose_vision',label: 'Purpose & Vision', desc: 'Why the company exists and what it is building towards.' }
+    ];
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     UTILITY
-     ══════════════════════════════════════════════════════════════════════════ */
-  function esc(s) {
-    if (!s) return '';
-    const d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
+    const renderCard = (item) => {
+      const on      = item.locked ? true : (sec[item.key] !== false && sec[item.key]);
+      const disabled = item.locked ? 'disabled style="opacity:0.4;cursor:default;"' : '';
+      return `<div class="mh-setup-card">
+        <div class="mh-setup-card-body">
+          <div class="mh-setup-card-title">${item.label}</div>
+          <div class="mh-setup-card-desc">${item.desc}</div>
+        </div>
+        <label class="mh-toggle-switch" ${disabled}>
+          <input type="checkbox" ${on?'checked':''} ${item.locked?'disabled':''} onchange="mhToggleSec('${item.key}',this.checked)">
+          <div class="mh-toggle-track"></div>
+        </label>
+      </div>`;
+    };
+
+    document.getElementById('mh-setup-body').innerHTML = `
+      <div class="mh-setup-grid" style="max-width:680px;">
+        <div class="mh-setup-section-head">Core Sections (always shown)</div>
+        ${coreItems.map(renderCard).join('')}
+
+        <div class="mh-setup-section-head" style="margin-top:0.5rem;">Optional Sections</div>
+        ${optItems.map(renderCard).join('')}
+
+        <div class="mh-setup-section-head" style="margin-top:0.5rem;">Pillars</div>
+        <div class="mh-setup-card">
+          <div class="mh-setup-card-body">
+            <div class="mh-setup-card-title">Number of Pillars</div>
+            <div class="mh-setup-card-desc">How many messaging pillars does this house have?</div>
+          </div>
+          <div class="mh-pillars-count">
+            <button onclick="mhChangePillarCount(-1)">−</button>
+            <span id="mh-pillar-count-num">${pils}</span>
+            <button onclick="mhChangePillarCount(1)">+</button>
+          </div>
+        </div>
+      </div>`;
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     BOOT
-     ══════════════════════════════════════════════════════════════════════════ */
+  window.mhToggleSec = function (key, val) {
+    if (!mhData.enabled_sections) mhData.enabled_sections = {};
+    mhData.enabled_sections[key] = val;
+    mhScheduleSave();
+    mhRenderSetup(); // re-render setup to reflect
+  };
+
+  window.mhChangePillarCount = function (delta) {
+    const curr = mhData.pillars || [];
+    const next = curr.length + delta;
+    if (next < 1 || next > 6) return;
+    if (delta > 0) {
+      mhData.pillars.push({ name: '', points: ['', ''] });
+    } else {
+      mhData.pillars.pop();
+    }
+    document.getElementById('mh-pillar-count-num').textContent = mhData.pillars.length;
+    mhScheduleSave();
+  };
+
+  /* ════════════════════════════════════════════════════
+     UTILITY
+     ════════════════════════════════════════════════════ */
+  function esc(s) {
+    if (!s) return '';
+    const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+  }
+
+  /* ════════════════════════════════════════════════════
+     START
+     ════════════════════════════════════════════════════ */
   mhInit();
 
 })();
