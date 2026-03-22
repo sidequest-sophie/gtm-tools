@@ -628,7 +628,7 @@
     if (sec.outcome !== false) {
       html += `<div class="mh-canvas-section mh-canvas-outcome">
         <div class="mh-canvas-section-label">Core Message</div>
-        <div ${edit('outcome','mh-text mh-outcome-text')} data-ph="We help [specific humans] achieve [the thing that matters] without [the painful part].">${esc(d.outcome||'')}</div>
+        <div ${edit('outcome','mh-text mh-outcome-text')} data-ph="The single most important thing you want every prospect, analyst, and internal team member to take away.">${esc(d.outcome||'')}</div>
       </div>`;
     }
 
@@ -636,7 +636,7 @@
     if (sec.positioning !== false) {
       const p = d.positioning || {};
       const posFields = [
-        { key: 'target_audience', label: 'For…',  ph: 'People with a specific, solvable problem' },
+        { key: 'target_audience', label: 'For…',  ph: 'Specific types of organizations or people that we help' },
         { key: 'problem',         label: 'Who…',  ph: 'Struggle with the thing keeping them up at night' },
         { key: 'solution',        label: 'We…',   ph: 'Make that problem go away, differently' }
       ];
