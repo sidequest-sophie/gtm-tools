@@ -1365,39 +1365,34 @@ function mmDirty() {
 
 async function mmResetBrandToClient() {
   try {
-    const clientId = Storage.getActiveClientId();
-    if (!clientId) {
-      alert('No active client selected.');
-      return;
-    }
-    const client = await Auth.getClientById(clientId);
+    // Try localStorage first — client-config saves brandHeader/brandAccent/brandBg/brandText there
+    let client = Storage.getActiveClient();
+
+    // If no localStorage data, try Supabase
     if (!client) {
-      alert('Could not load client data.');
+      const clientId = Storage.getActiveClientId();
+      if (!clientId) { alert('No active client selected.'); return; }
+      client = await Auth.getClientById(clientId);
+    }
+    if (!client) { alert('Could not load client data.'); return; }
+
+    // Client config stores: brandHeader, brandAccent, brandBg, brandText, logo
+    const hasColours = client.brandHeader || client.brandAccent || client.brandBg || client.brandText;
+
+    if (!hasColours && !client.logo) {
+      alert('No brand colours found on this client. Set them first in Client Configuration \u2192 Brand Colours.');
       return;
     }
 
-    // Read brand from client settings.brand, or fall back to top-level fields
-    const brand = (client.settings && client.settings.brand) || {};
-    const logo = brand.logo || client.logo || '';
-    const primary = brand.primary || brand.brandAccent || '#d02090';
-    const primaryName = brand.primaryName || '';
-    const accent = brand.accent || brand.brandHeader || '#6366f1';
-    const success = brand.success || '#10b981';
-    const logoHeight = brand.logoHeight || 36;
-
-    document.getElementById('mm-brand-primary').value = primary;
-    document.getElementById('mm-brand-primary-name').value = primaryName;
-    document.getElementById('mm-brand-logo').value = logo;
-    document.getElementById('mm-brand-logo-height').value = logoHeight;
-    document.getElementById('mm-brand-accent').value = accent;
-    document.getElementById('mm-brand-success').value = success;
+    // Map client brand colours to maturity model brand fields:
+    //   brandHeader (#134461) = dark primary colour → Primary Color
+    //   brandAccent (#9fef00) = highlight colour → Accent Color
+    //   logo = company logo → Logo URL
+    if (client.brandHeader) document.getElementById('mm-brand-primary').value = client.brandHeader;
+    if (client.brandAccent) document.getElementById('mm-brand-accent').value = client.brandAccent;
+    if (client.logo) document.getElementById('mm-brand-logo').value = client.logo;
 
     mmDirty();
-
-    const hasBrand = brand.primary || brand.accent || brand.logo;
-    if (!hasBrand && !client.logo) {
-      alert('No brand defaults found on this client yet. You can set them in the client\u2019s settings, or configure colours here manually.');
-    }
   } catch (err) {
     console.error('mmResetBrandToClient error:', err);
     alert('Error loading client brand settings: ' + err.message);
@@ -1406,24 +1401,17 @@ async function mmResetBrandToClient() {
 
 async function mmSaveBrandAsClientDefault() {
   try {
-    const clientId = Storage.getActiveClientId();
-    if (!clientId) { alert('No active client selected.'); return; }
+    const client = Storage.getActiveClient();
+    if (!client) { alert('No active client selected.'); return; }
 
-    const brand = {
-      primary: document.getElementById('mm-brand-primary').value,
-      primaryName: document.getElementById('mm-brand-primary-name').value,
-      logo: document.getElementById('mm-brand-logo').value,
-      logoHeight: parseInt(document.getElementById('mm-brand-logo-height').value) || 36,
-      accent: document.getElementById('mm-brand-accent').value,
-      success: document.getElementById('mm-brand-success').value
+    // Save in the same format client-config uses: top-level brandHeader, brandAccent, etc.
+    const updates = {
+      brandHeader: document.getElementById('mm-brand-primary').value,
+      brandAccent: document.getElementById('mm-brand-accent').value,
+      logo: document.getElementById('mm-brand-logo').value || client.logo
     };
 
-    // Merge into client settings.brand
-    const client = await Auth.getClientById(clientId);
-    const settings = client.settings || {};
-    settings.brand = brand;
-
-    await Auth.updateClientRecord(clientId, { settings, logo: brand.logo || client.logo });
+    Storage.updateClient(client.id, updates);
     alert('Brand defaults saved to client settings.');
   } catch (err) {
     console.error('mmSaveBrandAsClientDefault error:', err);
