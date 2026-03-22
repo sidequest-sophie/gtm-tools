@@ -222,6 +222,9 @@
 
 .mh-tag-picker { display:flex; flex-direction:column; gap:0.75rem; }
 .mh-tag-list { display:flex; flex-wrap:wrap; gap:0.5rem; }
+.mh-tag-scroll-wrap { position:relative; max-height:220px; overflow-y:auto; }
+.mh-tag-scroll-wrap .mh-tag-list { padding-bottom:1.5rem; }
+.mh-tag-scroll-fade { pointer-events:none; position:sticky; bottom:0; left:0; right:0; height:48px; background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1)); z-index:1; margin-top:-48px; }
 .mh-tag-item { display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.75rem; border:1.5px solid var(--gray-200); border-radius:20px; background:#fff; cursor:pointer; transition:all 0.15s; font-size:0.8rem; font-weight:600; color:var(--gray-700); white-space:nowrap; }
 .mh-tag-item:hover { border-color:var(--pink); background:rgba(217,43,150,0.02); }
 .mh-tag-item.selected { background:var(--pink); color:#fff; border-color:var(--pink); }
@@ -403,13 +406,16 @@
         <div class="mh-wizard-step" id="mh-wizard-step-2">
           <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Verticals</h4>
           <p class="mh-wizard-step-desc">Industries or segments where you help customers.</p>
-          <div class="mh-tag-picker">
-            <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step2-count">0</strong></div>
-            <div class="mh-tag-list" id="mh-step2-tags"></div>
-            <div class="mh-tag-picker-controls">
-              <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(2)">🎲</button>
-              <input type="text" class="mh-tag-input" id="mh-step2-input" placeholder="Add custom vertical…">
-              <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(2)">Add</button>
+          <div class="mh-radio-group" id="mh-step2-radio"></div>
+          <div id="mh-step2-picker" style="display:none;">
+            <div class="mh-tag-picker">
+              <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step2-count">0</strong></div>
+              <div class="mh-tag-list" id="mh-step2-tags"></div>
+              <div class="mh-tag-picker-controls">
+                <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(2)">🎲</button>
+                <input type="text" class="mh-tag-input" id="mh-step2-input" placeholder="Add custom vertical…">
+                <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(2)">Add</button>
+              </div>
             </div>
           </div>
         </div>
@@ -448,7 +454,10 @@
           <p class="mh-wizard-step-desc">Which departments do you serve?</p>
           <div class="mh-tag-picker">
             <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step4-count">0</strong></div>
-            <div class="mh-tag-list" id="mh-step4-tags"></div>
+            <div class="mh-tag-scroll-wrap">
+              <div class="mh-tag-list" id="mh-step4-tags"></div>
+              <div class="mh-tag-scroll-fade"></div>
+            </div>
             <div class="mh-tag-picker-controls">
               <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(4)">🎲</button>
               <input type="text" class="mh-tag-input" id="mh-step4-input" placeholder="Add custom department…">
@@ -463,7 +472,10 @@
           <p class="mh-wizard-step-desc">Decision-makers and influencers in your ICP.</p>
           <div class="mh-tag-picker">
             <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step5-count">0</strong></div>
-            <div class="mh-tag-list" id="mh-step5-tags"></div>
+            <div class="mh-tag-scroll-wrap">
+              <div class="mh-tag-list" id="mh-step5-tags"></div>
+              <div class="mh-tag-scroll-fade"></div>
+            </div>
             <div class="mh-tag-picker-controls">
               <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(5)">🎲</button>
               <input type="text" class="mh-tag-input" id="mh-step5-input" placeholder="Add custom role…">
@@ -1274,6 +1286,7 @@
     entityName: null,
     entityType: null,
     icpTypes: [],
+    verticalFocused: null, // null = not chosen, false = not focused, true = focused
     verticals: [],
     regions: [],
     countries: [],
@@ -1294,6 +1307,7 @@
       entityName: null,
       entityType: null,
       icpTypes: [],
+      verticalFocused: null,
       verticals: [],
       regions: [],
       countries: [],
@@ -1417,6 +1431,25 @@
   };
 
   function mhWizardRenderStep2() {
+    // Radio choice: focused or not
+    const radioHtml = [
+      { id: 'no', label: 'We are not focused on specific verticals' },
+      { id: 'yes', label: 'We focus on the following verticals' }
+    ].map(opt => {
+      const isSel = (opt.id === 'yes' && mhWizardState.verticalFocused === true) ||
+                    (opt.id === 'no' && mhWizardState.verticalFocused === false);
+      return `<div class="mh-radio-item ${isSel ? 'selected' : ''}" onclick="mhWizardSelectVerticalFocus('${opt.id}')">
+        <div class="mh-radio-circle"></div>
+        <div>${opt.label}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('mh-step2-radio').innerHTML = radioHtml;
+
+    const picker = document.getElementById('mh-step2-picker');
+    picker.style.display = mhWizardState.verticalFocused === true ? 'block' : 'none';
+
+    if (mhWizardState.verticalFocused !== true) return;
+
     const isB2B = mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
     const verticals = isB2B ? WIZARD_VERTICALS_B2B : WIZARD_VERTICALS_B2C;
 
@@ -1438,6 +1471,16 @@
 
     document.getElementById('mh-step2-count').textContent = mhWizardState.verticals.length;
   }
+
+  window.mhWizardSelectVerticalFocus = function (choice) {
+    if (choice === 'yes') {
+      mhWizardState.verticalFocused = true;
+    } else {
+      mhWizardState.verticalFocused = false;
+      mhWizardState.verticals = [];
+    }
+    mhWizardRenderStep2();
+  };
 
   function mhWizardRenderStep3() {
     const isGlobal = mhWizardState.regions.includes('__global__');
@@ -1503,7 +1546,7 @@
 
   function mhWizardRenderStep4() {
     if (!mhWizardState.visibleDepartmentIndices.length) {
-      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 15);
+      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 30);
     }
 
     const visibleDepts = mhWizardState.visibleDepartmentIndices.map(i => WIZARD_DEPARTMENTS[i]);
@@ -1522,7 +1565,7 @@
 
   function mhWizardRenderStep5() {
     if (!mhWizardState.visibleRoleIndices.length) {
-      mhWizardState.visibleRoleIndices = mhWizardGetRandomIndices(WIZARD_ROLES.length, 15);
+      mhWizardState.visibleRoleIndices = mhWizardGetRandomIndices(WIZARD_ROLES.length, 30);
     }
 
     const visibleRoles = mhWizardState.visibleRoleIndices.map(i => WIZARD_ROLES[i]);
