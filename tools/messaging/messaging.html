@@ -195,6 +195,74 @@
 .mh-entity-opt-name { font-size:0.88rem; font-weight:600; color:var(--navy); }
 .mh-entity-opt-type { font-size:0.72rem; color:var(--gray-500); margin-top:1px; }
 .mh-entity-none { font-size:0.85rem; color:var(--gray-500); text-align:center; padding:1.5rem 0; }
+
+/* ══════════════════════════════════════════════
+   POSITIONING WIZARD
+   ══════════════════════════════════════════════ */
+.mh-wizard-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.38); z-index:700; align-items:center; justify-content:center; }
+.mh-wizard-overlay.open { display:flex; }
+.mh-wizard-modal { background:#fff; border-radius:16px; padding:2rem; width:90%; max-width:640px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 16px 48px rgba(0,0,0,0.18); overflow-y:auto; }
+.mh-wizard-header { margin-bottom:1.5rem; }
+.mh-wizard-header h3 { font-size:1.05rem; font-weight:700; color:var(--navy); margin:0 0 0.5rem; }
+.mh-wizard-progress { font-size:0.75rem; color:var(--gray-500); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+.mh-wizard-progress-bar { width:100%; height:4px; background:var(--gray-200); border-radius:2px; margin-top:0.75rem; overflow:hidden; }
+.mh-wizard-progress-fill { height:100%; background:var(--pink); transition:width 0.3s ease; }
+
+.mh-wizard-body { flex:1; margin-bottom:1.5rem; overflow-y:auto; }
+
+.mh-wizard-step { display:none; }
+.mh-wizard-step.active { display:block; }
+.mh-wizard-step-desc { font-size:0.85rem; color:var(--gray-600); margin-bottom:1.25rem; line-height:1.5; }
+
+.mh-card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.65rem; margin-bottom:1rem; }
+.mh-card-item { padding:0.85rem; border:1.5px solid var(--gray-200); border-radius:10px; text-align:center; cursor:pointer; transition:all 0.15s; user-select:none; }
+.mh-card-item:hover { border-color:var(--pink); background:rgba(217,43,150,0.02); }
+.mh-card-item.selected { background:var(--pink); color:#fff; border-color:var(--pink); }
+.mh-card-item-label { font-size:0.8rem; font-weight:600; color:inherit; line-height:1.3; }
+
+.mh-tag-picker { display:flex; flex-direction:column; gap:0.75rem; }
+.mh-tag-list { display:flex; flex-wrap:wrap; gap:0.5rem; }
+.mh-tag-item { display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.75rem; border:1.5px solid var(--gray-200); border-radius:20px; background:#fff; cursor:pointer; transition:all 0.15s; font-size:0.8rem; font-weight:600; color:var(--gray-700); white-space:nowrap; }
+.mh-tag-item:hover { border-color:var(--pink); background:rgba(217,43,150,0.02); }
+.mh-tag-item.selected { background:var(--pink); color:#fff; border-color:var(--pink); }
+.mh-tag-item-remove { background:none; border:none; color:inherit; cursor:pointer; font-size:0.9rem; padding:0; line-height:1; opacity:0.7; }
+.mh-tag-item-remove:hover { opacity:1; }
+
+.mh-tag-picker-controls { display:flex; gap:0.5rem; margin-top:0.5rem; }
+.mh-tag-input { flex:1; padding:0.5rem 0.75rem; border:1.5px solid var(--gray-200); border-radius:8px; font-size:0.8rem; font-family:inherit; background:#fff; transition:border-color 0.15s; }
+.mh-tag-input:focus { outline:none; border-color:var(--pink); box-shadow:0 0 0 3px rgba(219,39,119,0.08); }
+.mh-btn-dice { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; padding:0; border:1.5px solid var(--gray-200); border-radius:8px; background:#fff; color:var(--gray-600); cursor:pointer; font-size:1.1rem; transition:all 0.15s; }
+.mh-btn-dice:hover { border-color:var(--pink); color:var(--pink); }
+
+.mh-radio-group { display:flex; flex-direction:column; gap:0.6rem; }
+.mh-radio-item { display:flex; align-items:center; gap:0.75rem; padding:0.8rem 1rem; border:1.5px solid var(--gray-200); border-radius:10px; cursor:pointer; transition:all 0.15s; }
+.mh-radio-item:hover { border-color:var(--pink); background:rgba(217,43,150,0.02); }
+.mh-radio-item.selected { background:var(--pink); color:#fff; border-color:var(--pink); }
+.mh-radio-circle { width:18px; height:18px; border:2px solid currentColor; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.mh-radio-item.selected .mh-radio-circle::after { content:'●'; }
+
+.mh-textarea-wrap { display:flex; flex-direction:column; gap:0.5rem; }
+.mh-textarea { width:100%; padding:0.85rem; border:1.5px solid var(--gray-200); border-radius:10px; font-size:0.85rem; font-family:inherit; resize:vertical; min-height:100px; background:#fff; transition:border-color 0.15s; }
+.mh-textarea:focus { outline:none; border-color:var(--pink); box-shadow:0 0 0 3px rgba(219,39,119,0.08); }
+.mh-textarea::placeholder { color:var(--gray-400); }
+
+.mh-wizard-selected-tags { font-size:0.75rem; color:var(--gray-500); font-weight:600; margin-bottom:0.5rem; }
+
+.mh-regions-wrap { display:flex; flex-direction:column; gap:0.8rem; }
+.mh-region-section { display:flex; flex-direction:column; gap:0.5rem; }
+.mh-region-label { font-size:0.75rem; color:var(--gray-500); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem; }
+.mh-region-tags { display:flex; flex-wrap:wrap; gap:0.4rem; }
+
+.mh-preview-card { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem; }
+.mh-preview-label { font-size:0.75rem; color:var(--gray-500); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.4rem; }
+.mh-preview-text { font-size:0.9rem; color:var(--navy); font-weight:600; line-height:1.5; word-break:break-word; }
+.mh-preview-text[contenteditable="true"] { outline:none; border:none; background:transparent; border-radius:4px; padding:2px 4px; margin:-2px -4px; }
+.mh-preview-text[contenteditable="true"]:focus { background:rgba(217,43,150,0.08); }
+
+.mh-wizard-footer { display:flex; gap:0.75rem; justify-content:flex-end; }
+.mh-wizard-footer button { padding:0.6rem 1.25rem; }
+.mh-btn-wizard-back { background:var(--white); color:var(--navy); border:1px solid var(--gray-200); }
+.mh-btn-wizard-back:hover { border-color:var(--pink); color:var(--pink); }
 </style>
 
 <div class="mh-tool" id="mhTool">
@@ -314,6 +382,145 @@
     </div>
   </div>
 
+  <!-- ══════════════════ MODAL: POSITIONING WIZARD ══════════════════ -->
+  <div class="mh-wizard-overlay" id="mh-modal-wizard">
+    <div class="mh-wizard-modal">
+      <div class="mh-wizard-header">
+        <h3 id="mh-wizard-title">Build Positioning</h3>
+        <div class="mh-wizard-progress" id="mh-wizard-progress">Step 1 of 8</div>
+        <div class="mh-wizard-progress-bar"><div class="mh-wizard-progress-fill" id="mh-wizard-progress-fill" style="width:12.5%;"></div></div>
+      </div>
+
+      <div class="mh-wizard-body">
+        <!-- STEP 1: ICP TYPE -->
+        <div class="mh-wizard-step active" id="mh-wizard-step-1">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Who do you help?</h4>
+          <p class="mh-wizard-step-desc">Select all that apply. Multi-select allowed.</p>
+          <div class="mh-card-grid" id="mh-step1-options"></div>
+        </div>
+
+        <!-- STEP 2: VERTICALS -->
+        <div class="mh-wizard-step" id="mh-wizard-step-2">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Verticals</h4>
+          <p class="mh-wizard-step-desc">Industries or segments where you help customers.</p>
+          <div class="mh-tag-picker">
+            <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step2-count">0</strong></div>
+            <div class="mh-tag-list" id="mh-step2-tags"></div>
+            <div class="mh-tag-picker-controls">
+              <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(2)">🎲</button>
+              <input type="text" class="mh-tag-input" id="mh-step2-input" placeholder="Add custom vertical…">
+              <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(2)">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: GEOGRAPHIES -->
+        <div class="mh-wizard-step" id="mh-wizard-step-3">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Geographic Focus</h4>
+          <p class="mh-wizard-step-desc">Where do you operate?</p>
+          <div class="mh-radio-group" id="mh-step3-radio"></div>
+          <div id="mh-step3-regions" style="display:none;">
+            <div class="mh-regions-wrap">
+              <div class="mh-region-section">
+                <div class="mh-region-label">Regions</div>
+                <div class="mh-region-tags" id="mh-step3-regions-list"></div>
+              </div>
+              <div class="mh-region-section">
+                <div class="mh-region-label">Countries</div>
+                <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step3-country-count">0</strong></div>
+                <div class="mh-tag-list" id="mh-step3-countries"></div>
+                <div class="mh-tag-picker-controls">
+                  <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(3)">🎲</button>
+                  <button class="mh-btn mh-btn-secondary mh-btn-sm" id="mh-step3-show-all" onclick="mhWizardShowAllCountries()">Show All</button>
+                </div>
+              </div>
+              <div class="mh-tag-picker-controls" style="margin-top:0.5rem;">
+                <input type="text" class="mh-tag-input" id="mh-step3-input" placeholder="Add custom country…">
+                <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(3)">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: DEPARTMENTS (conditional) -->
+        <div class="mh-wizard-step" id="mh-wizard-step-4" style="display:none;">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Departments</h4>
+          <p class="mh-wizard-step-desc">Which departments do you serve?</p>
+          <div class="mh-tag-picker">
+            <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step4-count">0</strong></div>
+            <div class="mh-tag-list" id="mh-step4-tags"></div>
+            <div class="mh-tag-picker-controls">
+              <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(4)">🎲</button>
+              <input type="text" class="mh-tag-input" id="mh-step4-input" placeholder="Add custom department…">
+              <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(4)">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: ROLES (conditional) -->
+        <div class="mh-wizard-step" id="mh-wizard-step-5" style="display:none;">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Roles & Titles</h4>
+          <p class="mh-wizard-step-desc">Decision-makers and influencers in your ICP.</p>
+          <div class="mh-tag-picker">
+            <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step5-count">0</strong></div>
+            <div class="mh-tag-list" id="mh-step5-tags"></div>
+            <div class="mh-tag-picker-controls">
+              <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(5)">🎲</button>
+              <input type="text" class="mh-tag-input" id="mh-step5-input" placeholder="Add custom role…">
+              <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(5)">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 6: MACRO PROBLEM -->
+        <div class="mh-wizard-step" id="mh-wizard-step-6" style="display:none;">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Macro Problem</h4>
+          <p class="mh-wizard-step-desc">What major challenge do they grapple with that you help solve?</p>
+          <div class="mh-textarea-wrap">
+            <textarea class="mh-textarea" id="mh-step6-text" placeholder="Describe the core problem your audience faces..."></textarea>
+          </div>
+        </div>
+
+        <!-- STEP 7: YOUR SOLUTION -->
+        <div class="mh-wizard-step" id="mh-wizard-step-7" style="display:none;">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Your Solution</h4>
+          <p class="mh-wizard-step-desc">How do you solve their problem differently?</p>
+          <div class="mh-textarea-wrap">
+            <textarea class="mh-textarea" id="mh-step7-text" placeholder="Describe what you do to solve this problem..."></textarea>
+          </div>
+        </div>
+
+        <!-- STEP 8: PREVIEW & CONFIRM -->
+        <div class="mh-wizard-step" id="mh-wizard-step-8" style="display:none;">
+          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.75rem;">Preview & Confirm</h4>
+          <p class="mh-wizard-step-desc">Review the positioning statement built from your selections.</p>
+
+          <div class="mh-preview-card">
+            <div class="mh-preview-label">For Statement</div>
+            <div class="mh-preview-text" contenteditable="true" id="mh-step8-for" data-field="positioning-for"></div>
+          </div>
+
+          <div class="mh-preview-card">
+            <div class="mh-preview-label">Who Statement (Problem)</div>
+            <div class="mh-preview-text" contenteditable="true" id="mh-step8-who" data-field="positioning-who"></div>
+          </div>
+
+          <div class="mh-preview-card">
+            <div class="mh-preview-label">We Statement (Solution)</div>
+            <div class="mh-preview-text" contenteditable="true" id="mh-step8-we" data-field="positioning-we"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mh-wizard-footer">
+        <button class="mh-btn mh-btn-wizard-back" id="mh-wizard-back" onclick="mhWizardPrevious()" style="display:none;">← Back</button>
+        <button class="mh-btn mh-btn-secondary" onclick="mhWizardCancel()">Cancel</button>
+        <button class="mh-btn mh-btn-primary" id="mh-wizard-next" onclick="mhWizardNext()">Next →</button>
+        <button class="mh-btn mh-btn-primary" id="mh-wizard-create" onclick="mhWizardCreate()" style="display:none;">Create House</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -421,6 +628,14 @@
     el.addEventListener('click', e => { if (e.target === el) mhCloseModals(); });
   });
 
+  // Close wizard on backdrop click
+  const wizardOverlay = document.getElementById('mh-modal-wizard');
+  if (wizardOverlay) {
+    wizardOverlay.addEventListener('click', e => {
+      if (e.target === wizardOverlay) mhWizardCancel();
+    });
+  }
+
   window.mhPickType = function (type) {
     mhCloseModals();
     if (type === 'company') {
@@ -448,7 +663,7 @@
     } else {
       list.innerHTML = opts.map(o => {
         const initial = (o.name || '?')[0].toUpperCase();
-        return `<div class="mh-entity-opt" onclick="mhCreateFromEntity('${o.id}','${esc(o.name)}','${esc(o.type)}')">
+        return `<div class="mh-entity-opt" onclick="mhShowWizard('${o.id}','${esc(o.name)}','${esc(o.type)}')">
           <div class="mh-entity-opt-icon">${initial}</div>
           <div class="mh-entity-opt-body">
             <div class="mh-entity-opt-name">${esc(o.name)}</div>
@@ -460,9 +675,17 @@
     document.getElementById('mh-modal-entity').classList.add('open');
   }
 
-  window.mhCreateFromEntity = async function (entityId, entityName, entityType) {
+  window.mhCreateFromEntity = async function (entityId, entityName, entityType, posData) {
     mhCloseModals();
     const title    = `${entityName} Messaging House`;
+
+    // Pre-populate positioning from wizard data if provided
+    const positioning = {
+      target_audience: posData?.for_statement || '',
+      problem: posData?.macro_problem || '',
+      solution: posData?.solution || ''
+    };
+
     const newHouse = {
       title,
       type        : 'company',
@@ -474,7 +697,7 @@
       context     : '',
       elevator    : { '25_word': { enabled: true, text: '' }, '50_word': { enabled: false, text: '' }, '100_word': { enabled: false, text: '' } },
       outcome     : '',
-      positioning : { target_audience: '', problem: '', solution: '' },
+      positioning : positioning,
       pillars     : [
         { name: '', points: ['', ''] },
         { name: '', points: ['', ''] },
@@ -484,6 +707,8 @@
       avoid       : [],
       purpose_vision : { purpose: '', vision: '' },
       proof_assets   : [],
+      // Store wizard data as metadata for future reference
+      wizard_data : posData || null,
       enabled_sections: {
         taglines      : true,
         outcome       : true,
@@ -917,6 +1142,472 @@
     if (!s) return '';
     const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
   }
+
+  /* ════════════════════════════════════════════════════
+     POSITIONING WIZARD DATA
+     ════════════════════════════════════════════════════ */
+
+  const WIZARD_ICP_OPTIONS = [
+    { id: 'consumers', label: 'Consumers' },
+    { id: 'prosumers', label: 'Prosumers' },
+    { id: 'sole-traders', label: 'Sole Traders' },
+    { id: 'solopreneurs', label: 'Solopreneurs' },
+    { id: 'freelancers', label: 'Freelancers' },
+    { id: 'small-biz', label: 'Small Businesses' },
+    { id: 'medium-biz', label: 'Medium Businesses' },
+    { id: 'enterprises', label: 'Enterprises' },
+    { id: 'other', label: 'Other' }
+  ];
+
+  const WIZARD_VERTICALS_B2C = [
+    'Health & Wellness', 'Education', 'Entertainment', 'Fashion', 'Home & Garden', 'Beauty',
+    'Food & Beverage', 'Travel & Tourism', 'Sports & Fitness', 'Personal Finance', 'Hobbies',
+    'Automotive', 'Real Estate', 'Parenting', 'Pet Care'
+  ];
+
+  const WIZARD_VERTICALS_B2B = [
+    'Financial Services', 'Healthcare', 'Technology', 'Retail', 'Manufacturing', 'Energy',
+    'Telecommunications', 'Construction', 'Logistics', 'Hospitality', 'Legal Services',
+    'Insurance', 'Real Estate', 'Education', 'Government', 'Non-profit'
+  ];
+
+  const WIZARD_REGIONS = [
+    'North America', 'Latin America', 'EMEA', 'Asia Pacific', 'Middle East', 'Africa', 'Oceania'
+  ];
+
+  const WIZARD_COUNTRIES_ALL = [
+    'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Australia', 'Japan',
+    'India', 'China', 'Brazil', 'Mexico', 'Netherlands', 'Sweden', 'Singapore', 'New Zealand',
+    'Spain', 'Italy', 'South Korea', 'Ireland', 'Switzerland', 'Belgium', 'Denmark', 'Norway',
+    'Austria', 'Portugal'
+  ];
+
+  const WIZARD_DEPARTMENTS = [
+    'Marketing', 'Sales', 'Product', 'Engineering', 'Finance', 'Operations', 'HR',
+    'Customer Success', 'IT', 'Security', 'Legal', 'Executive', 'Strategy', 'Analytics', 'UX/Design'
+  ];
+
+  const WIZARD_ROLES = [
+    'CMO', 'VP Marketing', 'Marketing Director', 'Product Manager', 'VP Sales', 'Sales Director',
+    'CTO', 'VP Engineering', 'VP Product', 'CEO', 'CFO', 'COO', 'CRO', 'Customer Success Manager',
+    'Marketing Manager', 'Growth Manager', 'Brand Manager', 'Content Manager', 'Analyst',
+    'Director of Operations', 'Head of Product', 'Engineering Lead', 'DevOps Engineer', 'Solutions Architect'
+  ];
+
+  // Wizard state
+  let mhWizardState = {
+    currentStep: 1,
+    entityId: null,
+    entityName: null,
+    entityType: null,
+    icpTypes: [],
+    verticals: [],
+    regions: [],
+    countries: [],
+    departments: [],
+    roles: [],
+    macroProblem: '',
+    solution: '',
+    visibleVerticalIndices: [],
+    visibleCountryIndices: [],
+    visibleDepartmentIndices: [],
+    visibleRoleIndices: []
+  };
+
+  function mhWizardReset() {
+    mhWizardState = {
+      currentStep: 1,
+      entityId: null,
+      entityName: null,
+      entityType: null,
+      icpTypes: [],
+      verticals: [],
+      regions: [],
+      countries: [],
+      departments: [],
+      roles: [],
+      macroProblem: '',
+      solution: '',
+      visibleVerticalIndices: [],
+      visibleCountryIndices: [],
+      visibleDepartmentIndices: [],
+      visibleRoleIndices: []
+    };
+  }
+
+  window.mhShowWizard = function (entityId, entityName, entityType) {
+    mhWizardReset();
+    mhWizardState.entityId = entityId;
+    mhWizardState.entityName = entityName;
+    mhWizardState.entityType = entityType;
+    mhWizardRenderStep();
+    document.getElementById('mh-modal-wizard').classList.add('open');
+  };
+
+  window.mhWizardCancel = function () {
+    document.getElementById('mh-modal-wizard').classList.remove('open');
+    mhWizardReset();
+  };
+
+  window.mhWizardNext = function () {
+    // Capture text from steps 6 and 7 before advancing
+    const step6El = document.getElementById('mh-step6-text');
+    if (step6El) mhWizardState.macroProblem = step6El.value;
+
+    const step7El = document.getElementById('mh-step7-text');
+    if (step7El) mhWizardState.solution = step7El.value;
+
+    if (mhWizardStep1()) mhWizardState.currentStep++;
+    if (mhWizardState.currentStep === 4 && !mhWizardShouldShowStep(4)) mhWizardState.currentStep++;
+    if (mhWizardState.currentStep === 5 && !mhWizardShouldShowStep(5)) mhWizardState.currentStep++;
+    if (mhWizardState.currentStep > 8) mhWizardState.currentStep = 8;
+    mhWizardRenderStep();
+  };
+
+  window.mhWizardPrevious = function () {
+    // Capture text from steps 6 and 7 before retreating
+    const step6El = document.getElementById('mh-step6-text');
+    if (step6El) mhWizardState.macroProblem = step6El.value;
+
+    const step7El = document.getElementById('mh-step7-text');
+    if (step7El) mhWizardState.solution = step7El.value;
+
+    mhWizardState.currentStep--;
+    if (mhWizardState.currentStep === 4 && !mhWizardShouldShowStep(4)) mhWizardState.currentStep--;
+    if (mhWizardState.currentStep === 5 && !mhWizardShouldShowStep(5)) mhWizardState.currentStep--;
+    if (mhWizardState.currentStep < 1) mhWizardState.currentStep = 1;
+    mhWizardRenderStep();
+  };
+
+  function mhWizardShouldShowStep(step) {
+    if (step === 4) return ['small-biz','medium-biz','enterprises'].some(t => mhWizardState.icpTypes.includes(t));
+    if (step === 5) return mhWizardState.departments.length > 0 || mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
+    return true;
+  }
+
+  function mhWizardStep1() {
+    // Step 1: ICP Type - at least one required
+    return true; // Allow proceed even if empty
+  }
+
+  function mhWizardRenderStep() {
+    const step = mhWizardState.currentStep;
+    const total = 8;
+    const showDepts = mhWizardShouldShowStep(4);
+    const showRoles = mhWizardShouldShowStep(5);
+
+    // Hide all steps
+    ['mh-wizard-step-1','mh-wizard-step-2','mh-wizard-step-3','mh-wizard-step-4','mh-wizard-step-5','mh-wizard-step-6','mh-wizard-step-7','mh-wizard-step-8'].forEach(id => {
+      document.getElementById(id).classList.remove('active');
+      if (id === 'mh-wizard-step-4') document.getElementById(id).style.display = showDepts ? 'block' : 'none';
+      if (id === 'mh-wizard-step-5') document.getElementById(id).style.display = showRoles ? 'block' : 'none';
+    });
+
+    document.getElementById('mh-wizard-step-'+step).classList.add('active');
+
+    // Update progress
+    document.getElementById('mh-wizard-progress').textContent = 'Step '+step+' of '+total;
+    document.getElementById('mh-wizard-progress-fill').style.width = (step/total*100)+'%';
+
+    // Update buttons
+    document.getElementById('mh-wizard-back').style.display = step > 1 ? 'inline-flex' : 'none';
+    const isLastStep = step === total;
+    document.getElementById('mh-wizard-next').style.display = isLastStep ? 'none' : 'inline-flex';
+    document.getElementById('mh-wizard-create').style.display = isLastStep ? 'inline-flex' : 'none';
+
+    // Render step-specific content
+    if (step === 1) mhWizardRenderStep1();
+    else if (step === 2) mhWizardRenderStep2();
+    else if (step === 3) mhWizardRenderStep3();
+    else if (step === 4 && showDepts) mhWizardRenderStep4();
+    else if (step === 5 && showRoles) mhWizardRenderStep5();
+    else if (step === 6) mhWizardRenderStep6();
+    else if (step === 7) mhWizardRenderStep7();
+    else if (step === 8) mhWizardRenderStep8();
+  }
+
+  function mhWizardRenderStep1() {
+    const container = document.getElementById('mh-step1-options');
+    container.innerHTML = WIZARD_ICP_OPTIONS.map(opt => {
+      const sel = mhWizardState.icpTypes.includes(opt.id) ? 'selected' : '';
+      return `<div class="mh-card-item ${sel}" onclick="mhWizardToggleICP('${opt.id}')">
+        <div class="mh-card-item-label">${opt.label}</div>
+      </div>`;
+    }).join('');
+  }
+
+  window.mhWizardToggleICP = function (id) {
+    const idx = mhWizardState.icpTypes.indexOf(id);
+    if (idx >= 0) mhWizardState.icpTypes.splice(idx, 1);
+    else mhWizardState.icpTypes.push(id);
+    mhWizardRenderStep1();
+  };
+
+  function mhWizardRenderStep2() {
+    const isB2B = mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
+    const verticals = isB2B ? WIZARD_VERTICALS_B2B : WIZARD_VERTICALS_B2C;
+
+    if (!mhWizardState.visibleVerticalIndices.length) {
+      mhWizardState.visibleVerticalIndices = mhWizardGetRandomIndices(verticals.length, 15);
+    }
+
+    const visibleVerticals = mhWizardState.visibleVerticalIndices.map(i => verticals[i]);
+    const container = document.getElementById('mh-step2-tags');
+    container.innerHTML = visibleVerticals.map(v => {
+      const sel = mhWizardState.verticals.includes(v) ? 'selected' : '';
+      return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('verticals','${esc(v)}')">${v}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('verticals','${esc(v)}')" style="${mhWizardState.verticals.includes(v)?'':'display:none;'}">✕</button></div>`;
+    }).join('');
+
+    // Add custom verticals
+    const customVerticals = mhWizardState.verticals.filter(v => !visibleVerticals.includes(v));
+    const customHtml = customVerticals.map(v => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('verticals','${esc(v)}')">${v}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('verticals','${esc(v)}')">✕</button></div>`).join('');
+    if (customHtml) container.innerHTML += customHtml;
+
+    document.getElementById('mh-step2-count').textContent = mhWizardState.verticals.length;
+  }
+
+  function mhWizardRenderStep3() {
+    const isGlobal = mhWizardState.regions.includes('__global__');
+
+    const radioHtml = [
+      { id: '__global__', label: 'We operate globally' },
+      { id: '__specific__', label: 'We target specific regions & countries' }
+    ].map(opt => {
+      const sel = isGlobal === (opt.id === '__global__') ? 'selected' : '';
+      return `<div class="mh-radio-item ${sel}" onclick="mhWizardSelectGeo('${opt.id}')">
+        <div class="mh-radio-circle"></div>
+        <div>${opt.label}</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('mh-step3-radio').innerHTML = radioHtml;
+    document.getElementById('mh-step3-regions').style.display = isGlobal ? 'none' : 'block';
+
+    if (!isGlobal) {
+      const regionsContainer = document.getElementById('mh-step3-regions-list');
+      regionsContainer.innerHTML = WIZARD_REGIONS.map(r => {
+        const sel = mhWizardState.regions.includes(r) ? 'selected' : '';
+        return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleRegion('${r}')">${r}</div>`;
+      }).join('');
+
+      const countries = WIZARD_COUNTRIES_ALL;
+      if (!mhWizardState.visibleCountryIndices.length) {
+        mhWizardState.visibleCountryIndices = mhWizardGetRandomIndices(countries.length, 12);
+      }
+
+      const visibleCountries = mhWizardState.visibleCountryIndices.map(i => countries[i]);
+      const countriesContainer = document.getElementById('mh-step3-countries');
+      countriesContainer.innerHTML = visibleCountries.map(c => {
+        const sel = mhWizardState.countries.includes(c) ? 'selected' : '';
+        return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('countries','${esc(c)}')">${c}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('countries','${esc(c)}')" style="${mhWizardState.countries.includes(c)?'':'display:none;'}">✕</button></div>`;
+      }).join('');
+
+      const customCountries = mhWizardState.countries.filter(c => !visibleCountries.includes(c));
+      const customHtml = customCountries.map(c => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('countries','${esc(c)}')">${c}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('countries','${esc(c)}')">✕</button></div>`).join('');
+      if (customHtml) countriesContainer.innerHTML += customHtml;
+
+      document.getElementById('mh-step3-country-count').textContent = mhWizardState.countries.length;
+    }
+  }
+
+  window.mhWizardSelectGeo = function (id) {
+    if (id === '__global__') {
+      mhWizardState.regions = ['__global__'];
+      mhWizardState.countries = [];
+    } else {
+      mhWizardState.regions = [];
+      mhWizardState.countries = [];
+    }
+    mhWizardRenderStep3();
+  };
+
+  window.mhWizardToggleRegion = function (r) {
+    const idx = mhWizardState.regions.indexOf(r);
+    if (idx >= 0) mhWizardState.regions.splice(idx, 1);
+    else mhWizardState.regions.push(r);
+    mhWizardRenderStep3();
+  };
+
+  function mhWizardRenderStep4() {
+    if (!mhWizardState.visibleDepartmentIndices.length) {
+      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 15);
+    }
+
+    const visibleDepts = mhWizardState.visibleDepartmentIndices.map(i => WIZARD_DEPARTMENTS[i]);
+    const container = document.getElementById('mh-step4-tags');
+    container.innerHTML = visibleDepts.map(d => {
+      const sel = mhWizardState.departments.includes(d) ? 'selected' : '';
+      return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('departments','${esc(d)}')">${d}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('departments','${esc(d)}')" style="${mhWizardState.departments.includes(d)?'':'display:none;'}">✕</button></div>`;
+    }).join('');
+
+    const customDepts = mhWizardState.departments.filter(d => !visibleDepts.includes(d));
+    const customHtml = customDepts.map(d => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('departments','${esc(d)}')">${d}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('departments','${esc(d)}')">✕</button></div>`).join('');
+    if (customHtml) container.innerHTML += customHtml;
+
+    document.getElementById('mh-step4-count').textContent = mhWizardState.departments.length;
+  }
+
+  function mhWizardRenderStep5() {
+    if (!mhWizardState.visibleRoleIndices.length) {
+      mhWizardState.visibleRoleIndices = mhWizardGetRandomIndices(WIZARD_ROLES.length, 15);
+    }
+
+    const visibleRoles = mhWizardState.visibleRoleIndices.map(i => WIZARD_ROLES[i]);
+    const container = document.getElementById('mh-step5-tags');
+    container.innerHTML = visibleRoles.map(r => {
+      const sel = mhWizardState.roles.includes(r) ? 'selected' : '';
+      return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')" style="${mhWizardState.roles.includes(r)?'':'display:none;'}">✕</button></div>`;
+    }).join('');
+
+    const customRoles = mhWizardState.roles.filter(r => !visibleRoles.includes(r));
+    const customHtml = customRoles.map(r => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')">✕</button></div>`).join('');
+    if (customHtml) container.innerHTML += customHtml;
+
+    document.getElementById('mh-step5-count').textContent = mhWizardState.roles.length;
+  }
+
+  function mhWizardRenderStep6() {
+    document.getElementById('mh-step6-text').value = mhWizardState.macroProblem;
+  }
+
+  function mhWizardRenderStep7() {
+    document.getElementById('mh-step7-text').value = mhWizardState.solution;
+  }
+
+  function mhWizardRenderStep8() {
+    const forStatement = mhWizardBuildForStatement();
+    document.getElementById('mh-step8-for').textContent = forStatement;
+    document.getElementById('mh-step8-who').textContent = mhWizardState.macroProblem;
+    document.getElementById('mh-step8-we').textContent = mhWizardState.solution;
+  }
+
+  function mhWizardBuildForStatement() {
+    // Natural-language list: "A, B and C"
+    function natList(arr) {
+      if (arr.length <= 1) return arr.join('');
+      return arr.slice(0, -1).join(', ') + ' and ' + arr[arr.length - 1];
+    }
+
+    const parts = [];
+
+    // ICP type
+    if (mhWizardState.icpTypes.length) {
+      const labels = mhWizardState.icpTypes.map(t => {
+        const opt = WIZARD_ICP_OPTIONS.find(o => o.id === t);
+        return opt ? opt.label : t;
+      });
+      parts.push(natList(labels));
+    }
+
+    // Roles (e.g. "CISOs and DevOps leads")
+    if (mhWizardState.roles.length) {
+      parts.push(natList(mhWizardState.roles));
+    }
+
+    // Departments (e.g. "in IT Security and Engineering")
+    if (mhWizardState.departments.length) {
+      parts.push('in ' + natList(mhWizardState.departments));
+    }
+
+    // Verticals (e.g. "across Financial Services and Healthcare")
+    if (mhWizardState.verticals.length) {
+      parts.push('in ' + natList(mhWizardState.verticals));
+    }
+
+    // Geography
+    if (mhWizardState.regions.length && !mhWizardState.regions.includes('__global__')) {
+      let geo = 'across ' + natList(mhWizardState.regions);
+      if (mhWizardState.countries.length) {
+        geo += ' (' + natList(mhWizardState.countries) + ')';
+      }
+      parts.push(geo);
+    }
+
+    return parts.join(' ') || 'Your target audience';
+  }
+
+  window.mhWizardToggleTag = function (field, value) {
+    if (!mhWizardState[field].includes(value)) {
+      mhWizardState[field].push(value);
+    }
+    mhWizardRenderStep();
+  };
+
+  window.mhWizardRemoveTag = function (field, value) {
+    const idx = mhWizardState[field].indexOf(value);
+    if (idx >= 0) mhWizardState[field].splice(idx, 1);
+    mhWizardRenderStep();
+  };
+
+  window.mhWizardAddCustomTag = function (step) {
+    const inputId = 'mh-step'+step+'-input';
+    const input = document.getElementById(inputId);
+    const val = (input.value || '').trim();
+    if (!val) return;
+
+    if (step === 2) {
+      if (!mhWizardState.verticals.includes(val)) mhWizardState.verticals.push(val);
+    } else if (step === 3) {
+      if (!mhWizardState.countries.includes(val)) mhWizardState.countries.push(val);
+    } else if (step === 4) {
+      if (!mhWizardState.departments.includes(val)) mhWizardState.departments.push(val);
+    } else if (step === 5) {
+      if (!mhWizardState.roles.includes(val)) mhWizardState.roles.push(val);
+    }
+
+    input.value = '';
+    mhWizardRenderStep();
+  };
+
+  window.mhWizardReshuffle = function (step) {
+    if (step === 2) {
+      const isB2B = mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
+      const verticals = isB2B ? WIZARD_VERTICALS_B2B : WIZARD_VERTICALS_B2C;
+      mhWizardState.visibleVerticalIndices = mhWizardGetRandomIndices(verticals.length, 15);
+    } else if (step === 3) {
+      mhWizardState.visibleCountryIndices = mhWizardGetRandomIndices(WIZARD_COUNTRIES_ALL.length, 12);
+    } else if (step === 4) {
+      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 15);
+    } else if (step === 5) {
+      mhWizardState.visibleRoleIndices = mhWizardGetRandomIndices(WIZARD_ROLES.length, 15);
+    }
+    mhWizardRenderStep();
+  };
+
+  window.mhWizardShowAllCountries = function () {
+    mhWizardState.visibleCountryIndices = Array.from({length: WIZARD_COUNTRIES_ALL.length}, (_, i) => i);
+    mhWizardRenderStep3();
+  };
+
+  function mhWizardGetRandomIndices(max, count) {
+    const indices = Array.from({length: max}, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices.slice(0, Math.min(count, max));
+  }
+
+  window.mhWizardCreate = async function () {
+    // Capture step 6 & 7 text before creating
+    mhWizardState.macroProblem = document.getElementById('mh-step6-text').value;
+    mhWizardState.solution = document.getElementById('mh-step7-text').value;
+
+    const posData = {
+      icp_types: mhWizardState.icpTypes,
+      verticals: mhWizardState.verticals,
+      regions: mhWizardState.regions,
+      countries: mhWizardState.countries,
+      departments: mhWizardState.departments,
+      roles: mhWizardState.roles,
+      macro_problem: mhWizardState.macroProblem,
+      solution: mhWizardState.solution,
+      for_statement: mhWizardBuildForStatement()
+    };
+
+    document.getElementById('mh-modal-wizard').classList.remove('open');
+    await mhCreateFromEntity(mhWizardState.entityId, mhWizardState.entityName, mhWizardState.entityType, posData);
+  };
 
   /* ════════════════════════════════════════════════════
      START
