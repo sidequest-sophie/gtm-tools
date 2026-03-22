@@ -1299,7 +1299,7 @@ window.clientConfig = {
       return;
     }
 
-    const typeOptions    = ['Brand','Family','Line','Product','Service','Platform','Solution','Module'];
+    const typeOptions    = ['Brand','Family','Line','Product','Content','Service','Platform','Solution','Module'];
     const statusOptions  = ['Active','Pilot','Internal','Deprecated','Retired','Acquired'];
     const packagingOptions = ['Core','Add-on','Bundle-only','Not sold standalone','Premium Service'];
 
@@ -1323,7 +1323,7 @@ window.clientConfig = {
   },
 
   _renderEntityNode(e, allEntities, byParent, typeOptions, statusOptions, packagingOptions, depth) {
-    const TYPE_ICONS = { Brand:'🏷️', Family:'🗂️', Line:'📏', Product:'📦', Service:'🛠️', Platform:'🖥️', Solution:'💡', Module:'🔩' };
+    const TYPE_ICONS = { Brand:'🏷️', Family:'🗂️', Line:'📏', Product:'📦', Content:'📝', Service:'🛠️', Platform:'🖥️', Solution:'💡', Module:'🔩' };
     const statusCls  = 'cc-status-' + (e.lifecycleStatus || 'active').toLowerCase();
     const showStatus = e.lifecycleStatus && e.lifecycleStatus !== 'Active';
     const aliases    = e.aliases || [];
@@ -1669,7 +1669,7 @@ window.clientConfig = {
     lines.push('# Each entity starts with an ## heading.');
     lines.push('# Only Name is required. All other fields are optional.');
     lines.push('#');
-    lines.push('# Type:             Brand | Family | Line | Product | Service | Platform | Solution | Module');
+    lines.push('# Type:             Brand | Family | Line | Product | Content | Service | Platform | Solution | Module');
     lines.push('# Lifecycle Status: Active | Pilot | Internal | Deprecated | Retired | Acquired');
     lines.push('# Aliases:          comma separated');
     lines.push('# Use Cases:        semicolon separated');
@@ -1803,7 +1803,7 @@ window.clientConfig = {
     const client = Storage.getActiveClient();
     if (!client) { alert('No active client.'); return; }
 
-    const validTypes   = ['Brand','Family','Line','Product','Service','Platform','Solution','Module'];
+    const validTypes   = ['Brand','Family','Line','Product','Content','Service','Platform','Solution','Module'];
     const validStatus  = ['Active','Pilot','Internal','Deprecated','Retired','Acquired'];
     const validPkg     = ['Core','Add-on','Bundle-only','Not sold standalone','Premium Service'];
     const existingEnts = client.brandEntities || [];
