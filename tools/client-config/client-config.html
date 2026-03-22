@@ -674,11 +674,21 @@
     <!-- TAB 2: Brand Ontology                       -->
     <!-- ═══════════════════════════════════════════ -->
     <div class="cc-panel" id="ccOntology">
-      <div class="cc-section-title">Brand Ontology</div>
-      <div class="cc-section-desc">
-        Define the client's products, services, platforms, and other brand entities.
-        This data is shared across all tools.
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.75rem; margin-bottom:0.5rem;">
+        <div>
+          <div class="cc-section-title">Brand Ontology</div>
+          <div class="cc-section-desc" style="margin-bottom:0;">
+            Define the client's products, services, platforms, and other brand entities.
+            This data is shared across all tools.
+          </div>
+        </div>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+          <button class="cc-btn cc-btn-outline" onclick="clientConfig.downloadImportSpec()" title="Download a template markdown file showing the expected import format" style="font-size:0.75rem; padding:0.35rem 0.7rem;">📄 Import Spec</button>
+          <button class="cc-btn cc-btn-outline" onclick="clientConfig.importBrandOntology()" title="Import brand ontology from a markdown file" style="font-size:0.75rem; padding:0.35rem 0.7rem;">📥 Import</button>
+          <button class="cc-btn cc-btn-outline" onclick="clientConfig.exportBrandOntology()" title="Export current brand ontology as markdown" style="font-size:0.75rem; padding:0.35rem 0.7rem;">📤 Export</button>
+        </div>
       </div>
+      <input type="file" id="ccOntologyFileInput" accept=".md,.markdown,.txt" style="display:none;" />
 
       <div id="ccEntityList" class="cc-entity-list"></div>
 
@@ -1446,6 +1456,161 @@ window.clientConfig = {
         catEl.disabled = false;
       });
     });
+  },
+
+  // ── Brand Ontology Import / Export ──
+
+  downloadImportSpec() {
+    const spec = `# Brand Ontology — Import Spec
+#
+# Use this template to bulk-import brand entities.
+# Save as .md and use the "Import" button on the Brand Ontology tab.
+#
+# Each entity is an H2 heading. Fields are listed below it as **Key:** Value.
+# Only **Name** is required — all other fields are optional.
+# Type must be one of: Product, Service, Platform, Solution, Module, Brand.
+
+## Entity 1
+
+- **Type:** Product
+- **Name:** DataShield Pro
+- **Description:** Enterprise data protection platform with real-time threat detection.
+- **URL:** https://example.com/datashield-pro
+
+## Entity 2
+
+- **Type:** Service
+- **Name:** Managed SOC
+- **Description:** 24/7 managed security operations centre.
+- **URL:** https://example.com/managed-soc
+
+## Entity 3
+
+- **Type:** Platform
+- **Name:** ThreatLab
+- **Description:** Interactive cybersecurity training and certification platform.
+- **URL:** https://example.com/threatlab
+`;
+    this._downloadText('brand-ontology-import-spec.md', spec);
+  },
+
+  exportBrandOntology() {
+    const client = Storage.getActiveClient();
+    if (!client) { alert('No active client.'); return; }
+    const entities = client.brandEntities || [];
+
+    if (entities.length === 0) {
+      alert('No brand entities to export. Add some first.');
+      return;
+    }
+
+    const clientName = client.name || 'Client';
+    const lines = [];
+    lines.push('# Brand Ontology \u2014 ' + clientName);
+    lines.push('# Exported ' + new Date().toISOString().slice(0, 10));
+    lines.push('');
+
+    entities.forEach((e) => {
+      lines.push('## ' + (e.name || 'Untitled'));
+      lines.push('');
+      lines.push('- **Type:** ' + (e.type || 'Product'));
+      lines.push('- **Name:** ' + (e.name || ''));
+      if (e.description) lines.push('- **Description:** ' + e.description);
+      if (e.url) lines.push('- **URL:** ' + e.url);
+      lines.push('');
+    });
+
+    const filename = (clientName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()) + '-brand-ontology.md';
+    this._downloadText(filename, lines.join('\n'));
+  },
+
+  importBrandOntology() {
+    const input = document.getElementById('ccOntologyFileInput');
+    if (!input) return;
+
+    // Reset and attach one-time handler
+    input.value = '';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          this._parseAndImportOntology(ev.target.result);
+        } catch (err) {
+          alert('Import failed: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  },
+
+  _parseAndImportOntology(mdText) {
+    const client = Storage.getActiveClient();
+    if (!client) { alert('No active client.'); return; }
+
+    const validTypes = ['Product','Service','Platform','Solution','Module','Brand'];
+    const entities = client.brandEntities || [];
+    const sections = mdText.split(/^## /m).slice(1); // split by H2
+
+    if (sections.length === 0) {
+      alert('No entities found. Make sure each entity starts with an ## heading.');
+      return;
+    }
+
+    let imported = 0;
+    sections.forEach(section => {
+      const lines = section.trim().split('\n');
+      const heading = lines[0].trim();
+
+      let type = 'Product', name = heading, description = '', url = '';
+
+      lines.forEach(line => {
+        const m = line.match(/^-\s*\*\*(.+?):\*\*\s*(.+)/);
+        if (!m) return;
+        const key = m[1].trim().toLowerCase();
+        const val = m[2].trim();
+        if (key === 'type' && validTypes.includes(val)) type = val;
+        else if (key === 'name') name = val;
+        else if (key === 'description') description = val;
+        else if (key === 'url') url = val;
+      });
+
+      if (!name) return;
+
+      // Skip duplicates by name
+      if (entities.some(e => e.name.toLowerCase() === name.toLowerCase())) return;
+
+      entities.push({
+        id: Storage.uuid(),
+        type,
+        name,
+        description,
+        url,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+      });
+      imported++;
+    });
+
+    Storage.updateClient(client.id, { brandEntities: entities });
+    this.renderOntologyTab();
+    this.renderCategoriesTab();
+    alert('Imported ' + imported + ' entit' + (imported === 1 ? 'y' : 'ies') + '.' + (sections.length - imported > 0 ? ' (' + (sections.length - imported) + ' skipped as duplicates)' : ''));
+  },
+
+  _downloadText(filename, content) {
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   },
 
   // ── Utility ──
