@@ -238,6 +238,20 @@
     transform: rotate(90deg);
   }
 
+  /* ── Ontology tree view ── */
+  .cc-tree-branch {
+    margin-left: 1.35rem;
+    padding-left: 0.85rem;
+    border-left: 2px solid #e5e7eb;
+  }
+  .cc-tree-branch + .cc-tree-branch { margin-top: 0; }
+  .cc-entity-type-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+  }
+
   /* ── v2 Lifecycle status badges ── */
   .cc-status-badge {
     font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
@@ -751,12 +765,14 @@
         <div class="cc-form-group">
           <label class="cc-form-label">Type</label>
           <select class="cc-form-input" id="ccNewEntityType">
+            <option value="Brand">Brand</option>
+            <option value="Family">Family</option>
+            <option value="Line">Line</option>
             <option value="Product">Product</option>
             <option value="Service">Service</option>
             <option value="Platform">Platform</option>
             <option value="Solution">Solution</option>
             <option value="Module">Module</option>
-            <option value="Brand">Brand</option>
           </select>
         </div>
         <div class="cc-form-group" style="flex:2;">
@@ -1283,32 +1299,56 @@ window.clientConfig = {
       return;
     }
 
-    const typeOptions = ['Product','Service','Platform','Solution','Module','Brand'];
-    const statusOptions = ['Active','Pilot','Internal','Deprecated','Retired','Acquired'];
+    const typeOptions    = ['Brand','Family','Line','Product','Service','Platform','Solution','Module'];
+    const statusOptions  = ['Active','Pilot','Internal','Deprecated','Retired','Acquired'];
     const packagingOptions = ['Core','Add-on','Bundle-only','Not sold standalone','Premium Service'];
 
-    container.innerHTML = entities.map(e => {
-      const statusCls = 'cc-status-' + (e.lifecycleStatus || 'active').toLowerCase();
-      const showStatus = e.lifecycleStatus && e.lifecycleStatus !== 'Active';
-      const parentEntity = e.parentEntityId ? entities.find(o => o.id === e.parentEntityId) : null;
-      const aliases = (e.aliases || []);
-      const useCases = (e.useCases || []);
-      const pkgRoles = (e.packagingRole || []);
-      const relatedIds = (e.relatedEntityIds || []);
+    container.innerHTML = this._renderEntityTree(entities, typeOptions, statusOptions, packagingOptions);
+  },
 
-      return `
-      <div class="cc-entity-item" id="ent-${e.id}">
+  _renderEntityTree(entities, typeOptions, statusOptions, packagingOptions) {
+    if (!entities.length) return '<div class="cc-empty-cats">No brand entities yet.</div>';
+
+    // Build parent → children map; treat missing/invalid parent as root
+    const validIds = new Set(entities.map(e => e.id));
+    const byParent = {};
+    entities.forEach(e => {
+      const pid = (e.parentEntityId && validIds.has(e.parentEntityId)) ? e.parentEntityId : '';
+      if (!byParent[pid]) byParent[pid] = [];
+      byParent[pid].push(e);
+    });
+
+    const roots = byParent[''] || [];
+    return roots.map(e => this._renderEntityNode(e, entities, byParent, typeOptions, statusOptions, packagingOptions, 0)).join('');
+  },
+
+  _renderEntityNode(e, allEntities, byParent, typeOptions, statusOptions, packagingOptions, depth) {
+    const TYPE_ICONS = { Brand:'🏷️', Family:'🗂️', Line:'📏', Product:'📦', Service:'🛠️', Platform:'🖥️', Solution:'💡', Module:'🔩' };
+    const statusCls  = 'cc-status-' + (e.lifecycleStatus || 'active').toLowerCase();
+    const showStatus = e.lifecycleStatus && e.lifecycleStatus !== 'Active';
+    const aliases    = e.aliases || [];
+    const useCases   = e.useCases || [];
+    const pkgRoles   = e.packagingRole || [];
+    const relatedIds = e.relatedEntityIds || [];
+    const icon       = TYPE_ICONS[e.type] || '📋';
+
+    const children   = byParent[e.id] || [];
+    const childrenHtml = children.length
+      ? `<div class="cc-tree-branch">${children.map(c => this._renderEntityNode(c, allEntities, byParent, typeOptions, statusOptions, packagingOptions, depth + 1)).join('')}</div>`
+      : '';
+
+    const cardHtml = `
+      <div class="cc-entity-item" id="ent-${e.id}" style="margin-bottom:0.4rem;">
         <div class="cc-entity-header" onclick="clientConfig.toggleEntity('${e.id}')">
+          <span class="cc-entity-type-icon">${icon}</span>
           <span class="cc-entity-type">${this.esc(e.type)}</span>
           <span class="cc-entity-name">${this.esc(e.name)}</span>
-          ${parentEntity ? `<span class="cc-entity-parent-hint">↳ ${this.esc(parentEntity.name)}</span>` : ''}
           ${showStatus ? `<span class="cc-status-badge ${statusCls}">${this.esc(e.lifecycleStatus)}</span>` : ''}
           <span class="cc-entity-desc">${this.esc(e.description || '')}</span>
           <span class="cc-entity-chevron">›</span>
         </div>
         <div class="cc-entity-detail">
 
-          <!-- ── Identity ── -->
           <div class="cc-detail-section-label" style="padding-top:0.65rem;">Identity</div>
           <div class="cc-form-row">
             <div class="cc-form-group" style="flex:0 0 140px;">
@@ -1343,7 +1383,6 @@ window.clientConfig = {
             </div>
           </div>
 
-          <!-- ── Description & Use Cases ── -->
           <div class="cc-detail-section">
             <div class="cc-detail-section-label">Description & Use Cases</div>
             <div class="cc-form-row">
@@ -1370,7 +1409,6 @@ window.clientConfig = {
             </div>
           </div>
 
-          <!-- ── Commercial ── -->
           <div class="cc-detail-section">
             <div class="cc-detail-section-label">Packaging Role</div>
             <div class="cc-pkg-grid">
@@ -1383,7 +1421,6 @@ window.clientConfig = {
             </div>
           </div>
 
-          <!-- ── Relationships ── -->
           <div class="cc-detail-section">
             <div class="cc-detail-section-label">Relationships</div>
             <div class="cc-form-row">
@@ -1391,15 +1428,15 @@ window.clientConfig = {
                 <label class="cc-form-label">Parent Entity</label>
                 <select class="cc-form-input" id="ent_${e.id}_parent">
                   <option value="">None (top level)</option>
-                  ${entities.filter(o => o.id !== e.id).map(o =>
+                  ${allEntities.filter(o => o.id !== e.id).map(o =>
                     `<option value="${o.id}"${e.parentEntityId===o.id?' selected':''}>${this.esc(o.name)}</option>`
                   ).join('')}
                 </select>
               </div>
               <div class="cc-form-group">
-                <label class="cc-form-label">Related Entities <span style="font-weight:400;text-transform:none;letter-spacing:0;">(hold Ctrl/⌘ to multi-select)</span></label>
+                <label class="cc-form-label">Related Entities <span style="font-weight:400;text-transform:none;letter-spacing:0;">(hold Ctrl/⌘ for multiple)</span></label>
                 <select class="cc-form-input" id="ent_${e.id}_related" multiple style="height:72px;">
-                  ${entities.filter(o => o.id !== e.id).map(o =>
+                  ${allEntities.filter(o => o.id !== e.id).map(o =>
                     `<option value="${o.id}"${relatedIds.includes(o.id)?' selected':''}>${this.esc(o.name)}</option>`
                   ).join('')}
                 </select>
@@ -1412,8 +1449,9 @@ window.clientConfig = {
             <button class="cc-icon-btn danger" onclick="clientConfig.deleteEntity('${e.id}')" title="Delete" style="width:auto;height:auto;padding:0.35rem 0.75rem;color:#ef4444;font-size:0.75rem;">Delete</button>
           </div>
         </div>
-      </div>
-    `}).join('');
+      </div>`;
+
+    return cardHtml + childrenHtml;
   },
 
   // ── Boilerplate Tab ──
@@ -1631,7 +1669,7 @@ window.clientConfig = {
     lines.push('# Each entity starts with an ## heading.');
     lines.push('# Only Name is required. All other fields are optional.');
     lines.push('#');
-    lines.push('# Type:             Product | Service | Platform | Solution | Module | Brand');
+    lines.push('# Type:             Brand | Family | Line | Product | Service | Platform | Solution | Module');
     lines.push('# Lifecycle Status: Active | Pilot | Internal | Deprecated | Retired | Acquired');
     lines.push('# Aliases:          comma separated');
     lines.push('# Use Cases:        semicolon separated');
@@ -1639,30 +1677,60 @@ window.clientConfig = {
     lines.push('# Related Entities: semicolon separated  (must match Name of another entity in this file or existing ontology)');
     lines.push('# Parent Entity:    must match Name of another entity in this file or existing ontology');
     lines.push('');
-    lines.push('## Threat Range');
+    lines.push('# ── Example A: flat (no sub-hierarchy needed) ──────────────────────────');
+    lines.push('');
+    lines.push('## Acme Analytics');
     lines.push('');
     lines.push('- **Type:** Product');
-    lines.push('- **Name:** Threat Range');
-    lines.push('- **Canonical Name:** threat-range');
-    lines.push('- **Aliases:** HTB Threat Range, TR');
-    lines.push('- **Parent Entity:** Hack The Box Enterprise Platform');
+    lines.push('- **Name:** Acme Analytics');
+    lines.push('- **Canonical Name:** acme-analytics');
     lines.push('- **Lifecycle Status:** Active');
-    lines.push('- **Description:** Live-fire blue team simulation environment for SOC analysts.');
-    lines.push('- **URL:** https://example.com/threat-range');
-    lines.push('- **Use Cases:** Blue team readiness; Incident response practice; Skill benchmarking');
-    lines.push('- **Packaging Role:** Core; Add-on');
-    lines.push('- **Related Entities:** Benchmarking & Gap Analysis; SOC Simulator');
-    lines.push('');
-    lines.push('## Hack The Box Enterprise Platform');
-    lines.push('');
-    lines.push('- **Type:** Platform');
-    lines.push('- **Name:** Hack The Box Enterprise Platform');
-    lines.push('- **Canonical Name:** htb-enterprise-platform');
-    lines.push('- **Lifecycle Status:** Active');
-    lines.push('- **Description:** The central enterprise cybersecurity training platform.');
-    lines.push('- **URL:** https://example.com/enterprise');
-    lines.push('- **Use Cases:** Workforce development; Cybersecurity onboarding');
+    lines.push('- **Description:** Real-time analytics platform for enterprise teams.');
+    lines.push('- **URL:** https://example.com/analytics');
+    lines.push('- **Use Cases:** Data visualisation; Executive reporting');
     lines.push('- **Packaging Role:** Core');
+    lines.push('');
+    lines.push('# ── Example B: full hierarchy (Brand → Family → Line → Product) ────────');
+    lines.push('');
+    lines.push('## Acme Brand');
+    lines.push('');
+    lines.push('- **Type:** Brand');
+    lines.push('- **Name:** Acme Brand');
+    lines.push('- **Canonical Name:** acme');
+    lines.push('- **Lifecycle Status:** Active');
+    lines.push('- **Description:** The parent brand.');
+    lines.push('');
+    lines.push('## Acme Security Suite');
+    lines.push('');
+    lines.push('- **Type:** Family');
+    lines.push('- **Name:** Acme Security Suite');
+    lines.push('- **Canonical Name:** acme-security-suite');
+    lines.push('- **Parent Entity:** Acme Brand');
+    lines.push('- **Lifecycle Status:** Active');
+    lines.push('- **Description:** All security-focused products under Acme.');
+    lines.push('');
+    lines.push('## Acme Threat Detection');
+    lines.push('');
+    lines.push('- **Type:** Line');
+    lines.push('- **Name:** Acme Threat Detection');
+    lines.push('- **Canonical Name:** acme-threat-detection');
+    lines.push('- **Parent Entity:** Acme Security Suite');
+    lines.push('- **Lifecycle Status:** Active');
+    lines.push('- **Description:** Threat detection product line.');
+    lines.push('');
+    lines.push('## ThreatSensor Pro');
+    lines.push('');
+    lines.push('- **Type:** Product');
+    lines.push('- **Name:** ThreatSensor Pro');
+    lines.push('- **Canonical Name:** threatsensor-pro');
+    lines.push('- **Aliases:** TSP, Threat Sensor');
+    lines.push('- **Parent Entity:** Acme Threat Detection');
+    lines.push('- **Lifecycle Status:** Active');
+    lines.push('- **Description:** Enterprise-grade threat detection with ML-powered alerts.');
+    lines.push('- **URL:** https://example.com/threatsensor-pro');
+    lines.push('- **Use Cases:** Threat detection; Incident response; SOC operations');
+    lines.push('- **Packaging Role:** Core; Add-on');
+    lines.push('- **Related Entities:** Acme Analytics');
     lines.push('');
     this._downloadText('brand-ontology-v2-import-spec.md', lines.join('\n'));
   },
@@ -1735,7 +1803,7 @@ window.clientConfig = {
     const client = Storage.getActiveClient();
     if (!client) { alert('No active client.'); return; }
 
-    const validTypes   = ['Product','Service','Platform','Solution','Module','Brand'];
+    const validTypes   = ['Brand','Family','Line','Product','Service','Platform','Solution','Module'];
     const validStatus  = ['Active','Pilot','Internal','Deprecated','Retired','Acquired'];
     const validPkg     = ['Core','Add-on','Bundle-only','Not sold standalone','Premium Service'];
     const existingEnts = client.brandEntities || [];
