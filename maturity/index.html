@@ -90,10 +90,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .q-dot.done{background:var(--accent);opacity:.45}
 .q-dot.active{background:var(--accent);width:18px;border-radius:4px}
 
+/* ── Upgrade Screen ── */
+.upgrade-container{max-width:600px;margin:0 auto;padding:64px 24px}
+.upgrade-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:48px 32px;text-align:center}
+.upgrade-icon{font-size:48px;margin-bottom:16px}
+.upgrade-h2{font-size:28px;font-weight:800;color:var(--text);margin-bottom:12px;letter-spacing:-.3px}
+.upgrade-desc{font-size:16px;color:var(--text-muted);max-width:480px;margin:0 auto 32px;line-height:1.65}
+.upgrade-benefits{display:flex;flex-direction:column;gap:12px;text-align:left;background:var(--bg);padding:24px;border-radius:12px;margin-bottom:32px;max-width:400px;margin-left:auto;margin-right:auto}
+.benefit-item{display:flex;gap:10px;align-items:flex-start}
+.benefit-icon{font-size:18px;flex-shrink:0}
+.benefit-text{font-size:13px;color:var(--text);line-height:1.5}
+.upgrade-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.upgrade-actions .btn{margin:0}
+
 /* ── Results ── */
 .results-layout{max-width:880px;margin:0 auto;padding:44px 24px 80px}
 .results-hdr{text-align:center;margin-bottom:44px}
 .results-badge{display:inline-flex;align-items:center;gap:7px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:700;padding:5px 14px;border-radius:100px;margin-bottom:14px;letter-spacing:.3px}
+.confidence-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.1);color:#10b981;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;margin-left:8px;letter-spacing:.2px}
 .results-hdr h2{font-size:26px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
 .results-hdr p{color:var(--text-muted);font-size:15px}
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
@@ -136,10 +150,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .rec-group-hdr{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;padding:6px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
 .rec-group-hdr strong{color:var(--accent, #6366f1)}
 .rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.rec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;border-left:4px solid var(--accent)}
+.rec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;border-left:4px solid var(--accent);display:flex;flex-direction:column;gap:8px}
 .rec-card.rec-prereq{opacity:.4;border-left-style:dashed}
 .rec-dim{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:6px;display:flex;align-items:center;gap:5px}
 .rec-text{font-size:13px;color:var(--text);line-height:1.55}
+.rec-effort{font-size:11px;color:var(--text-muted);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px}
+.rec-effort-badge{display:inline-flex;align-items:center;gap:4px;background:var(--bg);padding:2px 8px;border-radius:6px;font-weight:600}
 
 .results-cta{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);margin-top:32px}
 .results-cta p{color:var(--text-muted);font-size:14px;margin-bottom:16px}
@@ -233,6 +249,41 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+<!-- UPGRADE SCREEN -->
+<div class="screen" id="screen-upgrade">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-badge" id="up-badge">CL</div>
+      <span id="up-company">Assessment</span>
+    </div>
+  </header>
+  <div class="upgrade-container">
+    <div class="upgrade-card">
+      <div class="upgrade-icon">✨</div>
+      <h2 class="upgrade-h2">Get your full advisory report</h2>
+      <p class="upgrade-desc">Answer more strategic questions to unlock a comprehensive assessment with vendor guidance and prioritized recommendations.</p>
+      <div class="upgrade-benefits">
+        <div class="benefit-item">
+          <div class="benefit-icon">✓</div>
+          <div class="benefit-text">Deep-dive analysis with actionable recommendations</div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">✓</div>
+          <div class="benefit-text">Vendor enablement guidance to accelerate adoption</div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">✓</div>
+          <div class="benefit-text">Prioritized roadmap based on effort and impact</div>
+        </div>
+      </div>
+      <div class="upgrade-actions">
+        <button class="btn btn-secondary" onclick="skipAdvisory()">Get my fast score now</button>
+        <button class="btn btn-primary" onclick="continueToAdvisory()">Answer more questions →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- RESULTS -->
 <div class="screen" id="screen-results">
   <header class="header">
@@ -247,7 +298,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </header>
   <div class="results-layout">
     <div class="results-hdr">
-      <div class="results-badge">✓ Assessment Complete</div>
+      <div>
+        <span class="results-badge">✓ Assessment Complete</span><span class="confidence-badge" id="confidence-badge" style="display:none"></span>
+      </div>
       <h2>Your Maturity Report</h2>
     </div>
 
@@ -315,11 +368,15 @@ const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let MODEL = null;    // maturity_models row
 let DIMS = [];       // maturity_dimensions rows (ordered)
 let QS = {};         // { dimId: [questions with opts] }
-let S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null };
+let RECS = [];       // Recommendations from maturity_recommendations
+let S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null, mode: 'fast', sessionId: null };
 let SUBMISSION_ID = null;
+let SESSION_ID = null;
 let radarChart = null;
 let IS_PREVIEW = false;
 let GATE_PASSED = false;
+let QUESTIONS_BY_MODE = { fast: [], advisory: [] }; // For progressive mode
+let CURRENT_MODE = 'fast';
 
 // =============================================
 //  LOAD MODEL
@@ -332,6 +389,7 @@ async function loadModel() {
   const slugMatch = path.match(/\/maturity\/([a-z0-9-]+)/i);
 
   let model = null;
+  let versionId = null;
 
   if (previewMatch) {
     IS_PREVIEW = true;
@@ -354,6 +412,7 @@ async function loadModel() {
       .single();
     if (error || !data) return showError('Assessment not found or not yet published.');
     model = data;
+    versionId = model.live_version_id || null;
   } else {
     return showError('No assessment specified.');
   }
@@ -365,6 +424,47 @@ async function loadModel() {
     document.getElementById('preview-banner').classList.add('active');
   }
 
+  // Load from version snapshot if live_version_id is set
+  if (versionId && !IS_PREVIEW) {
+    const { data: version, error: verr } = await supa
+      .from('assessment_versions')
+      .select('snapshot')
+      .eq('id', versionId)
+      .single();
+
+    if (!verr && version && version.snapshot) {
+      const snap = version.snapshot;
+      // Use snapshot data: model, dimensions, questions, recommendations
+      if (snap.dimensions) DIMS = snap.dimensions;
+      if (snap.questions) {
+        QS = {};
+        (snap.questions || []).forEach(q => {
+          if (!QS[q.dimension_id]) QS[q.dimension_id] = [];
+          q.maturity_options = (q.maturity_options || []).sort((a,b) => a.sort_order - b.sort_order);
+          QS[q.dimension_id].push(q);
+        });
+      }
+      if (snap.recommendations) RECS = snap.recommendations;
+    } else {
+      // Fallback to live loading
+      await loadLiveData();
+    }
+  } else {
+    // Load from live tables
+    await loadLiveData();
+  }
+
+  // Apply branding
+  applyBranding();
+
+  // Set up welcome screen
+  setupWelcome();
+
+  // Show welcome
+  showScreen('welcome');
+}
+
+async function loadLiveData() {
   // Load dimensions
   const { data: dims } = await supa
     .from('maturity_dimensions')
@@ -386,19 +486,17 @@ async function loadModel() {
   QS = {};
   (questions || []).forEach(q => {
     if (!QS[q.dimension_id]) QS[q.dimension_id] = [];
-    // Sort options by sort_order
     q.maturity_options = (q.maturity_options || []).sort((a,b) => a.sort_order - b.sort_order);
     QS[q.dimension_id].push(q);
   });
 
-  // Apply branding
-  applyBranding();
-
-  // Set up welcome screen
-  setupWelcome();
-
-  // Show welcome
-  showScreen('welcome');
+  // Load recommendations from maturity_recommendations table
+  const { data: recs } = await supa
+    .from('maturity_recommendations')
+    .select('*')
+    .eq('model_id', MODEL.id)
+    .order('sort_order');
+  RECS = recs || [];
 }
 
 function showError(msg) {
@@ -448,7 +546,7 @@ function applyBranding() {
       el.textContent = initials;
     }
   });
-  ['w-company','a-company','r-company'].forEach(id => {
+  ['w-company','a-company','r-company','up-company'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = companyName;
   });
@@ -493,15 +591,107 @@ function setupWelcome() {
 }
 
 // =============================================
+//  SESSION TRACKING
+// =============================================
+async function createSession() {
+  if (IS_PREVIEW) return null;
+  try {
+    const { data, error } = await supa
+      .from('maturity_sessions')
+      .insert({
+        model_id: MODEL.id,
+        version_id: MODEL.live_version_id || null,
+        mode: 'fast',
+        state: 'started'
+      })
+      .select('id')
+      .single();
+    if (!error && data) {
+      SESSION_ID = data.id;
+      fireAnalytics('assessment_started');
+      return data.id;
+    }
+  } catch (err) {
+    console.error('[Session] Create error:', err);
+  }
+  return null;
+}
+
+async function updateSession(state) {
+  if (!SESSION_ID || IS_PREVIEW) return;
+  try {
+    await supa
+      .from('maturity_sessions')
+      .update({ state })
+      .eq('id', SESSION_ID);
+  } catch (err) {
+    console.error('[Session] Update error:', err);
+  }
+}
+
+async function fireAnalytics(event, metadata = {}) {
+  if (IS_PREVIEW) return;
+  try {
+    await supa
+      .from('analytics_events')
+      .insert({
+        model_id: MODEL.id,
+        session_id: SESSION_ID,
+        event_type: event,
+        metadata
+      });
+  } catch (err) {
+    console.error('[Analytics]', event, 'error:', err);
+  }
+}
+
+// =============================================
 //  ASSESSMENT FLOW
 // =============================================
-function totalQs() { return DIMS.reduce((n, d) => n + (QS[d.id]||[]).length, 0); }
-function qsBefore(di) { let n=0; for(let i=0;i<di;i++) n += (QS[DIMS[i].id]||[]).length; return n; }
-function progress() { return ((qsBefore(S.dimIdx) + S.qIdx) / totalQs()) * 100; }
+function totalQs(mode = null) {
+  if (mode === 'fast') return QUESTIONS_BY_MODE.fast.length;
+  if (mode === 'advisory') return QUESTIONS_BY_MODE.advisory.length;
+  return DIMS.reduce((n, d) => n + (QS[d.id]||[]).length, 0);
+}
 
-function startAssessment() {
-  S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null };
+function filterQuestionsByMode() {
+  QUESTIONS_BY_MODE = { fast: [], advisory: [] };
+  DIMS.forEach(d => {
+    (QS[d.id] || []).forEach(q => {
+      if (q.mode === 'fast' || q.mode === 'both') QUESTIONS_BY_MODE.fast.push(q);
+      if (q.mode === 'advisory' || q.mode === 'both') QUESTIONS_BY_MODE.advisory.push(q);
+    });
+  });
+}
+
+function qsBefore(di, mode = null) {
+  let n = 0;
+  for (let i = 0; i < di; i++) {
+    const qs = QS[DIMS[i].id] || [];
+    if (mode === 'fast') n += qs.filter(q => q.mode === 'fast' || q.mode === 'both').length;
+    else if (mode === 'advisory') n += qs.filter(q => q.mode === 'advisory' || q.mode === 'both').length;
+    else n += qs.length;
+  }
+  return n;
+}
+
+function progress(mode = null) {
+  const total = totalQs(mode);
+  if (!total) return 0;
+  return ((qsBefore(S.dimIdx, mode) + S.qIdx) / total) * 100;
+}
+
+async function startAssessment() {
+  // Determine mode strategy
+  const strategy = MODEL.mode_strategy || 'progressive';
+  filterQuestionsByMode();
+
+  S = { dimIdx: 0, qIdx: 0, answers: {}, selected: null, mode: 'fast', sessionId: null };
   DIMS.forEach(d => { S.answers[d.id] = []; });
+
+  SESSION_ID = await createSession();
+  await updateSession('in_progress_fast');
+
   showScreen('assessment');
   renderQ();
 }
@@ -518,16 +708,50 @@ function goNext() {
   S.answers[dim.id][S.qIdx] = S.selected;
   S.selected = null;
   const qs = QS[dim.id] || [];
-  if (S.qIdx < qs.length - 1) { S.qIdx++; renderQ(); }
-  else if (S.dimIdx < DIMS.length - 1) { S.dimIdx++; S.qIdx = 0; renderQ(); }
-  else { showResults(); }
+  const strategy = MODEL.mode_strategy || 'progressive';
+
+  if (S.qIdx < qs.length - 1) {
+    S.qIdx++;
+    renderQ();
+  } else if (S.dimIdx < DIMS.length - 1) {
+    S.dimIdx++;
+    S.qIdx = 0;
+    renderQ();
+  } else {
+    // Fast mode complete
+    if (CURRENT_MODE === 'fast') {
+      fireAnalytics('fast_completed');
+      if (strategy === 'fast_only') {
+        showResults();
+      } else if (strategy === 'advisory_only') {
+        // Shouldn't happen, but handle it
+        showResults();
+      } else {
+        // Progressive: check if offer advisory before results
+        if (MODEL.offer_advisory_before_results !== false) {
+          showScreen('upgrade');
+        } else {
+          showResults();
+        }
+      }
+    } else {
+      // Advisory mode complete
+      showResults();
+    }
+  }
 }
 
 function goBack() {
   S.selected = null;
-  if (S.qIdx > 0) { S.qIdx--; }
-  else if (S.dimIdx > 0) { S.dimIdx--; S.qIdx = (QS[DIMS[S.dimIdx].id]||[]).length - 1; }
-  else { showScreen('welcome'); return; }
+  if (S.qIdx > 0) {
+    S.qIdx--;
+  } else if (S.dimIdx > 0) {
+    S.dimIdx--;
+    S.qIdx = (QS[DIMS[S.dimIdx].id]||[]).length - 1;
+  } else {
+    showScreen('welcome');
+    return;
+  }
   renderQ();
 }
 
@@ -547,12 +771,12 @@ function renderQ() {
   const qs = QS[dim.id] || [];
   const q = qs[S.qIdx];
   if (!q) return;
-  const globalNum = qsBefore(S.dimIdx) + S.qIdx + 1;
-  const total = totalQs();
+  const globalNum = qsBefore(S.dimIdx, CURRENT_MODE) + S.qIdx + 1;
+  const total = totalQs(CURRENT_MODE);
   const isLast = S.dimIdx === DIMS.length - 1 && S.qIdx === qs.length - 1;
   const isFirst = S.dimIdx === 0 && S.qIdx === 0;
 
-  document.getElementById('prog-fill').style.width = progress() + '%';
+  document.getElementById('prog-fill').style.width = progress(CURRENT_MODE) + '%';
   document.getElementById('q-ctx').innerHTML = `<span class="dim-chip">${dim.icon} ${esc(dim.name)}</span><span class="q-num">Question ${globalNum} of ${total}</span>`;
   document.getElementById('q-text').textContent = q.text;
 
@@ -595,6 +819,23 @@ function renderQ() {
   });
 }
 
+async function skipAdvisory() {
+  await updateSession('fast_complete');
+  fireAnalytics('upgrade_declined');
+  showResults();
+}
+
+async function continueToAdvisory() {
+  CURRENT_MODE = 'advisory';
+  await updateSession('in_progress_advisory');
+  fireAnalytics('advisory_started');
+  showScreen('assessment');
+  // Reset to start advisory questions
+  S.dimIdx = 0;
+  S.qIdx = 0;
+  renderQ();
+}
+
 // =============================================
 //  RESULTS
 // =============================================
@@ -611,6 +852,7 @@ function overallScore() {
 
 async function showResults() {
   showScreen('results');
+  fireAnalytics('results_viewed');
 
   const scores = DIMS.map(d => dimScore(d.id));
   const minScore = Math.min(...scores);
@@ -622,6 +864,17 @@ async function showResults() {
   const tierNames = { 1:'Learning', 2:'Developing', 3:'Established', 4:'Advanced', 5:'Optimising' };
   document.getElementById('r-score').textContent = maturityTier;
   document.getElementById('r-subtitle').textContent = `Level ${maturityTier} – ${tierNames[maturityTier]}`;
+
+  // Confidence indicator
+  if (MODEL.confidence_enabled) {
+    const answeredCount = DIMS.reduce((c, d) => c + (S.answers[d.id] || []).length, 0);
+    const totalCount = DIMS.reduce((c, d) => c + (QS[d.id] || []).length, 0);
+    const answeredPct = totalCount > 0 ? (answeredCount / totalCount) * 100 : 0;
+    const isHighConfidence = CURRENT_MODE === 'advisory' && answeredPct >= 85;
+    const badge = document.getElementById('confidence-badge');
+    badge.style.display = 'inline-flex';
+    badge.textContent = isHighConfidence ? '⭐ High confidence' : '⭐ Moderate confidence';
+  }
 
   // Radar chart
   if (radarChart) radarChart.destroy();
@@ -649,13 +902,10 @@ async function showResults() {
   // Apply lead gate (skip in preview mode)
   const gate = MODEL.lead_gate || 'before_full_report';
   if (IS_PREVIEW) {
-    // Preview mode — show full results, no gate
     renderFullResults(scores);
   } else if (gate === 'before_any_results') {
-    // Gate everything — must submit details before seeing any results
     openGate();
   } else if (gate === 'before_full_report') {
-    // Show headline (radar + findings), blur the rest
     const gated = document.getElementById('r-gated-section');
     gated.classList.add('gated-blur');
     gated.style.position = 'relative';
@@ -665,11 +915,9 @@ async function showResults() {
     gated.parentElement.insertBefore(prompt, gated);
     prompt.style.cssText = 'text-align:center;background:rgba(255,255,255,0.95);padding:2rem;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);margin-bottom:1rem;';
   } else if (gate === 'before_download') {
-    // Show full results freely, but gate the PDF download
     renderFullResults(scores);
     saveSubmission(overall, scores, null);
   } else {
-    // No gate — render full results, no gating at all
     renderFullResults(scores);
     saveSubmission(overall, scores, null);
   }
@@ -714,7 +962,7 @@ function isValidEmail(e) {
 async function pushToHubSpot(leadInfo) {
   const portalId = MODEL.hubspot_portal_id;
   const formGuid = MODEL.hubspot_form_guid;
-  if (!portalId || !formGuid) return; // HubSpot not configured
+  if (!portalId || !formGuid) return;
 
   const fields = [
     { name: 'email', value: leadInfo.email || '' },
@@ -762,29 +1010,26 @@ async function submitGate() {
   const leadInfo = { full_name: name, email, company, job_title: title };
 
   if (gate === 'before_download') {
-    // Results already shown — just save submission with lead info
     await saveSubmission(overall, scores, leadInfo);
-    pushToHubSpot(leadInfo); // fire-and-forget
-    // Now trigger the PDF download they were trying to get
+    pushToHubSpot(leadInfo);
+    fireAnalytics('pdf_downloaded');
     downloadPDF();
   } else {
-    // Remove blur
     const gated = document.getElementById('r-gated-section');
     gated.classList.remove('gated-blur');
-    // Remove prompt overlay
     const prompt = gated.parentElement.querySelector('.gate-prompt');
     if (prompt) prompt.remove();
 
     renderFullResults(scores);
     await saveSubmission(overall, scores, leadInfo);
-    pushToHubSpot(leadInfo); // fire-and-forget
+    pushToHubSpot(leadInfo);
   }
 }
 
 function renderFullResults(scores) {
   const accent = (MODEL.brand || {}).accentColor || '#6366f1';
 
-  // Tier placement grid — 5 columns, stickers for each dimension
+  // Tier placement grid
   const tiers = [
     { num:1, name:'Learning',     bg:'rgba(239,68,68,.06)' },
     { num:2, name:'Developing',   bg:'rgba(245,158,11,.06)' },
@@ -792,13 +1037,11 @@ function renderFullResults(scores) {
     { num:4, name:'Advanced',     bg:'rgba(16,185,129,.06)' },
     { num:5, name:'Optimising',   bg:'rgba(16,185,129,.10)' }
   ];
-  // Bucket each dimension into a tier (truncate score, clamp 1-5)
   const buckets = { 1:[], 2:[], 3:[], 4:[], 5:[] };
   DIMS.forEach((d, i) => {
     const tier = Math.max(1, Math.min(5, Math.floor(scores[i]) || 1));
     buckets[tier].push({ dim: d, score: scores[i] });
   });
-  // Determine the org's maturity tier (lowest score, floored)
   const orgTier = Math.max(1, Math.min(5, Math.floor(Math.min(...scores)) || 1));
   const companyEl = document.getElementById('gate-company');
   const orgName = (companyEl && companyEl.value.trim()) || 'Your Organisation';
@@ -824,45 +1067,50 @@ function renderFullResults(scores) {
   gridHTML += '</div>';
   document.getElementById('tierGrid').innerHTML = gridHTML;
 
-  // Recommendations — grouped by target tier, lowest first
-  const va = MODEL.va_recommendations != null ? MODEL.va_recommendations : 0.5;
+  // Recommendations from maturity_recommendations table
   const tierNamesRec = { 1:'Learning', 2:'Developing', 3:'Established', 4:'Advanced', 5:'Optimising' };
-
-  // Build list of recommendations with their current tier and target tier
   const recs = [];
+
   DIMS.forEach((d, i) => {
     const sc = scores[i];
     const currentTier = Math.max(1, Math.min(5, Math.floor(sc) || 1));
-    const targetTier = Math.min(5, currentTier + 1);
     let band;
     if (sc < 2.5) band = 'low';
     else if (sc < 3.5) band = 'mid';
     else band = 'high';
 
-    const indKey = 'rec_' + band + '_industry';
-    const venKey = 'rec_' + band + '_vendor';
-    const indRec = d[indKey] || '';
-    const venRec = d[venKey] || '';
+    // Find recommendations for this dimension at this band from maturity_recommendations
+    const dimRecs = RECS.filter(r => r.dimension_id === d.id && r.maturity_band === band);
+
+    // If no structured recs, fall back to old format from dimension (backwards compat)
     let rec = '';
-    if (indRec && venRec) {
-      rec = va >= 0.5 ? venRec : indRec;
+    if (dimRecs.length > 0) {
+      const r = dimRecs[0];
+      const va = MODEL.va_recommendations != null ? MODEL.va_recommendations : 0.5;
+      rec = va >= 0.5 && r.vendor_enablement ? r.vendor_enablement : (r.industry_guidance || r.short_version || '');
     } else {
-      rec = venRec || indRec || d.recommendation || '';
+      const indKey = 'rec_' + band + '_industry';
+      const venKey = 'rec_' + band + '_vendor';
+      const indRec = d[indKey] || '';
+      const venRec = d[venKey] || '';
+      if (indRec && venRec) {
+        const va = MODEL.va_recommendations != null ? MODEL.va_recommendations : 0.5;
+        rec = va >= 0.5 ? venRec : indRec;
+      } else {
+        rec = venRec || indRec || d.recommendation || '';
+      }
     }
-    if (rec) {
-      recs.push({ dim: d, score: sc, currentTier, targetTier, rec, color: d.color || accent });
+
+    if (rec || dimRecs.length > 0) {
+      recs.push({ dim: d, score: sc, currentTier, dimRecs, rec, color: d.color || accent });
     }
   });
 
-  // Sort by score (lowest first)
   recs.sort((a, b) => a.score - b.score);
 
-  // Find the range of tiers we need groups for
   const lowestTier = recs.length ? recs[0].currentTier : 5;
   const highestTier = recs.length ? Math.max(...recs.map(r => r.currentTier)) : 1;
 
-  // Build groups: each tier group includes all dimensions below that tier
-  // "Recommendations to reach Established" = all dims currently at tier 1 or 2
   let recHTML = '';
   let isFirstGroup = true;
   for (let tier = lowestTier + 1; tier <= Math.min(highestTier + 1, 5); tier++) {
@@ -872,12 +1120,23 @@ function renderFullResults(scores) {
       <div class="rec-group-hdr">Recommendations to reach <strong>${tierNamesRec[tier]}</strong></div>
       <div class="rec-grid">`;
     items.forEach(r => {
-      // Grey out cards carried forward from a previous group (needs earlier tier completed first)
       const isPrereq = !isFirstGroup && r.currentTier < tier - 1;
+      const mainText = r.rec || (r.dimRecs.length > 0 ? (r.dimRecs[0].short_version || r.dimRecs[0].industry_guidance || '') : '');
+      const effort = r.dimRecs.length > 0 ? r.dimRecs[0].effort : null;
+      const impact = r.dimRecs.length > 0 ? r.dimRecs[0].impact : null;
+
       recHTML += `<div class="rec-card${isPrereq ? ' rec-prereq' : ''}" style="border-left-color:${r.color}">
         <div class="rec-dim">${r.dim.icon} ${esc(r.dim.name)} <span style="font-size:0.7rem;font-weight:500;color:#9ca3af;margin-left:4px;">${r.score.toFixed(1)}</span></div>
-        <div class="rec-text">${esc(r.rec)}</div>
-      </div>`;
+        <div class="rec-text">${esc(mainText)}</div>`;
+
+      if (effort || impact) {
+        recHTML += '<div class="rec-effort">';
+        if (effort) recHTML += `<span class="rec-effort-badge">⏱ ${esc(effort)}</span>`;
+        if (impact) recHTML += `<span class="rec-effort-badge">📈 ${esc(impact)}</span>`;
+        recHTML += '</div>';
+      }
+
+      recHTML += '</div>';
     });
     recHTML += '</div></div>';
     isFirstGroup = false;
@@ -898,7 +1157,7 @@ function renderFullResults(scores) {
 //  SAVE SUBMISSION
 // =============================================
 async function saveSubmission(overall, scores, leadInfo) {
-  if (IS_PREVIEW) return; // Don't save in preview mode
+  if (IS_PREVIEW) return;
 
   const dimScores = {};
   DIMS.forEach((d,i) => { dimScores[d.id] = scores[i]; });
@@ -960,7 +1219,6 @@ function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 //  PDF EXPORT
 // =============================================
 async function downloadPDF() {
-  // Check if download gate applies
   const gate = MODEL.lead_gate || 'before_full_report';
   if (gate === 'before_download' && !GATE_PASSED && !IS_PREVIEW) {
     openGate();
@@ -989,7 +1247,6 @@ async function downloadPDF() {
     const hexToRgb = h => { const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16); return [r,g,b]; };
     const [acR,acG,acB] = hexToRgb(accent);
 
-    // ── Helper: capture element as JPEG, fit to page width ──
     async function capture(el) {
       if (!el || el.offsetHeight === 0) return null;
       const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
@@ -1004,7 +1261,6 @@ async function downloadPDF() {
       curY += imgH + (gap || 4);
     }
     function addPage() {
-      // Footer on current page
       pdf.setFontSize(7); pdf.setTextColor(180,180,180); pdf.setFont('helvetica','normal');
       pdf.text('Generated by Category Leaders  •  categoryleaders.co.uk', pageW/2, pageH - 6, { align:'center' });
       pdf.addPage(); curY = margin;
@@ -1020,7 +1276,7 @@ async function downloadPDF() {
       pdf.text(text, margin, curY + 3); curY += 8;
     }
 
-    // ── Title bar ──
+    // Title bar
     const [hr,hg,hb] = hexToRgb(headerColor);
     pdf.setFillColor(hr,hg,hb);
     pdf.rect(0, 0, pageW, 24, 'F');
@@ -1032,7 +1288,7 @@ async function downloadPDF() {
     pdf.text(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}), pageW-margin, 17, {align:'right'});
     curY = 30;
 
-    // ── Radar chart ──
+    // Radar chart
     const radarCanvas = document.getElementById('radarChart');
     if (radarCanvas) {
       const radarImg = radarCanvas.toDataURL('image/jpeg', 0.92);
@@ -1040,7 +1296,6 @@ async function downloadPDF() {
       const radarX = margin + (contentW - radarSize) / 2;
       pdf.addImage(radarImg, 'JPEG', radarX, curY, radarSize, radarSize);
 
-      // Score beside radar
       const scoreX = radarX + radarSize + 6;
       const scoreY = curY + radarSize / 2;
       const maturityTier = document.getElementById('r-score')?.textContent || '';
@@ -1055,31 +1310,29 @@ async function downloadPDF() {
       curY += radarSize + 6;
     }
 
-    // ── Findings ──
+    // Findings
     const findings = document.getElementById('findings-list');
     const findingsImg = await capture(findings);
     addImg(findingsImg, 6);
 
-    // ── Tier grid ──
+    // Tier grid
     const tierCard = document.getElementById('r-col-chart-card');
     const tierImg = await capture(tierCard);
     addImg(tierImg, 6);
 
-    // ── Recommendations ──
+    // Recommendations
     const recSection = document.getElementById('rec-section');
     if (recSection && recSection.style.display !== 'none') {
       const groups = recSection.querySelectorAll('.rec-group');
       if (groups.length > 0) {
         addHeading('Recommendations');
         for (const group of groups) {
-          // Get the group header text
           const hdr = group.querySelector('.rec-group-hdr');
           if (hdr) {
             const strong = hdr.querySelector('strong');
             const tierName = strong ? strong.textContent : '';
             addSubheading('Recommendations to reach ' + tierName, accent);
           }
-          // Capture the rec-grid (just the cards, not the header)
           const grid = group.querySelector('.rec-grid');
           const gridImg = await capture(grid);
           addImg(gridImg, 6);
@@ -1087,7 +1340,7 @@ async function downloadPDF() {
       }
     }
 
-    // ── Boilerplate ──
+    // Boilerplate
     if (MODEL.include_boilerplate && MODEL.boilerplate_text) {
       if (curY + 20 > pageH - margin) addPage();
       pdf.setDrawColor(220,220,220); pdf.line(margin, curY, pageW-margin, curY); curY += 5;
@@ -1100,11 +1353,10 @@ async function downloadPDF() {
       curY += 3;
     }
 
-    // ── Final footer ──
+    // Final footer
     pdf.setFontSize(7); pdf.setTextColor(180,180,180); pdf.setFont('helvetica','normal');
     pdf.text('Generated by Category Leaders  •  categoryleaders.co.uk', pageW/2, pageH - 6, { align:'center' });
 
-    // Download
     const slug = (MODEL.slug || 'maturity-report');
     pdf.save(`${slug}-${orgName.toLowerCase().replace(/\s+/g, '-')}.pdf`);
   } catch (err) {
