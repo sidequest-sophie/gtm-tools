@@ -422,6 +422,7 @@ Background about the client...
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <span class="mm-label" style="margin:0;">Colours &amp; Identity</span>
           <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmResetBrandToClient()" title="Reset all branding to match client config">↻ Reset to client defaults</button>
+          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmSaveBrandAsClientDefault()" title="Save current branding as client default" style="margin-left:0.25rem;">💾 Save as client default</button>
         </div>
 
         <div class="mm-row">
@@ -1360,6 +1361,74 @@ async function mmSaveModel() {
 
 function mmDirty() {
   mmState.isDirty = true;
+}
+
+async function mmResetBrandToClient() {
+  try {
+    const clientId = Storage.getActiveClientId();
+    if (!clientId) {
+      alert('No active client selected.');
+      return;
+    }
+    const client = await Auth.getClientById(clientId);
+    if (!client) {
+      alert('Could not load client data.');
+      return;
+    }
+
+    // Read brand from client settings.brand, or fall back to top-level fields
+    const brand = (client.settings && client.settings.brand) || {};
+    const logo = brand.logo || client.logo || '';
+    const primary = brand.primary || brand.brandAccent || '#d02090';
+    const primaryName = brand.primaryName || '';
+    const accent = brand.accent || brand.brandHeader || '#6366f1';
+    const success = brand.success || '#10b981';
+    const logoHeight = brand.logoHeight || 36;
+
+    document.getElementById('mm-brand-primary').value = primary;
+    document.getElementById('mm-brand-primary-name').value = primaryName;
+    document.getElementById('mm-brand-logo').value = logo;
+    document.getElementById('mm-brand-logo-height').value = logoHeight;
+    document.getElementById('mm-brand-accent').value = accent;
+    document.getElementById('mm-brand-success').value = success;
+
+    mmDirty();
+
+    const hasBrand = brand.primary || brand.accent || brand.logo;
+    if (!hasBrand && !client.logo) {
+      alert('No brand defaults found on this client yet. You can set them in the client\u2019s settings, or configure colours here manually.');
+    }
+  } catch (err) {
+    console.error('mmResetBrandToClient error:', err);
+    alert('Error loading client brand settings: ' + err.message);
+  }
+}
+
+async function mmSaveBrandAsClientDefault() {
+  try {
+    const clientId = Storage.getActiveClientId();
+    if (!clientId) { alert('No active client selected.'); return; }
+
+    const brand = {
+      primary: document.getElementById('mm-brand-primary').value,
+      primaryName: document.getElementById('mm-brand-primary-name').value,
+      logo: document.getElementById('mm-brand-logo').value,
+      logoHeight: parseInt(document.getElementById('mm-brand-logo-height').value) || 36,
+      accent: document.getElementById('mm-brand-accent').value,
+      success: document.getElementById('mm-brand-success').value
+    };
+
+    // Merge into client settings.brand
+    const client = await Auth.getClientById(clientId);
+    const settings = client.settings || {};
+    settings.brand = brand;
+
+    await Auth.updateClientRecord(clientId, { settings, logo: brand.logo || client.logo });
+    alert('Brand defaults saved to client settings.');
+  } catch (err) {
+    console.error('mmSaveBrandAsClientDefault error:', err);
+    alert('Error saving brand defaults: ' + err.message);
+  }
 }
 
 function mmSwitchTab(tab) {
