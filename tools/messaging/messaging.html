@@ -1160,15 +1160,40 @@
   ];
 
   const WIZARD_VERTICALS_B2C = [
-    'Health & Wellness', 'Education', 'Entertainment', 'Fashion', 'Home & Garden', 'Beauty',
-    'Food & Beverage', 'Travel & Tourism', 'Sports & Fitness', 'Personal Finance', 'Hobbies',
-    'Automotive', 'Real Estate', 'Parenting', 'Pet Care'
+    'Health & Wellness', 'Education', 'Entertainment', 'Fashion & Apparel', 'Home & Garden',
+    'Beauty & Cosmetics', 'Food & Beverage', 'Travel & Tourism', 'Sports & Fitness',
+    'Personal Finance', 'Hobbies & Crafts', 'Automotive', 'Residential Real Estate',
+    'Parenting & Family', 'Pet Care', 'Mental Health & Therapy', 'Dating & Relationships',
+    'Gaming', 'Music & Audio', 'Photography & Video', 'Art & Design', 'Books & Publishing',
+    'Home Improvement & DIY', 'Gardening & Landscaping', 'Cooking & Recipes',
+    'Wine & Spirits', 'Outdoor & Adventure', 'Cycling', 'Running & Athletics',
+    'Yoga & Mindfulness', 'Nutrition & Supplements', 'Weight Management',
+    'Skincare', 'Haircare', 'Jewellery & Accessories', 'Luxury Goods',
+    'Baby & Toddler', 'Senior Care & Ageing', 'Home Security',
+    'Sustainable Living & Eco', 'Streaming & Media', 'Podcasting',
+    'Mobile Apps', 'Social Media & Influencer', 'Wedding & Events',
+    'Moving & Relocation', 'Personal Development', 'Career & Job Hunting',
+    'Language Learning', 'Tutoring & Test Prep', 'Subscription Boxes'
   ];
 
   const WIZARD_VERTICALS_B2B = [
-    'Financial Services', 'Healthcare', 'Technology', 'Retail', 'Manufacturing', 'Energy',
-    'Telecommunications', 'Construction', 'Logistics', 'Hospitality', 'Legal Services',
-    'Insurance', 'Real Estate', 'Education', 'Government', 'Non-profit'
+    'Financial Services', 'Healthcare & Life Sciences', 'Technology & SaaS',
+    'Retail & eCommerce', 'Manufacturing', 'Energy & Utilities',
+    'Telecommunications', 'Construction & Engineering', 'Logistics & Supply Chain',
+    'Hospitality & Tourism', 'Legal Services', 'Insurance',
+    'Commercial Real Estate', 'Education & EdTech', 'Government & Public Sector',
+    'Non-profit & NGO', 'Aerospace & Defence', 'Agriculture & AgTech',
+    'Automotive & Mobility', 'Banking & Capital Markets', 'Biotechnology',
+    'Chemicals & Materials', 'Consulting & Professional Services', 'Cybersecurity',
+    'Data & Analytics', 'Digital Marketing & AdTech', 'eCommerce Infrastructure',
+    'Environmental & Cleantech', 'Fashion & Textile', 'Food Processing & FMCG',
+    'Freight & Shipping', 'Gaming & Interactive', 'HR & Workforce Management',
+    'Industrial Automation', 'IT Services & Outsourcing', 'Media & Publishing',
+    'Medical Devices', 'Mining & Resources', 'Oil & Gas', 'Packaging',
+    'Pharmaceuticals', 'PropTech', 'Recruitment & Staffing',
+    'Robotics & AI', 'Semiconductor & Electronics', 'Sports & Entertainment',
+    'Sustainability & ESG', 'Travel & Expense Management', 'Venture Capital & PE',
+    'Waste Management & Recycling'
   ];
 
   const WIZARD_REGIONS = [
@@ -1179,19 +1204,67 @@
     'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Australia', 'Japan',
     'India', 'China', 'Brazil', 'Mexico', 'Netherlands', 'Sweden', 'Singapore', 'New Zealand',
     'Spain', 'Italy', 'South Korea', 'Ireland', 'Switzerland', 'Belgium', 'Denmark', 'Norway',
-    'Austria', 'Portugal'
+    'Austria', 'Portugal', 'Finland', 'Poland', 'Czech Republic', 'Romania', 'Hungary',
+    'Greece', 'Turkey', 'Israel', 'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait',
+    'Bahrain', 'Oman', 'South Africa', 'Nigeria', 'Kenya', 'Egypt', 'Morocco', 'Ghana',
+    'Ethiopia', 'Tanzania', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Venezuela',
+    'Costa Rica', 'Panama', 'Uruguay', 'Ecuador', 'Dominican Republic',
+    'Thailand', 'Vietnam', 'Indonesia', 'Philippines', 'Malaysia', 'Taiwan',
+    'Hong Kong', 'Bangladesh', 'Pakistan', 'Sri Lanka', 'Myanmar',
+    'Russia', 'Ukraine', 'Belarus', 'Kazakhstan', 'Uzbekistan',
+    'Iceland', 'Luxembourg', 'Malta', 'Cyprus', 'Estonia', 'Latvia', 'Lithuania',
+    'Slovenia', 'Slovakia', 'Croatia', 'Serbia', 'Bulgaria', 'Georgia',
+    'Armenia', 'Azerbaijan', 'Mongolia', 'Cambodia', 'Laos', 'Nepal',
+    'Fiji', 'Papua New Guinea', 'Jamaica', 'Trinidad & Tobago', 'Bahamas',
+    'Bermuda', 'Mauritius', 'Botswana', 'Rwanda', 'Senegal',
+    'Tunisia', 'Jordan', 'Lebanon', 'Iraq', 'Iran'
   ];
 
   const WIZARD_DEPARTMENTS = [
     'Marketing', 'Sales', 'Product', 'Engineering', 'Finance', 'Operations', 'HR',
-    'Customer Success', 'IT', 'Security', 'Legal', 'Executive', 'Strategy', 'Analytics', 'UX/Design'
+    'Customer Success', 'IT', 'Security', 'Legal', 'Executive Leadership', 'Strategy',
+    'Analytics & BI', 'UX/Design', 'Research & Development', 'Quality Assurance',
+    'DevOps & Infrastructure', 'Data Science', 'Supply Chain', 'Procurement',
+    'Facilities & Workplace', 'Customer Support', 'Training & Enablement',
+    'Compliance & Risk', 'Corporate Communications', 'Public Relations',
+    'Partnerships & Alliances', 'Business Development', 'Revenue Operations',
+    'Content & Editorial', 'Brand', 'Growth', 'Demand Generation',
+    'Field Marketing', 'Channel Sales', 'Inside Sales', 'Solutions Engineering',
+    'Professional Services', 'Implementation', 'Technical Support',
+    'Account Management', 'Customer Onboarding', 'Pricing & Packaging',
+    'Investor Relations', 'Treasury', 'Tax', 'Internal Audit',
+    'Enterprise Architecture', 'Information Security', 'Cloud & Platform',
+    'Mobile Engineering', 'Frontend Engineering', 'Backend Engineering',
+    'Site Reliability', 'Project Management (PMO)', 'Change Management',
+    'Mergers & Acquisitions', 'Sustainability & ESG', 'Diversity & Inclusion',
+    'Talent Acquisition', 'Learning & Development', 'Compensation & Benefits'
   ];
 
   const WIZARD_ROLES = [
-    'CMO', 'VP Marketing', 'Marketing Director', 'Product Manager', 'VP Sales', 'Sales Director',
-    'CTO', 'VP Engineering', 'VP Product', 'CEO', 'CFO', 'COO', 'CRO', 'Customer Success Manager',
-    'Marketing Manager', 'Growth Manager', 'Brand Manager', 'Content Manager', 'Analyst',
-    'Director of Operations', 'Head of Product', 'Engineering Lead', 'DevOps Engineer', 'Solutions Architect'
+    'CEO', 'CFO', 'COO', 'CTO', 'CIO', 'CISO', 'CMO', 'CRO', 'CPO', 'CDO',
+    'VP Marketing', 'VP Sales', 'VP Engineering', 'VP Product', 'VP Operations',
+    'VP Customer Success', 'VP Finance', 'VP HR', 'VP IT',
+    'Marketing Director', 'Sales Director', 'Engineering Director', 'Product Director',
+    'Director of Operations', 'Director of Analytics', 'Director of Design',
+    'Director of Customer Experience', 'Director of Partnerships',
+    'Head of Product', 'Head of Growth', 'Head of Brand', 'Head of Content',
+    'Head of Demand Gen', 'Head of Data', 'Head of Security', 'Head of DevOps',
+    'Head of Talent', 'Head of Legal', 'Head of Compliance',
+    'Marketing Manager', 'Product Manager', 'Project Manager', 'Programme Manager',
+    'Account Manager', 'Customer Success Manager', 'Community Manager',
+    'Brand Manager', 'Content Manager', 'Growth Manager', 'Channel Manager',
+    'Campaign Manager', 'Events Manager', 'PR Manager', 'Social Media Manager',
+    'Engineering Lead', 'Tech Lead', 'Team Lead', 'Architect', 'Solutions Architect',
+    'Principal Engineer', 'Staff Engineer', 'DevOps Engineer', 'Platform Engineer',
+    'Data Engineer', 'ML Engineer', 'Frontend Developer', 'Backend Developer',
+    'Full Stack Developer', 'QA Engineer', 'Site Reliability Engineer',
+    'Business Analyst', 'Data Analyst', 'Financial Analyst', 'Marketing Analyst',
+    'UX Researcher', 'UX Designer', 'Product Designer', 'Graphic Designer',
+    'Copywriter', 'Content Strategist', 'SEO Specialist', 'PPC Specialist',
+    'Sales Development Rep (SDR)', 'Account Executive', 'Sales Engineer',
+    'Solutions Consultant', 'Implementation Specialist', 'Technical Writer',
+    'Procurement Specialist', 'Supply Chain Manager', 'Compliance Officer',
+    'Risk Manager', 'IT Administrator', 'Security Analyst', 'Founder', 'Co-founder'
   ];
 
   // Wizard state
