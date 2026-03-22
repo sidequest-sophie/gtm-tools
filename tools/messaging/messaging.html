@@ -425,12 +425,14 @@
     const list   = document.getElementById('mh-entity-list');
     const entities = client ? (client.brandEntities || []) : [];
 
-    // Build options: the company itself + brand entities
+    // Build options: the company itself + only Brand-type entities from ontology
     let opts = [];
     if (client && client.name) {
       opts.push({ id: '__company__', name: client.name, type: 'Company', isCompany: true });
     }
-    entities.forEach(e => opts.push({ id: e.id, name: e.name, type: e.type, isCompany: false }));
+    entities
+      .filter(e => e.type === 'Brand')
+      .forEach(e => opts.push({ id: e.id, name: e.name, type: e.type, isCompany: false }));
 
     if (!opts.length) {
       list.innerHTML = `<div class="mh-entity-none">No brand entities found.<br><small style="color:var(--gray-400);">Add brands in Client Config → Brand Ontology first.</small></div>`;
@@ -456,6 +458,7 @@
       title,
       type        : 'company',
       entity_id   : entityId === '__company__' ? null : entityId,
+      entity_name : entityName,
       description : '',
       status      : 'draft',
       taglines    : [{ label: 'Primary', text: '' }],
@@ -481,13 +484,14 @@
         context       : false,
         lead_avoid    : false,
         purpose_vision: false
-      },
-      // store entity name so we can display it
-      _entity_name: entityName,
-      _entity_type: entityType
+      }
     };
     const row = await dbInsert(newHouse);
-    if (row) { await mhOpen(row.id); }
+    if (row) {
+      await mhOpen(row.id);
+    } else {
+      alert('Could not create messaging house. Check you have an active client selected and try again.');
+    }
   };
 
   /* ════════════════════════════════════════════════════
@@ -546,7 +550,7 @@
   function mhRenderHouse() {
     const d   = mhData;
     const sec = d.enabled_sections || {};
-    const name = d._entity_name || d.title || '';
+    const name = d.entity_name || d.title || '';
     const type = TYPE_LABELS[d.type] || d.type;
     let html = '';
 
