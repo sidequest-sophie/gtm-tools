@@ -421,8 +421,11 @@ Background about the client...
       <div class="mm-tab-panel mm-editor" id="tab-branding">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <span class="mm-label" style="margin:0;">Colours &amp; Identity</span>
-          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmResetBrandToClient()" title="Reset all branding to match client config">↻ Reset to client defaults</button>
-          <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmSaveBrandAsClientDefault()" title="Save current branding as client default" style="margin-left:0.25rem;">💾 Save as client default</button>
+          <div style="display:flex; gap:0.25rem; flex-wrap:wrap;">
+            <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmResetBrandToClient()" title="Reset all branding to match client config">↻ Client defaults</button>
+            <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmResetBrandToCategoryLeaders()" title="Reset to Category Leaders default branding">↻ CL defaults</button>
+            <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="mmSaveBrandAsClientDefault()" title="Save current branding as client default">💾 Save as client default</button>
+          </div>
         </div>
 
         <div class="mm-row">
@@ -1397,6 +1400,16 @@ async function mmResetBrandToClient() {
     console.error('mmResetBrandToClient error:', err);
     alert('Error loading client brand settings: ' + err.message);
   }
+}
+
+function mmResetBrandToCategoryLeaders() {
+  document.getElementById('mm-brand-primary').value = '#134461';
+  document.getElementById('mm-brand-primary-name').value = 'Navy';
+  document.getElementById('mm-brand-accent').value = '#d92b96';
+  document.getElementById('mm-brand-success').value = '#10b981';
+  document.getElementById('mm-brand-logo').value = '';
+  document.getElementById('mm-brand-logo-height').value = '36';
+  mmDirty();
 }
 
 async function mmSaveBrandAsClientDefault() {
