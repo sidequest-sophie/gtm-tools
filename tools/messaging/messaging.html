@@ -53,8 +53,12 @@
 .mh-house-wrap { max-width:920px; }
 .mh-house-table { width:100%; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.07); background:#F5F3EF; }
 
-/* ── Canvas header (dark full-bleed) ── */
-.mh-canvas-header { background:#0F172A; padding:1.35rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+/* ── Canvas header (uses company brand colours) ── */
+.mh-canvas-header { padding:1.35rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.mh-header-left { display:flex; align-items:center; gap:0.85rem; min-width:0; }
+.mh-header-logo { width:36px; height:36px; border-radius:8px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.15); }
+.mh-header-logo img { width:100%; height:100%; object-fit:contain; }
+.mh-header-logo-initial { font-size:1rem; font-weight:800; color:rgba(255,255,255,0.85); }
 .mh-brand-name { font-size:1.25rem; font-weight:800; color:#fff !important; letter-spacing:-0.01em; }
 .mh-brand-name:empty::before { color:rgba(255,255,255,0.35); }
 .mh-brand-name[contenteditable="true"] { outline:none; border-radius:6px; padding:4px 8px; margin:-4px -8px; background:transparent; transition:background 0.15s; }
@@ -93,9 +97,11 @@
 .mh-outcome-text { font-size:0.95rem; font-weight:600; color:#1E40AF; line-height:1.55; }
 .mh-outcome-text:empty::before { font-weight:400; color:rgba(30,64,175,0.3); }
 
-/* ── Positioning row (FOR / WHO / WE) — full-width above pillars ── */
+/* ── Positioning container (company-level, wraps FOR/WHO/WE) ── */
+.mh-canvas-pos-wrap { background:#fff; border:1px solid rgba(0,0,0,0.06); border-radius:14px; padding:1.25rem 1.35rem 1.35rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+.mh-canvas-pos-wrap .mh-canvas-section-label { margin-bottom:0.75rem; }
 .mh-canvas-pos-row { display:grid; grid-template-columns:repeat(3, 1fr); gap:0.85rem; }
-.mh-pos-card { border-radius:12px; padding:1rem 1.15rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+.mh-pos-card { border-radius:10px; padding:1rem 1.15rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
 .mh-pos-label { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem; }
 .mh-pos-text { font-size:0.82rem; line-height:1.5; }
 
@@ -576,11 +582,26 @@
     const sec  = d.enabled_sections || {};
     const name = d.entity_name || d.title || '';
     const type = TYPE_LABELS[d.type] || d.type;
+
+    // ── Pull company brand colours + logo ──
+    const client    = Storage.getActiveClient() || {};
+    const headerBg  = client.brandHeader || '#0F172A';
+    const accentClr = client.brandAccent || '#6366f1';
+    const clientLogo = client.logo || '';
+    const initial    = (name || '?').charAt(0).toUpperCase();
+
     let html = '';
 
-    // ── Dark header ──
-    html += `<div class="mh-canvas-header">
-      <div ${edit('_entity_name','mh-text mh-brand-name')} data-ph="Company Name">${esc(name)}</div>
+    // ── Header with company colours + logo ──
+    const logoHtml = clientLogo
+      ? `<div class="mh-header-logo"><img src="${clientLogo}" alt="" /></div>`
+      : `<div class="mh-header-logo"><span class="mh-header-logo-initial">${initial}</span></div>`;
+
+    html += `<div class="mh-canvas-header" style="background:${headerBg};">
+      <div class="mh-header-left">
+        ${logoHtml}
+        <div ${edit('_entity_name','mh-text mh-brand-name')} data-ph="Company Name">${esc(name)}</div>
+      </div>
       <span class="mh-type-badge">${esc(type)} Messaging House</span>
     </div>`;
 
@@ -611,7 +632,7 @@
       </div>`;
     }
 
-    // ── Positioning (FOR / WHO / WE) — ABOVE pillars, clearly company-level ──
+    // ── Positioning (FOR / WHO / WE) — company-level, wrapped in container ──
     if (sec.positioning !== false) {
       const p = d.positioning || {};
       const posFields = [
@@ -626,7 +647,10 @@
           <div ${editPos(f.key,'mh-text mh-pos-text')} style="color:${c.text};" data-ph="${f.ph}">${esc(p[f.key]||'')}</div>
         </div>`;
       }).join('');
-      html += `<div class="mh-canvas-pos-row">${posCards}</div>`;
+      html += `<div class="mh-canvas-pos-wrap">
+        <div class="mh-canvas-section-label">Positioning Statement</div>
+        <div class="mh-canvas-pos-row">${posCards}</div>
+      </div>`;
     }
 
     // ── Pillars (colour-coded cards) ──
