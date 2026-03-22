@@ -383,7 +383,7 @@
   <!-- Header -->
   <div class="mh-header">
     <div style="display:flex; align-items:center; gap:0.75rem;">
-      <h2>Messaging House</h2>
+      <h2 id="mhTitle">Messaging House</h2>
       <span class="mh-save-indicator" id="mhSaveIndicator">
         <span class="mh-save-dot" id="mhSaveDot"></span>
         <span id="mhSaveText">Saved</span>
@@ -414,20 +414,17 @@ const PILLAR_COLORS = ['#00d4aa', '#f59e0b', '#ef4444', '#6366f1', '#06b6d4', '#
 
 const MH_SECTIONS = [
   // ── CORE (enabled by default) ──
+  { id: 'tagline',       label: 'Taglines',               core: true,  hint: 'Short punchy lines for campaigns, hero sections, and ads.' },
   { id: 'context',       label: 'Context / Why',          core: true,  hint: 'What market reality, pain, or trend makes your message urgent right now?' },
-  { id: 'elevator',      label: 'Elevator Pitch',         core: true,  hint: 'The overarching message — your "roof". One statement that captures the whole story.' },
+  { id: 'elevator',      label: 'Elevator Pitch',         core: true,  hint: 'The overarching message \u2014 your "roof". Short, medium, and extended versions, each toggleable.' },
   { id: 'outcome',       label: 'Outcome / So\u2026',    core: true,  hint: 'What does the customer achieve or become? The "so what" of the elevator pitch.' },
   { id: 'positioning',   label: 'Positioning Statement',  core: true,  hint: 'A concise strategic anchor: who you serve, what problem you solve, and why you\'re different.' },
   { id: 'pillars',       label: 'Messaging Pillars',      core: true,  hint: 'The 3\u20134 supporting narrative themes. Each pillar needs a title, description, outcome, and proof points.' },
-  { id: 'lead_avoid',    label: 'Lead With / Avoid',      core: true,  hint: 'Talking points to emphasise and messages to steer clear of.' },
 
   // ── OPTIONAL ──
-  { id: 'tagline',       label: 'Taglines',               core: false, hint: 'Short punchy lines for campaigns, hero sections, and ads.' },
+  { id: 'lead_avoid',    label: 'Lead With / Avoid',      core: false, hint: 'Talking points to emphasise and messages to steer clear of.' },
   { id: 'purpose_vision',label: 'Purpose & Vision',       core: false, hint: 'Organisational mission, brand promise, and long-term aspiration.' },
-  { id: 'audiences',     label: 'Target Audiences',       core: false, hint: 'Buyer personas with role-specific pain points, aspirations, and decision criteria.' },
   { id: 'proof_assets',  label: 'Proof Point Assets',     core: false, hint: 'Customer testimonials, case study summaries, third-party validation, and certifications.' },
-  { id: 'objections',    label: 'Objection Handling',     core: false, hint: 'Anticipated pushback with messaging-aligned, proof-backed responses.' },
-  { id: 'keywords',      label: 'Keywords & Terminology', core: false, hint: 'Primary/secondary keywords and preferred terminology.' },
 ];
 
 let mhData = {};
@@ -437,6 +434,12 @@ let mhSaveTimer = null;
 
 function mhInit() {
   mhLoad();
+  // Set header title from client name
+  const client = Storage.getActiveClient();
+  const titleEl = document.getElementById('mhTitle');
+  if (titleEl && client && client.name) {
+    titleEl.textContent = client.name + ' \u2014 Messaging House';
+  }
   mhRender();
 }
 
@@ -565,9 +568,7 @@ function mhRenderSection(s) {
       break;
 
     case 'elevator':
-      inner = mhFieldInput(s.id, 'short', 'Short (25 words)', 'One sentence\u2026');
-      inner += mhFieldTextarea(s.id, 'medium', 'Medium (50 words)', 'Two\u2013three sentences\u2026', 300);
-      inner += mhFieldTextarea(s.id, 'long', 'Extended (100 words)', 'Full paragraph\u2026', 600);
+      inner = mhRenderElevator();
       break;
 
     case 'outcome':
@@ -599,24 +600,11 @@ function mhRenderSection(s) {
       inner += mhFieldTextarea(s.id, 'promise', 'Brand Promise', 'What you commit to customers\u2026', 200);
       break;
 
-    case 'audiences':
-      inner = mhRenderAudiences();
-      break;
 
     case 'proof_assets':
       inner = mhRenderProofAssets();
       break;
 
-    case 'objections':
-      inner = mhRenderObjections();
-      break;
-
-    case 'keywords':
-      inner = mhFieldTextarea(s.id, 'primary', 'Primary Keywords', 'Comma-separated\u2026', 200);
-      inner += mhFieldTextarea(s.id, 'secondary', 'Secondary Keywords', 'Comma-separated\u2026', 200);
-      inner += mhFieldTextarea(s.id, 'avoid_terms', 'Avoid / Never Use', 'Terms to steer clear of\u2026', 200);
-      inner += mhFieldTextarea(s.id, 'preferred', 'Preferred Terminology', 'Say this, not that\u2026', 200);
-      break;
 
     default:
       inner = `<p style="color:var(--gray-400); font-size:0.82rem;">Section not yet configured.</p>`;
@@ -636,6 +624,51 @@ function mhRenderSection(s) {
 }
 
 // ── Field helpers ──
+
+// ── Elevator Pitch (toggleable lengths) ──
+
+const ELEVATOR_LENGTHS = [
+  { key: 'short',  label: 'Short (~25 words)',  type: 'input',    placeholder: 'One sentence\u2026', max: null },
+  { key: 'medium', label: 'Medium (~50 words)', type: 'textarea', placeholder: 'Two\u2013three sentences\u2026', max: 300 },
+  { key: 'long',   label: 'Extended (~100 words)', type: 'textarea', placeholder: 'Full paragraph\u2026', max: 600 },
+];
+
+function mhRenderElevator() {
+  if (!mhData.elevatorLengths) {
+    mhData.elevatorLengths = { short: true, medium: true, long: true };
+  }
+
+  let html = '<div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">';
+  ELEVATOR_LENGTHS.forEach(l => {
+    const on = mhData.elevatorLengths[l.key];
+    html += `<div style="display:flex; align-items:center; gap:0.4rem;">
+      <div class="mh-toggle ${on ? 'on' : ''}" onclick="mhToggleElevatorLength('${l.key}', this)" style="width:30px; height:16px;">
+        <div class="mh-toggle-knob" style="width:12px; height:12px; top:2px; left:2px;"></div>
+      </div>
+      <span style="font-size:0.75rem; font-weight:600; color:${on ? 'var(--gray-700)' : 'var(--gray-400)'};">${l.label}</span>
+    </div>`;
+  });
+  html += '</div>';
+
+  ELEVATOR_LENGTHS.forEach(l => {
+    if (!mhData.elevatorLengths[l.key]) return;
+    if (l.type === 'input') {
+      html += mhFieldInput('elevator', l.key, l.label, l.placeholder);
+    } else {
+      html += mhFieldTextarea('elevator', l.key, l.label, l.placeholder, l.max);
+    }
+  });
+
+  return html;
+}
+
+function mhToggleElevatorLength(key, el) {
+  if (!mhData.elevatorLengths) mhData.elevatorLengths = { short: true, medium: true, long: true };
+  mhData.elevatorLengths[key] = !mhData.elevatorLengths[key];
+  el.classList.toggle('on');
+  mhDirty();
+  mhRender();
+}
 
 function mhFieldInput(sectionId, field, label, placeholder) {
   const val = mhGetField(sectionId, field);
@@ -832,44 +865,6 @@ function mhRemoveListItem(listKey, i) {
   mhRender();
 }
 
-// ── Audiences (optional section) ──
-
-function mhRenderAudiences() {
-  if (!mhData.audiences) mhData.audiences = [];
-  let html = '';
-
-  mhData.audiences.forEach((a, i) => {
-    html += `
-      <div class="mh-pillar ${a._open ? 'open' : ''}">
-        <div class="mh-pillar-header" onclick="mhData.audiences[${i}]._open=!mhData.audiences[${i}]._open; mhRender();">
-          <span class="mh-pillar-name">${esc(a.role || 'Untitled Audience')}</span>
-          <button class="mh-btn mh-btn-outline mh-btn-sm" onclick="event.stopPropagation(); mhData.audiences.splice(${i},1); mhDirty(); mhRender();" style="color:var(--error);">&#215;</button>
-        </div>
-        <div class="mh-pillar-body">
-          <div class="mh-field">
-            <label class="mh-label">Role / Persona</label>
-            <input class="mh-input" value="${esc(a.role || '')}" oninput="mhData.audiences[${i}].role=this.value; mhDirty();" placeholder="e.g. CISO" />
-          </div>
-          <div class="mh-field">
-            <label class="mh-label">Pain Points</label>
-            <textarea class="mh-textarea" oninput="mhData.audiences[${i}].pains=this.value; mhDirty();" placeholder="What keeps them up at night\u2026">${esc(a.pains || '')}</textarea>
-          </div>
-          <div class="mh-field">
-            <label class="mh-label">Aspirations</label>
-            <textarea class="mh-textarea" oninput="mhData.audiences[${i}].aspirations=this.value; mhDirty();" placeholder="What success looks like for them\u2026">${esc(a.aspirations || '')}</textarea>
-          </div>
-          <div class="mh-field">
-            <label class="mh-label">Decision Criteria</label>
-            <textarea class="mh-textarea" oninput="mhData.audiences[${i}].criteria=this.value; mhDirty();" placeholder="What influences their buying decision\u2026">${esc(a.criteria || '')}</textarea>
-          </div>
-        </div>
-      </div>`;
-  });
-
-  html += `<button class="mh-btn mh-btn-outline" onclick="mhData.audiences.push({role:'',pains:'',aspirations:'',criteria:'',_open:true}); mhDirty(); mhRender();">+ Add Audience</button>`;
-  return html;
-}
-
 // ── Proof Assets (optional section) ──
 
 function mhRenderProofAssets() {
@@ -913,40 +908,6 @@ function mhRenderProofAssets() {
   });
 
   html += `<button class="mh-btn mh-btn-outline" onclick="mhData.proofAssets.push({title:'',type:'testimonial',content:'',source:'',_open:true}); mhDirty(); mhRender();">+ Add Proof Asset</button>`;
-  return html;
-}
-
-// ── Objections (optional section) ──
-
-function mhRenderObjections() {
-  if (!mhData.objections) mhData.objections = [];
-  let html = '';
-
-  mhData.objections.forEach((o, i) => {
-    html += `
-      <div class="mh-pillar ${o._open ? 'open' : ''}">
-        <div class="mh-pillar-header" onclick="mhData.objections[${i}]._open=!mhData.objections[${i}]._open; mhRender();">
-          <span class="mh-pillar-name">${esc(o.objection || 'Untitled')}</span>
-          <button class="mh-btn mh-btn-outline mh-btn-sm" onclick="event.stopPropagation(); mhData.objections.splice(${i},1); mhDirty(); mhRender();" style="color:var(--error);">&#215;</button>
-        </div>
-        <div class="mh-pillar-body">
-          <div class="mh-field">
-            <label class="mh-label">Objection</label>
-            <input class="mh-input" value="${esc(o.objection || '')}" oninput="mhData.objections[${i}].objection=this.value; mhDirty();" placeholder="What the prospect says\u2026" />
-          </div>
-          <div class="mh-field">
-            <label class="mh-label">Response</label>
-            <textarea class="mh-textarea" oninput="mhData.objections[${i}].response=this.value; mhDirty();">${esc(o.response || '')}</textarea>
-          </div>
-          <div class="mh-field">
-            <label class="mh-label">Proof / Evidence</label>
-            <input class="mh-input" value="${esc(o.proof || '')}" oninput="mhData.objections[${i}].proof=this.value; mhDirty();" placeholder="Supporting data or reference\u2026" />
-          </div>
-        </div>
-      </div>`;
-  });
-
-  html += `<button class="mh-btn mh-btn-outline" onclick="mhData.objections.push({objection:'',response:'',proof:'',_open:true}); mhDirty(); mhRender();">+ Add Objection</button>`;
   return html;
 }
 
@@ -1045,16 +1006,6 @@ function mhExportMarkdown() {
         if (mhGetField(s.id, 'promise')) { lines.push('**Brand Promise:** ' + mhGetField(s.id, 'promise')); }
         break;
 
-      case 'audiences':
-        (mhData.audiences || []).forEach(a => {
-          lines.push('### ' + (a.role || 'Untitled'));
-          if (a.pains) { lines.push('**Pain Points:** ' + a.pains); lines.push(''); }
-          if (a.aspirations) { lines.push('**Aspirations:** ' + a.aspirations); lines.push(''); }
-          if (a.criteria) { lines.push('**Decision Criteria:** ' + a.criteria); }
-          lines.push('');
-        });
-        break;
-
       case 'proof_assets':
         (mhData.proofAssets || []).forEach(a => {
           lines.push('### ' + (a.title || 'Untitled') + ' (' + (a.type || 'testimonial') + ')');
@@ -1064,21 +1015,6 @@ function mhExportMarkdown() {
         });
         break;
 
-      case 'objections':
-        (mhData.objections || []).forEach(o => {
-          lines.push('### ' + (o.objection || 'Untitled'));
-          if (o.response) { lines.push('**Response:** ' + o.response); lines.push(''); }
-          if (o.proof) { lines.push('**Evidence:** ' + o.proof); }
-          lines.push('');
-        });
-        break;
-
-      case 'keywords':
-        ['primary', 'secondary', 'avoid_terms', 'preferred'].forEach(k => {
-          const v = mhGetField(s.id, k);
-          if (v) { lines.push('**' + k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) + ':** ' + v); lines.push(''); }
-        });
-        break;
     }
 
     lines.push('');
