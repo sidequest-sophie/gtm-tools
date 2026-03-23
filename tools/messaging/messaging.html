@@ -1277,7 +1277,7 @@
     entityName: null,
     entityType: null,
     icpTypes: [],
-    verticalFocused: null, // null = not chosen, false = not focused, true = focused
+    verticalFocused: null, // null = not chosen, 'none' | 'locked' | 'strong'
     verticals: [],
     regions: [],
     countries: [],
@@ -1422,13 +1422,14 @@
   };
 
   function mhWizardRenderStep2() {
-    // Radio choice: focused or not
-    const radioHtml = [
-      { id: 'no', label: 'We are not focused on specific verticals' },
-      { id: 'yes', label: 'We focus on the following verticals' }
-    ].map(opt => {
-      const isSel = (opt.id === 'yes' && mhWizardState.verticalFocused === true) ||
-                    (opt.id === 'no' && mhWizardState.verticalFocused === false);
+    // Radio choice: 3 vertical focus options
+    const radioOpts = [
+      { id: 'none', label: "We aren't focused on specific verticals" },
+      { id: 'locked', label: 'We are a vertical-focused offering — our product targets the following verticals' },
+      { id: 'strong', label: 'We are not locked to a vertical, but we are really strong in the following verticals' }
+    ];
+    const radioHtml = radioOpts.map(opt => {
+      const isSel = mhWizardState.verticalFocused === opt.id;
       return `<div class="mh-radio-item ${isSel ? 'selected' : ''}" onclick="mhWizardSelectVerticalFocus('${opt.id}')">
         <div class="mh-radio-circle"></div>
         <div>${opt.label}</div>
@@ -1437,9 +1438,10 @@
     document.getElementById('mh-step2-radio').innerHTML = radioHtml;
 
     const picker = document.getElementById('mh-step2-picker');
-    picker.style.display = mhWizardState.verticalFocused === true ? 'block' : 'none';
+    const showPicker = mhWizardState.verticalFocused === 'locked' || mhWizardState.verticalFocused === 'strong';
+    picker.style.display = showPicker ? 'block' : 'none';
 
-    if (mhWizardState.verticalFocused !== true) return;
+    if (!showPicker) return;
 
     const isB2B = mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
     const verticals = isB2B ? WIZARD_VERTICALS_B2B : WIZARD_VERTICALS_B2C;
@@ -1464,12 +1466,8 @@
   }
 
   window.mhWizardSelectVerticalFocus = function (choice) {
-    if (choice === 'yes') {
-      mhWizardState.verticalFocused = true;
-    } else {
-      mhWizardState.verticalFocused = false;
-      mhWizardState.verticals = [];
-    }
+    mhWizardState.verticalFocused = choice; // 'none', 'locked', or 'strong'
+    if (choice === 'none') mhWizardState.verticals = [];
     mhWizardRenderStep2();
   };
 
@@ -1684,9 +1682,13 @@
       parts.push('in ' + natList(mhWizardState.departments));
     }
 
-    // Verticals (e.g. "across Financial Services and Healthcare")
+    // Verticals — phrasing depends on focus type
     if (mhWizardState.verticals.length) {
-      parts.push('in ' + natList(mhWizardState.verticals));
+      if (mhWizardState.verticalFocused === 'locked') {
+        parts.push('in ' + natList(mhWizardState.verticals));
+      } else if (mhWizardState.verticalFocused === 'strong') {
+        parts.push('particularly in ' + natList(mhWizardState.verticals));
+      }
     }
 
     // Geography
