@@ -1554,22 +1554,90 @@
     document.getElementById('mh-step4-count').textContent = mhWizardState.departments.length;
   }
 
+  // Department → relevant roles mapping
+  const DEPT_ROLE_MAP = {
+    'Marketing': ['CMO','VP Marketing','Marketing Director','Marketing Manager','Growth Manager','Brand Manager','Content Manager','Campaign Manager','Social Media Manager','Marketing Analyst','Copywriter','Content Strategist','SEO Specialist','PPC Specialist'],
+    'Sales': ['CRO','VP Sales','Sales Director','Account Executive','Sales Development Rep (SDR)','Sales Engineer','Channel Manager','Account Manager','Inside Sales'],
+    'Product': ['CPO','VP Product','Product Director','Head of Product','Product Manager','Product Designer','UX Researcher','UX Designer'],
+    'Engineering': ['CTO','VP Engineering','Engineering Director','Engineering Lead','Tech Lead','Principal Engineer','Staff Engineer','Full Stack Developer','Frontend Developer','Backend Developer','QA Engineer','Architect'],
+    'Finance': ['CFO','VP Finance','Financial Analyst','Procurement Specialist','Treasury','Tax'],
+    'Operations': ['COO','VP Operations','Director of Operations','Programme Manager','Project Manager','Supply Chain Manager'],
+    'HR': ['VP HR','Head of Talent','Talent Acquisition','Learning & Development','Compensation & Benefits'],
+    'Customer Success': ['VP Customer Success','Customer Success Manager','Account Manager','Community Manager'],
+    'IT': ['CIO','VP IT','IT Administrator','Enterprise Architecture','Platform Engineer'],
+    'Cybersecurity': ['CISO','Head of Security','Security Analyst','DevOps Engineer','Site Reliability Engineer'],
+    'Security': ['CISO','Head of Security','Security Analyst'],
+    'Legal': ['Head of Legal','Head of Compliance','Compliance Officer','Risk Manager'],
+    'Executive Leadership': ['CEO','CFO','COO','CTO','CIO','CISO','CMO','CRO','CPO','CDO','Founder','Co-founder'],
+    'Strategy': ['CDO','Director of Analytics','Business Analyst','Data Analyst'],
+    'Analytics & BI': ['Director of Analytics','Data Analyst','Business Analyst','Marketing Analyst','Data Engineer','ML Engineer'],
+    'UX/Design': ['Director of Design','UX Designer','UX Researcher','Product Designer','Graphic Designer'],
+    'Research & Development': ['Principal Engineer','Staff Engineer','Architect','ML Engineer','Data Engineer'],
+    'DevOps & Infrastructure': ['Head of DevOps','DevOps Engineer','Platform Engineer','Site Reliability Engineer','Cloud & Platform'],
+    'Data Science': ['CDO','Head of Data','Data Engineer','ML Engineer','Data Analyst'],
+    'Customer Support': ['Customer Success Manager','Technical Support','Implementation Specialist'],
+    'Compliance & Risk': ['Head of Compliance','Compliance Officer','Risk Manager','Security Analyst'],
+    'Business Development': ['Director of Partnerships','Account Executive','Solutions Consultant'],
+    'Revenue Operations': ['CRO','Growth Manager','Marketing Analyst','Sales Director'],
+    'Content & Editorial': ['Head of Content','Content Manager','Content Strategist','Copywriter','Technical Writer'],
+    'Brand': ['Head of Brand','Brand Manager','Graphic Designer','Copywriter'],
+    'Growth': ['Head of Growth','Growth Manager','Head of Demand Gen','PPC Specialist','SEO Specialist'],
+    'Demand Generation': ['Head of Demand Gen','Campaign Manager','PPC Specialist','SEO Specialist','Marketing Manager'],
+    'Solutions Engineering': ['Solutions Architect','Solutions Consultant','Sales Engineer','Implementation Specialist'],
+    'Professional Services': ['Solutions Consultant','Implementation Specialist','Technical Writer','Project Manager']
+  };
+
+  function mhWizardGetRelevantRoles() {
+    // Collect roles relevant to selected departments
+    const relevant = new Set();
+    mhWizardState.departments.forEach(dept => {
+      const mapped = DEPT_ROLE_MAP[dept];
+      if (mapped) mapped.forEach(r => relevant.add(r));
+    });
+    return relevant;
+  }
+
   function mhWizardRenderStep5() {
-    if (!mhWizardState.visibleRoleIndices.length) {
-      mhWizardState.visibleRoleIndices = mhWizardGetRandomIndices(WIZARD_ROLES.length, 30);
+    const relevant = mhWizardGetRelevantRoles();
+
+    // Always rebuild: show relevant roles first, then fill with random others
+    const relevantRoles = WIZARD_ROLES.filter(r => relevant.has(r));
+    const otherRoles = WIZARD_ROLES.filter(r => !relevant.has(r));
+
+    // Pick random others to pad to ~30 total
+    const needed = Math.max(0, 30 - relevantRoles.length);
+    const randomOtherIndices = mhWizardGetRandomIndices(otherRoles.length, needed);
+    const randomOthers = randomOtherIndices.map(i => otherRoles[i]);
+
+    const visibleRoles = [...relevantRoles, ...randomOthers];
+
+    const container = document.getElementById('mh-step5-tags');
+
+    // If we have relevant roles, show them with a subtle label
+    let html = '';
+    if (relevantRoles.length > 0) {
+      html += `<div style="width:100%;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:0.15rem;">Relevant to your departments</div>`;
+      html += relevantRoles.map(r => {
+        const sel = mhWizardState.roles.includes(r) ? 'selected' : '';
+        return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')" style="${mhWizardState.roles.includes(r)?'':'display:none;'}">✕</button></div>`;
+      }).join('');
+
+      if (randomOthers.length > 0) {
+        html += `<div style="width:100%;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-top:0.65rem;margin-bottom:0.15rem;">Other roles</div>`;
+      }
     }
 
-    const visibleRoles = mhWizardState.visibleRoleIndices.map(i => WIZARD_ROLES[i]);
-    const container = document.getElementById('mh-step5-tags');
-    container.innerHTML = visibleRoles.map(r => {
+    html += randomOthers.map(r => {
       const sel = mhWizardState.roles.includes(r) ? 'selected' : '';
       return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')" style="${mhWizardState.roles.includes(r)?'':'display:none;'}">✕</button></div>`;
     }).join('');
 
+    // Add custom/already-selected roles not in visible set
     const customRoles = mhWizardState.roles.filter(r => !visibleRoles.includes(r));
     const customHtml = customRoles.map(r => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')">✕</button></div>`).join('');
-    if (customHtml) container.innerHTML += customHtml;
+    if (customHtml) html += customHtml;
 
+    container.innerHTML = html;
     document.getElementById('mh-step5-count').textContent = mhWizardState.roles.length;
   }
 
@@ -1674,9 +1742,9 @@
     } else if (step === 3) {
       mhWizardState.visibleCountryIndices = mhWizardGetRandomIndices(WIZARD_COUNTRIES_ALL.length, 12);
     } else if (step === 4) {
-      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 15);
+      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 30);
     } else if (step === 5) {
-      mhWizardState.visibleRoleIndices = mhWizardGetRandomIndices(WIZARD_ROLES.length, 15);
+      // Roles are rebuilt each render (relevant + random others), so just re-render
     }
     mhWizardRenderStep();
   };
