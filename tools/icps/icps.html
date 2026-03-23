@@ -93,7 +93,7 @@
 .icp-radio-item:hover { border-color:var(--pink); background:rgba(217,43,150,0.02); }
 .icp-radio-item.selected { background:var(--pink); color:#fff; border-color:var(--pink); }
 .icp-radio-circle { width:18px; height:18px; border:2px solid currentColor; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.icp-radio-item.selected .icp-radio-circle::after { content:'●'; }
+.icp-radio-item.selected .icp-radio-circle::after { content:''; width:8px; height:8px; border-radius:50%; background:currentColor; }
 
 .icp-textarea-wrap { display:flex; flex-direction:column; gap:0.5rem; }
 .icp-textarea { width:100%; padding:0.85rem; border:1.5px solid var(--gray-200); border-radius:10px; font-size:0.85rem; font-family:inherit; resize:vertical; min-height:100px; background:#fff; transition:border-color 0.15s; }
