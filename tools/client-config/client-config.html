@@ -296,6 +296,12 @@
   }
   .cc-pkg-option input[type="checkbox"] { accent-color: #d92b96; }
 
+  /* ── Features ── */
+  .cc-feature-list { display:flex; flex-wrap:wrap; gap:0.4rem; min-height:1.5rem; }
+  .cc-feature-tag { display:inline-flex; align-items:center; gap:0.35rem; padding:0.3rem 0.65rem; background:rgba(217,43,150,0.1); border-radius:6px; font-size:0.78rem; font-weight:600; color:#d92b96; }
+  .cc-feature-remove { background:none; border:none; color:inherit; cursor:pointer; font-size:0.8rem; padding:0; line-height:1; opacity:0.6; }
+  .cc-feature-remove:hover { opacity:1; }
+
   /* ── v2 Section divider within entity detail ── */
   .cc-detail-section {
     padding-top: 0.65rem;
@@ -1259,6 +1265,32 @@ window.clientConfig = {
     if (el) el.classList.toggle('open');
   },
 
+  addFeature(entityId) {
+    const input = document.getElementById('ent_' + entityId + '_newfeature');
+    const name = (input?.value || '').trim();
+    if (!name) return;
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    const entities = client.brandEntities || [];
+    const entity = entities.find(e => e.id === entityId);
+    if (!entity) return;
+    if (!entity.features) entity.features = [];
+    entity.features.push({ id: Storage.uuid(), name });
+    Storage.updateClient(client.id, { brandEntities: entities });
+    this.renderOntologyTab();
+  },
+
+  removeFeature(entityId, featureId) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    const entities = client.brandEntities || [];
+    const entity = entities.find(e => e.id === entityId);
+    if (!entity || !entity.features) return;
+    entity.features = entity.features.filter(f => f.id !== featureId);
+    Storage.updateClient(client.id, { brandEntities: entities });
+    this.renderOntologyTab();
+  },
+
   updateEntity(entityId) {
     const client = Storage.getActiveClient();
     if (!client) return;
@@ -1418,6 +1450,26 @@ window.clientConfig = {
                     ${pkgRoles.includes(r) ? 'checked' : ''}>
                   ${this.esc(r)}
                 </label>`).join('')}
+            </div>
+          </div>
+
+          <div class="cc-detail-section">
+            <div class="cc-detail-section-label">Features</div>
+            <div class="cc-feature-list" id="ent_${e.id}_features">
+              ${(e.features || []).map(f => `
+                <span class="cc-feature-tag">
+                  ${this.esc(f.name)}
+                  <button class="cc-feature-remove" onclick="event.stopPropagation(); clientConfig.removeFeature('${e.id}','${f.id}')">✕</button>
+                </span>
+              `).join('')}
+            </div>
+            <div class="cc-form-row" style="margin-top:0.5rem;">
+              <div class="cc-form-group" style="flex:1;">
+                <input type="text" class="cc-form-input" id="ent_${e.id}_newfeature" placeholder="Add a feature…" onkeydown="if(event.key==='Enter'){clientConfig.addFeature('${e.id}');}" />
+              </div>
+              <div class="cc-form-group" style="flex:0 0 auto;">
+                <button class="cc-btn cc-btn-secondary" onclick="clientConfig.addFeature('${e.id}')" style="padding:0.4rem 0.75rem;font-size:0.75rem;">+ Add</button>
+              </div>
             </div>
           </div>
 
