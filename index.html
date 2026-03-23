@@ -169,6 +169,13 @@
     .nav-item.enabled:hover .icon svg .wh { stroke: var(--pink); }
     .nav-item.enabled:hover .icon svg .pk { stroke: var(--pink); }
 
+    .nav-item.nav-sub {
+      padding-left: 2.75rem;
+      font-size: 0.8rem;
+      font-weight: 400;
+      margin-bottom: 0;
+    }
+
     .nav-item .label { flex: 1; }
 
     .nav-item .badge {
@@ -1142,7 +1149,13 @@
           <div class="icon">
             <svg viewBox="0 0 24 24"><path class="wh" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path class="pk" d="M8 9h8M8 13h6"/></svg>
           </div>
-          <span class="label">Messaging House</span>
+          <span class="label">Messaging</span>
+        </button>
+        <button class="nav-item nav-sub enabled" data-tool-id="icps">
+          <span class="label">ICPs</span>
+        </button>
+        <button class="nav-item nav-sub enabled" data-tool-id="messaging">
+          <span class="label">Messaging Houses</span>
         </button>
 
         <button class="nav-item" disabled>
@@ -1451,7 +1464,8 @@
         'client-config': 'Client Configuration',
         'branding-style': 'Branding & Style',
         'analyst-relations': 'Analyst Relations',
-        'messaging': 'Messaging House',
+        'messaging': 'Messaging Houses',
+        'icps': 'Ideal Customer Profiles',
         'sales-enablement': 'Sales Enablement',
         'maturity-models': 'Maturity Models',
         'roi-calculator': 'ROI Calculator',

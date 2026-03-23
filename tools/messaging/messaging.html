@@ -370,159 +370,18 @@
     </div>
   </div>
 
-  <!-- ══════════════════ MODAL: ENTITY PICKER ══════════════════ -->
-  <div class="mh-overlay" id="mh-modal-entity">
+  <!-- ══════════════════ MODAL: ICP PICKER ══════════════════ -->
+  <div class="mh-overlay" id="mh-modal-icp">
     <div class="mh-modal">
       <div class="mh-modal-head">
-        <h3>Select Company / Brand</h3>
+        <h3>Select an ICP</h3>
         <button class="mh-modal-close" onclick="mhCloseModals()">✕</button>
       </div>
-      <p style="font-size:0.82rem;color:var(--gray-500);margin:0 0 1.25rem;">Pick the brand this messaging house represents. Brands come from your client's Brand Ontology.</p>
-      <div class="mh-entity-list" id="mh-entity-list"></div>
+      <p style="font-size:0.82rem;color:var(--gray-500);margin:0 0 1.25rem;">Choose an existing Ideal Customer Profile to pre-populate positioning, or start from scratch.</p>
+      <div class="mh-entity-list" id="mh-icp-list"></div>
     </div>
   </div>
 
-  <!-- ══════════════════ MODAL: POSITIONING WIZARD ══════════════════ -->
-  <div class="mh-wizard-overlay" id="mh-modal-wizard">
-    <div class="mh-wizard-modal">
-      <div class="mh-wizard-header">
-        <h3 id="mh-wizard-title">Build Positioning</h3>
-        <div class="mh-wizard-progress" id="mh-wizard-progress">Step 1 of 8</div>
-        <div class="mh-wizard-progress-bar"><div class="mh-wizard-progress-fill" id="mh-wizard-progress-fill" style="width:12.5%;"></div></div>
-      </div>
-
-      <div class="mh-wizard-body">
-        <!-- STEP 1: ICP TYPE -->
-        <div class="mh-wizard-step active" id="mh-wizard-step-1">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Who do you help?</h4>
-          <p class="mh-wizard-step-desc">Select all that apply. Multi-select allowed.</p>
-          <div class="mh-card-grid" id="mh-step1-options"></div>
-        </div>
-
-        <!-- STEP 2: VERTICALS -->
-        <div class="mh-wizard-step" id="mh-wizard-step-2">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Verticals</h4>
-          <p class="mh-wizard-step-desc">Industries or segments where you help customers.</p>
-          <div class="mh-radio-group" id="mh-step2-radio"></div>
-          <div id="mh-step2-picker" style="display:none;">
-            <div class="mh-tag-picker">
-              <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step2-count">0</strong></div>
-              <div class="mh-tag-list" id="mh-step2-tags"></div>
-              <div class="mh-tag-picker-controls">
-                <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(2)">🎲</button>
-                <input type="text" class="mh-tag-input" id="mh-step2-input" placeholder="Add custom vertical…">
-                <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(2)">Add</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 3: GEOGRAPHIES -->
-        <div class="mh-wizard-step" id="mh-wizard-step-3">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Geographic Focus</h4>
-          <p class="mh-wizard-step-desc">Where do you operate?</p>
-          <div class="mh-radio-group" id="mh-step3-radio"></div>
-          <div id="mh-step3-regions" style="display:none;">
-            <div class="mh-regions-wrap">
-              <div class="mh-region-section">
-                <div class="mh-region-label">Regions</div>
-                <div class="mh-region-tags" id="mh-step3-regions-list"></div>
-              </div>
-              <div class="mh-region-section">
-                <div class="mh-region-label">Countries</div>
-                <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step3-country-count">0</strong></div>
-                <div class="mh-tag-list" id="mh-step3-countries"></div>
-                <div class="mh-tag-picker-controls">
-                  <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(3)">🎲</button>
-                  <button class="mh-btn mh-btn-secondary mh-btn-sm" id="mh-step3-show-all" onclick="mhWizardShowAllCountries()">Show All</button>
-                </div>
-              </div>
-              <div class="mh-tag-picker-controls" style="margin-top:0.5rem;">
-                <input type="text" class="mh-tag-input" id="mh-step3-input" placeholder="Add custom country…">
-                <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(3)">Add</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 4: DEPARTMENTS (conditional) -->
-        <div class="mh-wizard-step" id="mh-wizard-step-4" style="display:none;">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Departments</h4>
-          <p class="mh-wizard-step-desc">Which departments do you serve?</p>
-          <div class="mh-tag-picker">
-            <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step4-count">0</strong></div>
-            <div class="mh-tag-list" id="mh-step4-tags"></div>
-            <div class="mh-tag-picker-controls">
-              <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(4)">🎲</button>
-              <input type="text" class="mh-tag-input" id="mh-step4-input" placeholder="Add custom department…">
-              <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(4)">Add</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 5: ROLES (conditional) -->
-        <div class="mh-wizard-step" id="mh-wizard-step-5" style="display:none;">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Roles & Titles</h4>
-          <p class="mh-wizard-step-desc">Decision-makers and influencers in your ICP.</p>
-          <div class="mh-tag-picker">
-            <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step5-count">0</strong></div>
-            <div class="mh-tag-list" id="mh-step5-tags"></div>
-            <div class="mh-tag-picker-controls">
-              <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(5)">🎲</button>
-              <input type="text" class="mh-tag-input" id="mh-step5-input" placeholder="Add custom role…">
-              <button class="mh-btn mh-btn-secondary mh-btn-sm" onclick="mhWizardAddCustomTag(5)">Add</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 6: MACRO PROBLEM -->
-        <div class="mh-wizard-step" id="mh-wizard-step-6" style="display:none;">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Macro Problem</h4>
-          <p class="mh-wizard-step-desc">What major challenge do they grapple with that you help solve?</p>
-          <div class="mh-textarea-wrap">
-            <textarea class="mh-textarea" id="mh-step6-text" placeholder="Describe the core problem your audience faces..."></textarea>
-          </div>
-        </div>
-
-        <!-- STEP 7: YOUR SOLUTION -->
-        <div class="mh-wizard-step" id="mh-wizard-step-7" style="display:none;">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.5rem;">Your Solution</h4>
-          <p class="mh-wizard-step-desc">How do you solve their problem differently?</p>
-          <div class="mh-textarea-wrap">
-            <textarea class="mh-textarea" id="mh-step7-text" placeholder="Describe what you do to solve this problem..."></textarea>
-          </div>
-        </div>
-
-        <!-- STEP 8: PREVIEW & CONFIRM -->
-        <div class="mh-wizard-step" id="mh-wizard-step-8" style="display:none;">
-          <h4 style="font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 0.75rem;">Preview & Confirm</h4>
-          <p class="mh-wizard-step-desc">Review the positioning statement built from your selections.</p>
-
-          <div class="mh-preview-card">
-            <div class="mh-preview-label">For Statement</div>
-            <div class="mh-preview-text" contenteditable="true" id="mh-step8-for" data-field="positioning-for"></div>
-          </div>
-
-          <div class="mh-preview-card">
-            <div class="mh-preview-label">Who Statement (Problem)</div>
-            <div class="mh-preview-text" contenteditable="true" id="mh-step8-who" data-field="positioning-who"></div>
-          </div>
-
-          <div class="mh-preview-card">
-            <div class="mh-preview-label">We Statement (Solution)</div>
-            <div class="mh-preview-text" contenteditable="true" id="mh-step8-we" data-field="positioning-we"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="mh-wizard-footer">
-        <button class="mh-btn mh-btn-wizard-back" id="mh-wizard-back" onclick="mhWizardPrevious()" style="display:none;">← Back</button>
-        <button class="mh-btn mh-btn-secondary" onclick="mhWizardCancel()">Cancel</button>
-        <button class="mh-btn mh-btn-primary" id="mh-wizard-next" onclick="mhWizardNext()">Next →</button>
-        <button class="mh-btn mh-btn-primary" id="mh-wizard-create" onclick="mhWizardCreate()" style="display:none;">Create House</button>
-      </div>
-    </div>
-  </div>
 
 </div>
 
@@ -641,58 +500,109 @@
 
   window.mhPickType = function (type) {
     mhCloseModals();
-    if (type === 'company') {
-      mhShowEntityPicker();
-    }
-    // future types would branch here
+    mhShowIcpPicker(type);
   };
 
-  function mhShowEntityPicker() {
+  async function mhShowIcpPicker(houseType) {
+    const list = document.getElementById('mh-icp-list');
+    list.innerHTML = '<div class="mh-entity-none">Loading ICPs…</div>';
+    document.getElementById('mh-modal-icp').classList.add('open');
+
+    // Fetch ICPs for this client
+    const cid = Storage.getActiveClientId();
+    const { data: icps } = await sb()
+      .from('client_icps')
+      .select('*')
+      .eq('client_id', cid)
+      .eq('status', 'active')
+      .order('updated_at', { ascending: false });
+
     const client = Storage.getActiveClient();
-    const list   = document.getElementById('mh-entity-list');
-    const entities = client ? (client.brandEntities || []) : [];
+    const companyName = client ? client.name : 'Company';
 
-    // Build options: the company itself + only Brand-type entities from ontology
-    let opts = [];
-    if (client && client.name) {
-      opts.push({ id: '__company__', name: client.name, type: 'Company', isCompany: true });
-    }
-    entities
-      .filter(e => e.type === 'Brand')
-      .forEach(e => opts.push({ id: e.id, name: e.name, type: e.type, isCompany: false }));
+    let html = '';
 
-    if (!opts.length) {
-      list.innerHTML = `<div class="mh-entity-none">No brand entities found.<br><small style="color:var(--gray-400);">Add brands in Client Config → Brand Ontology first.</small></div>`;
-    } else {
-      list.innerHTML = opts.map(o => {
-        const initial = (o.name || '?')[0].toUpperCase();
-        return `<div class="mh-entity-opt" onclick="mhShowWizard('${o.id}','${esc(o.name)}','${esc(o.type)}')">
+    // "Skip ICP" option — create with blank positioning
+    html += `<div class="mh-entity-opt" onclick="mhCreateFromIcp(null, '${esc(companyName)}')">
+      <div class="mh-entity-opt-icon" style="background:var(--gray-200);color:var(--gray-500);">—</div>
+      <div class="mh-entity-opt-body">
+        <div class="mh-entity-opt-name">Start without an ICP</div>
+        <div class="mh-entity-opt-type">Create messaging house with blank positioning</div>
+      </div>
+    </div>`;
+
+    if (icps && icps.length) {
+      icps.forEach(icp => {
+        const initial = (icp.name || '?')[0].toUpperCase();
+        const scope = icp.scope === 'company' ? 'Company-wide' : (icp.entity_name || icp.scope);
+        const preview = icp.for_statement ? icp.for_statement.substring(0, 80) + (icp.for_statement.length > 80 ? '…' : '') : 'No positioning defined';
+        html += `<div class="mh-entity-opt" onclick="mhCreateFromIcp('${icp.id}', '${esc(icp.entity_name || companyName)}')">
           <div class="mh-entity-opt-icon">${initial}</div>
           <div class="mh-entity-opt-body">
-            <div class="mh-entity-opt-name">${esc(o.name)}</div>
-            <div class="mh-entity-opt-type">${esc(o.type)}</div>
+            <div class="mh-entity-opt-name">${esc(icp.name)}</div>
+            <div class="mh-entity-opt-type">${esc(scope)} · ${esc(preview)}</div>
           </div>
         </div>`;
-      }).join('');
+      });
     }
-    document.getElementById('mh-modal-entity').classList.add('open');
+
+    // "Create New ICP" option — navigates to ICPs tool
+    html += `<div class="mh-entity-opt" style="border:1.5px dashed var(--pink); background:rgba(217,43,150,0.03);" onclick="mhCloseModals(); document.querySelector('[data-tool-id=icps]').click();">
+      <div class="mh-entity-opt-icon" style="background:var(--pink);color:#fff;">+</div>
+      <div class="mh-entity-opt-body">
+        <div class="mh-entity-opt-name" style="color:var(--pink);">Create a New ICP</div>
+        <div class="mh-entity-opt-type">Opens the ICP builder to define a new Ideal Customer Profile</div>
+      </div>
+    </div>`;
+
+    list.innerHTML = html;
   }
 
-  window.mhCreateFromEntity = async function (entityId, entityName, entityType, posData) {
+  window.mhCreateFromIcp = async function (icpId, entityName) {
     mhCloseModals();
-    const title    = `${entityName} Messaging House`;
 
-    // Pre-populate positioning from wizard data if provided
-    const positioning = {
-      target_audience: posData?.for_statement || '',
-      problem: posData?.macro_problem || '',
-      solution: posData?.solution || ''
-    };
+    let positioning = { target_audience: '', problem: '', solution: '' };
+    let wizardData = null;
+    let entityId = null;
 
+    if (icpId) {
+      // Fetch the ICP to pre-populate
+      const { data: icp } = await sb()
+        .from('client_icps')
+        .select('*')
+        .eq('id', icpId)
+        .single();
+
+      if (icp) {
+        positioning = {
+          target_audience: icp.for_statement || '',
+          problem: icp.macro_problem || '',
+          solution: icp.solution || ''
+        };
+        entityId = icp.entity_id;
+        entityName = icp.entity_name || entityName;
+        wizardData = {
+          icp_id: icp.id,
+          icp_name: icp.name,
+          icp_types: icp.icp_types,
+          vertical_focus: icp.vertical_focus,
+          verticals: icp.verticals,
+          regions: icp.regions,
+          countries: icp.countries,
+          departments: icp.departments,
+          roles: icp.roles,
+          macro_problem: icp.macro_problem,
+          solution: icp.solution,
+          for_statement: icp.for_statement
+        };
+      }
+    }
+
+    const title = `${entityName} Messaging House`;
     const newHouse = {
       title,
       type        : 'company',
-      entity_id   : entityId === '__company__' ? null : entityId,
+      entity_id   : entityId,
       entity_name : entityName,
       description : '',
       status      : 'draft',
@@ -710,8 +620,7 @@
       avoid       : [],
       purpose_vision : { purpose: '', vision: '' },
       proof_assets   : [],
-      // Store wizard data as metadata for future reference
-      wizard_data : posData || null,
+      wizard_data : wizardData,
       enabled_sections: {
         taglines      : true,
         outcome       : true,
@@ -729,6 +638,11 @@
     } else {
       alert('Could not create messaging house. Check you have an active client selected and try again.');
     }
+  };
+
+  // Legacy mhCreateFromEntity kept as alias for backward compatibility
+  window.mhCreateFromEntity = async function (entityId, entityName, entityType, posData) {
+    await mhCreateFromIcp(null, entityName);
   };
 
   /* ════════════════════════════════════════════════════
@@ -1146,645 +1060,7 @@
     const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
   }
 
-  /* ════════════════════════════════════════════════════
-     POSITIONING WIZARD DATA
-     ════════════════════════════════════════════════════ */
-
-  const WIZARD_ICP_OPTIONS = [
-    { id: 'consumers', label: 'Consumers' },
-    { id: 'prosumers', label: 'Prosumers' },
-    { id: 'sole-traders', label: 'Sole Traders' },
-    { id: 'solopreneurs', label: 'Solopreneurs' },
-    { id: 'freelancers', label: 'Freelancers' },
-    { id: 'small-biz', label: 'Small Businesses' },
-    { id: 'medium-biz', label: 'Medium Businesses' },
-    { id: 'enterprises', label: 'Enterprises' },
-    { id: 'other', label: 'Other' }
-  ];
-
-  const WIZARD_VERTICALS_B2C = [
-    'Health & Wellness', 'Education', 'Entertainment', 'Fashion & Apparel', 'Home & Garden',
-    'Beauty & Cosmetics', 'Food & Beverage', 'Travel & Tourism', 'Sports & Fitness',
-    'Personal Finance', 'Hobbies & Crafts', 'Automotive', 'Residential Real Estate',
-    'Parenting & Family', 'Pet Care', 'Mental Health & Therapy', 'Dating & Relationships',
-    'Gaming', 'Music & Audio', 'Photography & Video', 'Art & Design', 'Books & Publishing',
-    'Home Improvement & DIY', 'Gardening & Landscaping', 'Cooking & Recipes',
-    'Wine & Spirits', 'Outdoor & Adventure', 'Cycling', 'Running & Athletics',
-    'Yoga & Mindfulness', 'Nutrition & Supplements', 'Weight Management',
-    'Skincare', 'Haircare', 'Jewellery & Accessories', 'Luxury Goods',
-    'Baby & Toddler', 'Senior Care & Ageing', 'Home Security',
-    'Sustainable Living & Eco', 'Streaming & Media', 'Podcasting',
-    'Mobile Apps', 'Social Media & Influencer', 'Wedding & Events',
-    'Moving & Relocation', 'Personal Development', 'Career & Job Hunting',
-    'Language Learning', 'Tutoring & Test Prep', 'Subscription Boxes'
-  ];
-
-  const WIZARD_VERTICALS_B2B = [
-    'Financial Services', 'Healthcare & Life Sciences', 'Technology & SaaS',
-    'Retail & eCommerce', 'Manufacturing', 'Energy & Utilities',
-    'Telecommunications', 'Construction & Engineering', 'Logistics & Supply Chain',
-    'Hospitality & Tourism', 'Legal Services', 'Insurance',
-    'Commercial Real Estate', 'Education & EdTech', 'Government & Public Sector',
-    'Non-profit & NGO', 'Aerospace & Defence', 'Agriculture & AgTech',
-    'Automotive & Mobility', 'Banking & Capital Markets', 'Biotechnology',
-    'Chemicals & Materials', 'Consulting & Professional Services',
-    'Data & Analytics', 'Digital Marketing & AdTech', 'eCommerce Infrastructure',
-    'Environmental & Cleantech', 'Fashion & Textile', 'Food Processing & FMCG',
-    'Freight & Shipping', 'Gaming & Interactive', 'HR & Workforce Management',
-    'Industrial Automation', 'IT Services & Outsourcing', 'Media & Publishing',
-    'Medical Devices', 'Mining & Resources', 'Oil & Gas', 'Packaging',
-    'Pharmaceuticals', 'PropTech', 'Recruitment & Staffing',
-    'Robotics & AI', 'Semiconductor & Electronics', 'Sports & Entertainment',
-    'Sustainability & ESG', 'Travel & Expense Management', 'Venture Capital & PE',
-    'Waste Management & Recycling'
-  ];
-
-  const WIZARD_REGIONS = [
-    'North America', 'Latin America', 'EMEA', 'Asia Pacific', 'Middle East', 'Africa', 'Oceania'
-  ];
-
-  const WIZARD_COUNTRIES_ALL = [
-    'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Australia', 'Japan',
-    'India', 'China', 'Brazil', 'Mexico', 'Netherlands', 'Sweden', 'Singapore', 'New Zealand',
-    'Spain', 'Italy', 'South Korea', 'Ireland', 'Switzerland', 'Belgium', 'Denmark', 'Norway',
-    'Austria', 'Portugal', 'Finland', 'Poland', 'Czech Republic', 'Romania', 'Hungary',
-    'Greece', 'Turkey', 'Israel', 'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait',
-    'Bahrain', 'Oman', 'South Africa', 'Nigeria', 'Kenya', 'Egypt', 'Morocco', 'Ghana',
-    'Ethiopia', 'Tanzania', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Venezuela',
-    'Costa Rica', 'Panama', 'Uruguay', 'Ecuador', 'Dominican Republic',
-    'Thailand', 'Vietnam', 'Indonesia', 'Philippines', 'Malaysia', 'Taiwan',
-    'Hong Kong', 'Bangladesh', 'Pakistan', 'Sri Lanka', 'Myanmar',
-    'Russia', 'Ukraine', 'Belarus', 'Kazakhstan', 'Uzbekistan',
-    'Iceland', 'Luxembourg', 'Malta', 'Cyprus', 'Estonia', 'Latvia', 'Lithuania',
-    'Slovenia', 'Slovakia', 'Croatia', 'Serbia', 'Bulgaria', 'Georgia',
-    'Armenia', 'Azerbaijan', 'Mongolia', 'Cambodia', 'Laos', 'Nepal',
-    'Fiji', 'Papua New Guinea', 'Jamaica', 'Trinidad & Tobago', 'Bahamas',
-    'Bermuda', 'Mauritius', 'Botswana', 'Rwanda', 'Senegal',
-    'Tunisia', 'Jordan', 'Lebanon', 'Iraq', 'Iran'
-  ];
-
-  const WIZARD_DEPARTMENTS = [
-    'Marketing', 'Sales', 'Product', 'Engineering', 'Finance', 'Operations', 'HR',
-    'Customer Success', 'IT', 'Security', 'Legal', 'Executive Leadership', 'Strategy',
-    'Analytics & BI', 'UX/Design', 'Research & Development', 'Quality Assurance',
-    'DevOps & Infrastructure', 'Data Science', 'Supply Chain', 'Procurement',
-    'Facilities & Workplace', 'Customer Support', 'Training & Enablement',
-    'Compliance & Risk', 'Corporate Communications', 'Public Relations',
-    'Partnerships & Alliances', 'Business Development', 'Revenue Operations',
-    'Content & Editorial', 'Brand', 'Growth', 'Demand Generation',
-    'Field Marketing', 'Channel Sales', 'Inside Sales', 'Solutions Engineering',
-    'Professional Services', 'Implementation', 'Technical Support',
-    'Account Management', 'Customer Onboarding', 'Pricing & Packaging',
-    'Investor Relations', 'Treasury', 'Tax', 'Internal Audit',
-    'Enterprise Architecture', 'Cybersecurity', 'Cloud & Platform',
-    'Mobile Engineering', 'Frontend Engineering', 'Backend Engineering',
-    'Site Reliability', 'Project Management (PMO)', 'Change Management',
-    'Mergers & Acquisitions', 'Sustainability & ESG', 'Diversity & Inclusion',
-    'Talent Acquisition', 'Learning & Development', 'Compensation & Benefits'
-  ];
-
-  const WIZARD_ROLES = [
-    'CEO', 'CFO', 'COO', 'CTO', 'CIO', 'CISO', 'CMO', 'CRO', 'CPO', 'CDO',
-    'VP Marketing', 'VP Sales', 'VP Engineering', 'VP Product', 'VP Operations',
-    'VP Customer Success', 'VP Finance', 'VP HR', 'VP IT',
-    'Marketing Director', 'Sales Director', 'Engineering Director', 'Product Director',
-    'Director of Operations', 'Director of Analytics', 'Director of Design',
-    'Director of Customer Experience', 'Director of Partnerships',
-    'Head of Product', 'Head of Growth', 'Head of Brand', 'Head of Content',
-    'Head of Demand Gen', 'Head of Data', 'Head of Security', 'Head of DevOps',
-    'Head of Talent', 'Head of Legal', 'Head of Compliance',
-    'Marketing Manager', 'Product Manager', 'Project Manager', 'Programme Manager',
-    'Account Manager', 'Customer Success Manager', 'Community Manager',
-    'Brand Manager', 'Content Manager', 'Growth Manager', 'Channel Manager',
-    'Campaign Manager', 'Events Manager', 'PR Manager', 'Social Media Manager',
-    'Engineering Lead', 'Tech Lead', 'Team Lead', 'Architect', 'Solutions Architect',
-    'Principal Engineer', 'Staff Engineer', 'DevOps Engineer', 'Platform Engineer',
-    'Data Engineer', 'ML Engineer', 'Frontend Developer', 'Backend Developer',
-    'Full Stack Developer', 'QA Engineer', 'Site Reliability Engineer',
-    'Business Analyst', 'Data Analyst', 'Financial Analyst', 'Marketing Analyst',
-    'UX Researcher', 'UX Designer', 'Product Designer', 'Graphic Designer',
-    'Copywriter', 'Content Strategist', 'SEO Specialist', 'PPC Specialist',
-    'Sales Development Rep (SDR)', 'Account Executive', 'Sales Engineer',
-    'Solutions Consultant', 'Implementation Specialist', 'Technical Writer',
-    'Procurement Specialist', 'Supply Chain Manager', 'Compliance Officer',
-    'Risk Manager', 'IT Administrator', 'Security Analyst', 'Founder', 'Co-founder'
-  ];
-
-  // Wizard state
-  let mhWizardState = {
-    currentStep: 1,
-    entityId: null,
-    entityName: null,
-    entityType: null,
-    icpTypes: [],
-    verticalFocused: null, // null = not chosen, 'none' | 'locked' | 'strong'
-    verticals: [],
-    regions: [],
-    countries: [],
-    departments: [],
-    roles: [],
-    macroProblem: '',
-    solution: '',
-    visibleVerticalIndices: [],
-    visibleCountryIndices: [],
-    visibleDepartmentIndices: [],
-    visibleRoleIndices: []
-  };
-
-  function mhWizardReset() {
-    mhWizardState = {
-      currentStep: 1,
-      entityId: null,
-      entityName: null,
-      entityType: null,
-      icpTypes: [],
-      verticalFocused: null,
-      verticals: [],
-      regions: [],
-      countries: [],
-      departments: [],
-      roles: [],
-      macroProblem: '',
-      solution: '',
-      visibleVerticalIndices: [],
-      visibleCountryIndices: [],
-      visibleDepartmentIndices: [],
-      visibleRoleIndices: []
-    };
-  }
-
-  window.mhShowWizard = function (entityId, entityName, entityType) {
-    mhWizardReset();
-    mhWizardState.entityId = entityId;
-    mhWizardState.entityName = entityName;
-    mhWizardState.entityType = entityType;
-    mhWizardRenderStep();
-    document.getElementById('mh-modal-wizard').classList.add('open');
-  };
-
-  window.mhWizardCancel = function () {
-    document.getElementById('mh-modal-wizard').classList.remove('open');
-    mhWizardReset();
-  };
-
-  window.mhWizardNext = function () {
-    // Capture text from steps 6 and 7 before advancing
-    const step6El = document.getElementById('mh-step6-text');
-    if (step6El) mhWizardState.macroProblem = step6El.value;
-
-    const step7El = document.getElementById('mh-step7-text');
-    if (step7El) mhWizardState.solution = step7El.value;
-
-    if (mhWizardStep1()) mhWizardState.currentStep++;
-    if (mhWizardState.currentStep === 4 && !mhWizardShouldShowStep(4)) mhWizardState.currentStep++;
-    if (mhWizardState.currentStep === 5 && !mhWizardShouldShowStep(5)) mhWizardState.currentStep++;
-    if (mhWizardState.currentStep > 8) mhWizardState.currentStep = 8;
-    mhWizardRenderStep();
-  };
-
-  window.mhWizardPrevious = function () {
-    // Capture text from steps 6 and 7 before retreating
-    const step6El = document.getElementById('mh-step6-text');
-    if (step6El) mhWizardState.macroProblem = step6El.value;
-
-    const step7El = document.getElementById('mh-step7-text');
-    if (step7El) mhWizardState.solution = step7El.value;
-
-    mhWizardState.currentStep--;
-    if (mhWizardState.currentStep === 4 && !mhWizardShouldShowStep(4)) mhWizardState.currentStep--;
-    if (mhWizardState.currentStep === 5 && !mhWizardShouldShowStep(5)) mhWizardState.currentStep--;
-    if (mhWizardState.currentStep < 1) mhWizardState.currentStep = 1;
-    mhWizardRenderStep();
-  };
-
-  function mhWizardShouldShowStep(step) {
-    if (step === 4) return ['small-biz','medium-biz','enterprises'].some(t => mhWizardState.icpTypes.includes(t));
-    if (step === 5) return mhWizardState.departments.length > 0 || mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
-    return true;
-  }
-
-  function mhWizardStep1() {
-    // Step 1: ICP Type - at least one required
-    return true; // Allow proceed even if empty
-  }
-
-  function mhWizardRenderStep() {
-    const step = mhWizardState.currentStep;
-    const total = 8;
-    const showDepts = mhWizardShouldShowStep(4);
-    const showRoles = mhWizardShouldShowStep(5);
-
-    // Hide all steps
-    ['mh-wizard-step-1','mh-wizard-step-2','mh-wizard-step-3','mh-wizard-step-4','mh-wizard-step-5','mh-wizard-step-6','mh-wizard-step-7','mh-wizard-step-8'].forEach(id => {
-      document.getElementById(id).classList.remove('active');
-      if (id === 'mh-wizard-step-4') document.getElementById(id).style.display = showDepts ? 'block' : 'none';
-      if (id === 'mh-wizard-step-5') document.getElementById(id).style.display = showRoles ? 'block' : 'none';
-    });
-
-    document.getElementById('mh-wizard-step-'+step).classList.add('active');
-
-    // Update progress
-    document.getElementById('mh-wizard-progress').textContent = 'Step '+step+' of '+total;
-    document.getElementById('mh-wizard-progress-fill').style.width = (step/total*100)+'%';
-
-    // Update buttons
-    document.getElementById('mh-wizard-back').style.display = step > 1 ? 'inline-flex' : 'none';
-    const isLastStep = step === total;
-    document.getElementById('mh-wizard-next').style.display = isLastStep ? 'none' : 'inline-flex';
-    document.getElementById('mh-wizard-create').style.display = isLastStep ? 'inline-flex' : 'none';
-
-    // Render step-specific content
-    if (step === 1) mhWizardRenderStep1();
-    else if (step === 2) mhWizardRenderStep2();
-    else if (step === 3) mhWizardRenderStep3();
-    else if (step === 4 && showDepts) mhWizardRenderStep4();
-    else if (step === 5 && showRoles) mhWizardRenderStep5();
-    else if (step === 6) mhWizardRenderStep6();
-    else if (step === 7) mhWizardRenderStep7();
-    else if (step === 8) mhWizardRenderStep8();
-  }
-
-  function mhWizardRenderStep1() {
-    const container = document.getElementById('mh-step1-options');
-    container.innerHTML = WIZARD_ICP_OPTIONS.map(opt => {
-      const sel = mhWizardState.icpTypes.includes(opt.id) ? 'selected' : '';
-      return `<div class="mh-card-item ${sel}" onclick="mhWizardToggleICP('${opt.id}')">
-        <div class="mh-card-item-label">${opt.label}</div>
-      </div>`;
-    }).join('');
-  }
-
-  window.mhWizardToggleICP = function (id) {
-    const idx = mhWizardState.icpTypes.indexOf(id);
-    if (idx >= 0) mhWizardState.icpTypes.splice(idx, 1);
-    else mhWizardState.icpTypes.push(id);
-    mhWizardRenderStep1();
-  };
-
-  function mhWizardRenderStep2() {
-    // Radio choice: 3 vertical focus options
-    const radioOpts = [
-      { id: 'none', label: "We aren't focused on specific verticals" },
-      { id: 'locked', label: 'We are a vertical-focused offering — our product targets the following verticals' },
-      { id: 'strong', label: 'We are not locked to a vertical, but we are really strong in the following verticals' }
-    ];
-    const radioHtml = radioOpts.map(opt => {
-      const isSel = mhWizardState.verticalFocused === opt.id;
-      return `<div class="mh-radio-item ${isSel ? 'selected' : ''}" onclick="mhWizardSelectVerticalFocus('${opt.id}')">
-        <div class="mh-radio-circle"></div>
-        <div>${opt.label}</div>
-      </div>`;
-    }).join('');
-    document.getElementById('mh-step2-radio').innerHTML = radioHtml;
-
-    const picker = document.getElementById('mh-step2-picker');
-    const showPicker = mhWizardState.verticalFocused === 'locked' || mhWizardState.verticalFocused === 'strong';
-    picker.style.display = showPicker ? 'block' : 'none';
-
-    if (!showPicker) return;
-
-    const isB2B = mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
-    const verticals = isB2B ? WIZARD_VERTICALS_B2B : WIZARD_VERTICALS_B2C;
-
-    if (!mhWizardState.visibleVerticalIndices.length) {
-      mhWizardState.visibleVerticalIndices = mhWizardGetRandomIndices(verticals.length, 15);
-    }
-
-    const visibleVerticals = mhWizardState.visibleVerticalIndices.map(i => verticals[i]);
-    const container = document.getElementById('mh-step2-tags');
-    container.innerHTML = visibleVerticals.map(v => {
-      const sel = mhWizardState.verticals.includes(v) ? 'selected' : '';
-      return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('verticals','${esc(v)}')">${v}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('verticals','${esc(v)}')" style="${mhWizardState.verticals.includes(v)?'':'display:none;'}">✕</button></div>`;
-    }).join('');
-
-    // Add custom verticals
-    const customVerticals = mhWizardState.verticals.filter(v => !visibleVerticals.includes(v));
-    const customHtml = customVerticals.map(v => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('verticals','${esc(v)}')">${v}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('verticals','${esc(v)}')">✕</button></div>`).join('');
-    if (customHtml) container.innerHTML += customHtml;
-
-    document.getElementById('mh-step2-count').textContent = mhWizardState.verticals.length;
-  }
-
-  window.mhWizardSelectVerticalFocus = function (choice) {
-    mhWizardState.verticalFocused = choice; // 'none', 'locked', or 'strong'
-    if (choice === 'none') mhWizardState.verticals = [];
-    mhWizardRenderStep2();
-  };
-
-  function mhWizardRenderStep3() {
-    const isGlobal = mhWizardState.regions.includes('__global__');
-
-    const radioHtml = [
-      { id: '__global__', label: 'We operate globally' },
-      { id: '__specific__', label: 'We target specific regions & countries' }
-    ].map(opt => {
-      const sel = isGlobal === (opt.id === '__global__') ? 'selected' : '';
-      return `<div class="mh-radio-item ${sel}" onclick="mhWizardSelectGeo('${opt.id}')">
-        <div class="mh-radio-circle"></div>
-        <div>${opt.label}</div>
-      </div>`;
-    }).join('');
-
-    document.getElementById('mh-step3-radio').innerHTML = radioHtml;
-    document.getElementById('mh-step3-regions').style.display = isGlobal ? 'none' : 'block';
-
-    if (!isGlobal) {
-      const regionsContainer = document.getElementById('mh-step3-regions-list');
-      regionsContainer.innerHTML = WIZARD_REGIONS.map(r => {
-        const sel = mhWizardState.regions.includes(r) ? 'selected' : '';
-        return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleRegion('${r}')">${r}</div>`;
-      }).join('');
-
-      const countries = WIZARD_COUNTRIES_ALL;
-      if (!mhWizardState.visibleCountryIndices.length) {
-        mhWizardState.visibleCountryIndices = mhWizardGetRandomIndices(countries.length, 12);
-      }
-
-      const visibleCountries = mhWizardState.visibleCountryIndices.map(i => countries[i]);
-      const countriesContainer = document.getElementById('mh-step3-countries');
-      countriesContainer.innerHTML = visibleCountries.map(c => {
-        const sel = mhWizardState.countries.includes(c) ? 'selected' : '';
-        return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('countries','${esc(c)}')">${c}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('countries','${esc(c)}')" style="${mhWizardState.countries.includes(c)?'':'display:none;'}">✕</button></div>`;
-      }).join('');
-
-      const customCountries = mhWizardState.countries.filter(c => !visibleCountries.includes(c));
-      const customHtml = customCountries.map(c => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('countries','${esc(c)}')">${c}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('countries','${esc(c)}')">✕</button></div>`).join('');
-      if (customHtml) countriesContainer.innerHTML += customHtml;
-
-      document.getElementById('mh-step3-country-count').textContent = mhWizardState.countries.length;
-    }
-  }
-
-  window.mhWizardSelectGeo = function (id) {
-    if (id === '__global__') {
-      mhWizardState.regions = ['__global__'];
-      mhWizardState.countries = [];
-    } else {
-      mhWizardState.regions = [];
-      mhWizardState.countries = [];
-    }
-    mhWizardRenderStep3();
-  };
-
-  window.mhWizardToggleRegion = function (r) {
-    const idx = mhWizardState.regions.indexOf(r);
-    if (idx >= 0) mhWizardState.regions.splice(idx, 1);
-    else mhWizardState.regions.push(r);
-    mhWizardRenderStep3();
-  };
-
-  function mhWizardRenderStep4() {
-    if (!mhWizardState.visibleDepartmentIndices.length) {
-      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 30);
-    }
-
-    const visibleDepts = mhWizardState.visibleDepartmentIndices.map(i => WIZARD_DEPARTMENTS[i]);
-    const container = document.getElementById('mh-step4-tags');
-    container.innerHTML = visibleDepts.map(d => {
-      const sel = mhWizardState.departments.includes(d) ? 'selected' : '';
-      return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('departments','${esc(d)}')">${d}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('departments','${esc(d)}')" style="${mhWizardState.departments.includes(d)?'':'display:none;'}">✕</button></div>`;
-    }).join('');
-
-    const customDepts = mhWizardState.departments.filter(d => !visibleDepts.includes(d));
-    const customHtml = customDepts.map(d => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('departments','${esc(d)}')">${d}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('departments','${esc(d)}')">✕</button></div>`).join('');
-    if (customHtml) container.innerHTML += customHtml;
-
-    document.getElementById('mh-step4-count').textContent = mhWizardState.departments.length;
-  }
-
-  // Department → relevant roles mapping
-  const DEPT_ROLE_MAP = {
-    'Marketing': ['CMO','VP Marketing','Marketing Director','Marketing Manager','Growth Manager','Brand Manager','Content Manager','Campaign Manager','Social Media Manager','Marketing Analyst','Copywriter','Content Strategist','SEO Specialist','PPC Specialist'],
-    'Sales': ['CRO','VP Sales','Sales Director','Account Executive','Sales Development Rep (SDR)','Sales Engineer','Channel Manager','Account Manager','Inside Sales'],
-    'Product': ['CPO','VP Product','Product Director','Head of Product','Product Manager','Product Designer','UX Researcher','UX Designer'],
-    'Engineering': ['CTO','VP Engineering','Engineering Director','Engineering Lead','Tech Lead','Principal Engineer','Staff Engineer','Full Stack Developer','Frontend Developer','Backend Developer','QA Engineer','Architect'],
-    'Finance': ['CFO','VP Finance','Financial Analyst','Procurement Specialist','Treasury','Tax'],
-    'Operations': ['COO','VP Operations','Director of Operations','Programme Manager','Project Manager','Supply Chain Manager'],
-    'HR': ['VP HR','Head of Talent','Talent Acquisition','Learning & Development','Compensation & Benefits'],
-    'Customer Success': ['VP Customer Success','Customer Success Manager','Account Manager','Community Manager'],
-    'IT': ['CIO','VP IT','IT Administrator','Enterprise Architecture','Platform Engineer'],
-    'Cybersecurity': ['CISO','Head of Security','Security Analyst','DevOps Engineer','Site Reliability Engineer'],
-    'Security': ['CISO','Head of Security','Security Analyst'],
-    'Legal': ['Head of Legal','Head of Compliance','Compliance Officer','Risk Manager'],
-    'Executive Leadership': ['CEO','CFO','COO','CTO','CIO','CISO','CMO','CRO','CPO','CDO','Founder','Co-founder'],
-    'Strategy': ['CDO','Director of Analytics','Business Analyst','Data Analyst'],
-    'Analytics & BI': ['Director of Analytics','Data Analyst','Business Analyst','Marketing Analyst','Data Engineer','ML Engineer'],
-    'UX/Design': ['Director of Design','UX Designer','UX Researcher','Product Designer','Graphic Designer'],
-    'Research & Development': ['Principal Engineer','Staff Engineer','Architect','ML Engineer','Data Engineer'],
-    'DevOps & Infrastructure': ['Head of DevOps','DevOps Engineer','Platform Engineer','Site Reliability Engineer','Cloud & Platform'],
-    'Data Science': ['CDO','Head of Data','Data Engineer','ML Engineer','Data Analyst'],
-    'Customer Support': ['Customer Success Manager','Technical Support','Implementation Specialist'],
-    'Compliance & Risk': ['Head of Compliance','Compliance Officer','Risk Manager','Security Analyst'],
-    'Business Development': ['Director of Partnerships','Account Executive','Solutions Consultant'],
-    'Revenue Operations': ['CRO','Growth Manager','Marketing Analyst','Sales Director'],
-    'Content & Editorial': ['Head of Content','Content Manager','Content Strategist','Copywriter','Technical Writer'],
-    'Brand': ['Head of Brand','Brand Manager','Graphic Designer','Copywriter'],
-    'Growth': ['Head of Growth','Growth Manager','Head of Demand Gen','PPC Specialist','SEO Specialist'],
-    'Demand Generation': ['Head of Demand Gen','Campaign Manager','PPC Specialist','SEO Specialist','Marketing Manager'],
-    'Solutions Engineering': ['Solutions Architect','Solutions Consultant','Sales Engineer','Implementation Specialist'],
-    'Professional Services': ['Solutions Consultant','Implementation Specialist','Technical Writer','Project Manager']
-  };
-
-  function mhWizardGetRelevantRoles() {
-    // Collect roles relevant to selected departments
-    const relevant = new Set();
-    mhWizardState.departments.forEach(dept => {
-      const mapped = DEPT_ROLE_MAP[dept];
-      if (mapped) mapped.forEach(r => relevant.add(r));
-    });
-    return relevant;
-  }
-
-  function mhWizardRenderStep5() {
-    const relevant = mhWizardGetRelevantRoles();
-
-    // Always rebuild: show relevant roles first, then fill with random others
-    const relevantRoles = WIZARD_ROLES.filter(r => relevant.has(r));
-    const otherRoles = WIZARD_ROLES.filter(r => !relevant.has(r));
-
-    // Pick random others to pad to ~30 total
-    const needed = Math.max(0, 30 - relevantRoles.length);
-    const randomOtherIndices = mhWizardGetRandomIndices(otherRoles.length, needed);
-    const randomOthers = randomOtherIndices.map(i => otherRoles[i]);
-
-    const visibleRoles = [...relevantRoles, ...randomOthers];
-
-    const container = document.getElementById('mh-step5-tags');
-
-    // If we have relevant roles, show them with a subtle label
-    let html = '';
-    if (relevantRoles.length > 0) {
-      html += `<div style="width:100%;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:0.15rem;">Relevant to your departments</div>`;
-      html += relevantRoles.map(r => {
-        const sel = mhWizardState.roles.includes(r) ? 'selected' : '';
-        return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')" style="${mhWizardState.roles.includes(r)?'':'display:none;'}">✕</button></div>`;
-      }).join('');
-
-      if (randomOthers.length > 0) {
-        html += `<div style="width:100%;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-top:0.65rem;margin-bottom:0.15rem;">Other roles</div>`;
-      }
-    }
-
-    html += randomOthers.map(r => {
-      const sel = mhWizardState.roles.includes(r) ? 'selected' : '';
-      return `<div class="mh-tag-item ${sel}" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')" style="${mhWizardState.roles.includes(r)?'':'display:none;'}">✕</button></div>`;
-    }).join('');
-
-    // Add custom/already-selected roles not in visible set
-    const customRoles = mhWizardState.roles.filter(r => !visibleRoles.includes(r));
-    const customHtml = customRoles.map(r => `<div class="mh-tag-item selected" onclick="mhWizardToggleTag('roles','${esc(r)}')">${r}<button class="mh-tag-item-remove" onclick="event.stopPropagation();mhWizardRemoveTag('roles','${esc(r)}')">✕</button></div>`).join('');
-    if (customHtml) html += customHtml;
-
-    container.innerHTML = html;
-    document.getElementById('mh-step5-count').textContent = mhWizardState.roles.length;
-  }
-
-  function mhWizardRenderStep6() {
-    document.getElementById('mh-step6-text').value = mhWizardState.macroProblem;
-  }
-
-  function mhWizardRenderStep7() {
-    document.getElementById('mh-step7-text').value = mhWizardState.solution;
-  }
-
-  function mhWizardRenderStep8() {
-    const forStatement = mhWizardBuildForStatement();
-    document.getElementById('mh-step8-for').textContent = forStatement;
-    document.getElementById('mh-step8-who').textContent = mhWizardState.macroProblem;
-    document.getElementById('mh-step8-we').textContent = mhWizardState.solution;
-  }
-
-  function mhWizardBuildForStatement() {
-    // Natural-language list: "A, B and C"
-    function natList(arr) {
-      if (arr.length <= 1) return arr.join('');
-      return arr.slice(0, -1).join(', ') + ' and ' + arr[arr.length - 1];
-    }
-
-    const parts = [];
-
-    // ICP type
-    if (mhWizardState.icpTypes.length) {
-      const labels = mhWizardState.icpTypes.map(t => {
-        const opt = WIZARD_ICP_OPTIONS.find(o => o.id === t);
-        return opt ? opt.label : t;
-      });
-      parts.push(natList(labels));
-    }
-
-    // Roles (e.g. "CISOs and DevOps leads")
-    if (mhWizardState.roles.length) {
-      parts.push(natList(mhWizardState.roles));
-    }
-
-    // Departments (e.g. "in IT Security and Engineering")
-    if (mhWizardState.departments.length) {
-      parts.push('in ' + natList(mhWizardState.departments));
-    }
-
-    // Verticals — phrasing depends on focus type
-    if (mhWizardState.verticals.length) {
-      if (mhWizardState.verticalFocused === 'locked') {
-        parts.push('in ' + natList(mhWizardState.verticals));
-      } else if (mhWizardState.verticalFocused === 'strong') {
-        parts.push('particularly in ' + natList(mhWizardState.verticals));
-      }
-    }
-
-    // Geography
-    if (mhWizardState.regions.length && !mhWizardState.regions.includes('__global__')) {
-      let geo = 'across ' + natList(mhWizardState.regions);
-      if (mhWizardState.countries.length) {
-        geo += ' (' + natList(mhWizardState.countries) + ')';
-      }
-      parts.push(geo);
-    }
-
-    return parts.join(' ') || 'Your target audience';
-  }
-
-  window.mhWizardToggleTag = function (field, value) {
-    if (!mhWizardState[field].includes(value)) {
-      mhWizardState[field].push(value);
-    }
-    mhWizardRenderStep();
-  };
-
-  window.mhWizardRemoveTag = function (field, value) {
-    const idx = mhWizardState[field].indexOf(value);
-    if (idx >= 0) mhWizardState[field].splice(idx, 1);
-    mhWizardRenderStep();
-  };
-
-  window.mhWizardAddCustomTag = function (step) {
-    const inputId = 'mh-step'+step+'-input';
-    const input = document.getElementById(inputId);
-    const val = (input.value || '').trim();
-    if (!val) return;
-
-    if (step === 2) {
-      if (!mhWizardState.verticals.includes(val)) mhWizardState.verticals.push(val);
-    } else if (step === 3) {
-      if (!mhWizardState.countries.includes(val)) mhWizardState.countries.push(val);
-    } else if (step === 4) {
-      if (!mhWizardState.departments.includes(val)) mhWizardState.departments.push(val);
-    } else if (step === 5) {
-      if (!mhWizardState.roles.includes(val)) mhWizardState.roles.push(val);
-    }
-
-    input.value = '';
-    mhWizardRenderStep();
-  };
-
-  window.mhWizardReshuffle = function (step) {
-    if (step === 2) {
-      const isB2B = mhWizardState.icpTypes.some(t => ['small-biz','medium-biz','enterprises'].includes(t));
-      const verticals = isB2B ? WIZARD_VERTICALS_B2B : WIZARD_VERTICALS_B2C;
-      mhWizardState.visibleVerticalIndices = mhWizardGetRandomIndices(verticals.length, 15);
-    } else if (step === 3) {
-      mhWizardState.visibleCountryIndices = mhWizardGetRandomIndices(WIZARD_COUNTRIES_ALL.length, 12);
-    } else if (step === 4) {
-      mhWizardState.visibleDepartmentIndices = mhWizardGetRandomIndices(WIZARD_DEPARTMENTS.length, 30);
-    } else if (step === 5) {
-      // Roles are rebuilt each render (relevant + random others), so just re-render
-    }
-    mhWizardRenderStep();
-  };
-
-  window.mhWizardShowAllCountries = function () {
-    mhWizardState.visibleCountryIndices = Array.from({length: WIZARD_COUNTRIES_ALL.length}, (_, i) => i);
-    mhWizardRenderStep3();
-  };
-
-  function mhWizardGetRandomIndices(max, count) {
-    const indices = Array.from({length: max}, (_, i) => i);
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-    return indices.slice(0, Math.min(count, max));
-  }
-
-  window.mhWizardCreate = async function () {
-    // Capture step 6 & 7 text before creating
-    mhWizardState.macroProblem = document.getElementById('mh-step6-text').value;
-    mhWizardState.solution = document.getElementById('mh-step7-text').value;
-
-    const posData = {
-      icp_types: mhWizardState.icpTypes,
-      verticals: mhWizardState.verticals,
-      regions: mhWizardState.regions,
-      countries: mhWizardState.countries,
-      departments: mhWizardState.departments,
-      roles: mhWizardState.roles,
-      macro_problem: mhWizardState.macroProblem,
-      solution: mhWizardState.solution,
-      for_statement: mhWizardBuildForStatement()
-    };
-
-    document.getElementById('mh-modal-wizard').classList.remove('open');
-    await mhCreateFromEntity(mhWizardState.entityId, mhWizardState.entityName, mhWizardState.entityType, posData);
-  };
+  /* Wizard code removed — now lives in tools/icps/icps.html */
 
   /* ════════════════════════════════════════════════════
      START

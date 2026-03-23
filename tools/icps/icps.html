@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICP Manager</title>
+  <style>
+    /* ===== Base Styles ===== */
+    .icp-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg);
+      color: var(--gray-700);
+    }
+
+    .icp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      background: var(--white);
+    }
+
+    .icp-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    .icp-header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .icp-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icp-btn-primary {
+      background: var(--pink);
+      color: var(--white);
+    }
+
+    .icp-btn-primary:hover {
+      background: var(--pink-hover);
+    }
+
+    .icp-btn-secondary {
+      background: var(--gray-100);
+      color: var(--navy);
+      border: 1px solid var(--gray-300);
+    }
+
+    .icp-btn-secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .icp-btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .icp-btn-danger {
+      background: var(--error);
+      color: var(--white);
+    }
+
+    .icp-btn-danger:hover {
+      opacity: 0.9;
+    }
+
+    /* ===== Content Area ===== */
+    .icp-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .icp-content-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* ===== List View ===== */
+    .icp-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .icp-card {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icp-card:hover {
+      border-color: var(--pink);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .icp-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .icp-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0;
+    }
+
+    .icp-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .icp-badge-scope {
+      background: var(--gray-200);
+      color: var(--navy);
+    }
+
+    .icp-badge-status {
+      background: var(--gray-200);
+      color: var(--navy);
+    }
+
+    .icp-badge-status.active {
+      background: rgba(76, 175, 80, 0.1);
+      color: #4CAF50;
+    }
+
+    .icp-card-meta {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .icp-card-for {
+      font-size: 14px;
+      color: var(--gray-600);
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .icp-card-date {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 8px;
+    }
+
+    .icp-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray-600);
+    }
+
+    .icp-empty h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+
+    .icp-empty p {
+      font-size: 14px;
+      margin: 0 0 20px 0;
+    }
+
+    /* ===== Detail View ===== */
+    .icp-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .icp-detail-title-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .icp-back-btn {
+      background: none;
+      border: none;
+      color: var(--pink);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icp-detail-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0;
+      flex: 1;
+    }
+
+    .icp-detail-title-edit {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--navy);
+      font-family: inherit;
+    }
+
+    .icp-detail-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .icp-section {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .icp-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 16px 0;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-200);
+    }
+
+    .icp-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .icp-pill {
+      background: var(--pink);
+      color: var(--white);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .icp-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .icp-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .icp-data-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .icp-data-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .icp-data-value {
+      font-size: 14px;
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    .icp-for-statement {
+      background: var(--gray-100);
+      border-left: 4px solid var(--pink);
+      padding: 16px;
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--navy);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .icp-text-block {
+      font-size: 14px;
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    /* ===== Wizard Styles ===== */
+    .icp-wizard {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .icp-wizard-header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .icp-wizard-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 8px 0;
+    }
+
+    .icp-wizard-progress {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .icp-progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gray-300);
+      transition: all 0.2s ease;
+    }
+
+    .icp-progress-dot.active {
+      background: var(--pink);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .icp-progress-dot.completed {
+      background: var(--pink);
+    }
+
+    .icp-step {
+      display: none;
+    }
+
+    .icp-step.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .icp-step-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 0 0 20px 0;
+    }
+
+    .icp-step-desc {
+      font-size: 14px;
+      color: var(--gray-600);
+      margin-bottom: 24px;
+    }
+
+    .icp-option-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .icp-option {
+      border: 2px solid var(--gray-300);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--white);
+    }
+
+    .icp-option:hover {
+      border-color: var(--pink);
+      background: rgba(255, 105, 180, 0.05);
+    }
+
+    .icp-option.selected {
+      border-color: var(--pink);
+      background: rgba(255, 105, 180, 0.1);
+      font-weight: 600;
+      color: var(--pink);
+    }
+
+    .icp-option-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--navy);
+    }
+
+    .icp-option.selected .icp-option-label {
+      color: var(--pink);
+    }
+
+    .icp-multiselect {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .icp-checkbox-group {
+      display: grid;
+      gap: 12px;
+    }
+
+    .icp-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .icp-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--pink);
+    }
+
+    .icp-checkbox label {
+      font-size: 14px;
+      color: var(--gray-700);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .icp-radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .icp-radio {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .icp-radio input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--pink);
+    }
+
+    .icp-radio label {
+      font-size: 14px;
+      color: var(--gray-700);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .icp-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--gray-700);
+      resize: vertical;
+    }
+
+    .icp-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--gray-700);
+    }
+
+    .icp-input:focus,
+    .icp-textarea:focus {
+      outline: none;
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+    }
+
+    .icp-wizard-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--gray-300);
+    }
+
+    .icp-wizard-footer .icp-btn {
+      flex: 1;
+    }
+
+    .icp-search {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .icp-search input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--gray-700);
+    }
+
+    .icp-search input::placeholder {
+      color: var(--gray-500);
+    }
+
+    .icp-scope-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .icp-scope-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icp-scope-option:hover {
+      background: var(--gray-100);
+    }
+
+    .icp-scope-option.selected {
+      border-color: var(--pink);
+      background: rgba(255, 105, 180, 0.05);
+    }
+
+    .icp-scope-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--pink);
+    }
+
+    .icp-scope-label {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+
+    .icp-loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      color: var(--gray-600);
+    }
+
+    .icp-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--gray-300);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .icp-error {
+      background: rgba(244, 67, 54, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .icp-success {
+      background: rgba(76, 175, 80, 0.1);
+      border: 1px solid #4CAF50;
+      color: #2E7D32;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .icp-content {
+        padding: 16px;
+      }
+
+      .icp-row {
+        grid-template-columns: 1fr;
+      }
+
+      .icp-option-group {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+
+      .icp-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .icp-detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .icp-detail-actions {
+        width: 100%;
+      }
+
+      .icp-detail-actions .icp-btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="icp-container">
+    <div class="icp-header">
+      <h1>Ideal Customer Profiles</h1>
+      <div class="icp-header-actions">
+        <button class="icp-btn icp-btn-primary" onclick="icpShowWizard()">+ New ICP</button>
+      </div>
+    </div>
+
+    <div class="icp-content">
+      <div class="icp-content-inner" id="icpView">
+        <!-- Views will render here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ===== Constants =====
+      const WIZARD_ICP_OPTIONS = [
+        { id: 'consumers', label: 'Consumers' },
+        { id: 'prosumers', label: 'Prosumers' },
+        { id: 'creators', label: 'Creators' },
+        { id: 'students', label: 'Students' },
+        { id: 'freelancers', label: 'Freelancers' },
+        { id: 'small-biz', label: 'Small Businesses' },
+        { id: 'medium-biz', label: 'Medium Businesses' },
+        { id: 'enterprises', label: 'Enterprises' },
+        { id: 'other', label: 'Other' }
+      ];
+
+      const WIZARD_VERTICALS_B2C = [
+        'Health & Wellness', 'Education', 'Entertainment', 'Fashion & Apparel', 'Home & Garden',
+        'Beauty & Cosmetics', 'Food & Beverage', 'Travel & Tourism', 'Sports & Fitness',
+        'Personal Finance', 'Hobbies & Crafts', 'Automotive', 'Residential Real Estate',
+        'Parenting & Family', 'Pet Care', 'Mental Health & Therapy', 'Dating & Relationships',
+        'Gaming', 'Music & Audio', 'Photography & Video', 'Art & Design', 'Books & Publishing',
+        'Home Improvement & DIY', 'Gardening & Landscaping', 'Cooking & Recipes',
+        'Wine & Spirits', 'Outdoor & Adventure', 'Cycling', 'Running & Athletics',
+        'Yoga & Mindfulness', 'Nutrition & Supplements', 'Weight Management',
+        'Skincare', 'Haircare', 'Jewellery & Accessories', 'Luxury Goods',
+        'Baby & Toddler', 'Senior Care & Ageing', 'Home Security',
+        'Sustainable Living & Eco', 'Streaming & Media', 'Podcasting',
+        'Mobile Apps', 'Social Media & Influencer', 'Wedding & Events',
+        'Moving & Relocation', 'Personal Development', 'Career & Job Hunting',
+        'Language Learning', 'Tutoring & Test Prep', 'Subscription Boxes'
+      ];
+
+      const WIZARD_VERTICALS_B2B = [
+        'Financial Services', 'Healthcare & Life Sciences', 'Technology & SaaS',
+        'Retail & eCommerce', 'Manufacturing', 'Energy & Utilities',
+        'Telecommunications', 'Construction & Engineering', 'Logistics & Supply Chain',
+        'Hospitality & Tourism', 'Legal Services', 'Insurance',
+        'Commercial Real Estate', 'Education & EdTech', 'Government & Public Sector',
+        'Non-profit & NGO', 'Aerospace & Defence', 'Agriculture & AgTech',
+        'Automotive & Mobility', 'Banking & Capital Markets', 'Biotechnology',
+        'Chemicals & Materials', 'Consulting & Professional Services',
+        'Data & Analytics', 'Digital Marketing & AdTech', 'eCommerce Infrastructure',
+        'Environmental & Cleantech', 'Fashion & Textile', 'Food Processing & FMCG',
+        'Freight & Shipping', 'Gaming & Interactive', 'HR & Workforce Management',
+        'Industrial Automation', 'IT Services & Outsourcing', 'Media & Publishing',
+        'Medical Devices', 'Mining & Resources', 'Oil & Gas', 'Packaging',
+        'Pharmaceuticals', 'PropTech', 'Recruitment & Staffing',
+        'Robotics & AI', 'Semiconductor & Electronics', 'Sports & Entertainment',
+        'Sustainability & ESG', 'Travel & Expense Management', 'Venture Capital & PE',
+        'Waste Management & Recycling'
+      ];
+
+      const WIZARD_REGIONS = [
+        'North America', 'Latin America', 'EMEA', 'Asia Pacific', 'Middle East', 'Africa', 'Oceania'
+      ];
+
+      const WIZARD_COUNTRIES_ALL = [
+        'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Australia', 'Japan',
+        'India', 'China', 'Brazil', 'Mexico', 'Netherlands', 'Sweden', 'Singapore', 'New Zealand',
+        'Spain', 'Italy', 'South Korea', 'Ireland', 'Switzerland', 'Belgium', 'Denmark', 'Norway',
+        'Austria', 'Portugal', 'Finland', 'Poland', 'Czech Republic', 'Romania', 'Hungary',
+        'Greece', 'Turkey', 'Israel', 'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait',
+        'Bahrain', 'Oman', 'South Africa', 'Nigeria', 'Kenya', 'Egypt', 'Morocco', 'Ghana',
+        'Ethiopia', 'Tanzania', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Venezuela',
+        'Costa Rica', 'Panama', 'Uruguay', 'Ecuador', 'Dominican Republic',
+        'Thailand', 'Vietnam', 'Indonesia', 'Philippines', 'Malaysia', 'Taiwan',
+        'Hong Kong', 'Bangladesh', 'Pakistan', 'Sri Lanka', 'Myanmar',
+        'Russia', 'Ukraine', 'Belarus', 'Kazakhstan', 'Uzbekistan',
+        'Iceland', 'Luxembourg', 'Malta', 'Cyprus', 'Estonia', 'Latvia', 'Lithuania',
+        'Slovenia', 'Slovakia', 'Croatia', 'Serbia', 'Bulgaria', 'Georgia',
+        'Armenia', 'Azerbaijan', 'Mongolia', 'Cambodia', 'Laos', 'Nepal',
+        'Fiji', 'Papua New Guinea', 'Jamaica', 'Trinidad & Tobago', 'Bahamas',
+        'Bermuda', 'Mauritius', 'Botswana', 'Rwanda', 'Senegal',
+        'Tunisia', 'Jordan', 'Lebanon', 'Iraq', 'Iran'
+      ];
+
+      const WIZARD_DEPARTMENTS = [
+        'Marketing', 'Sales', 'Product', 'Engineering', 'Finance', 'Operations', 'HR',
+        'Customer Success', 'IT', 'Security', 'Legal', 'Executive Leadership', 'Strategy',
+        'Analytics & BI', 'UX/Design', 'Research & Development', 'Quality Assurance',
+        'DevOps & Infrastructure', 'Data Science', 'Supply Chain', 'Procurement',
+        'Facilities & Workplace', 'Customer Support', 'Training & Enablement',
+        'Compliance & Risk', 'Corporate Communications', 'Public Relations',
+        'Partnerships & Alliances', 'Business Development', 'Revenue Operations',
+        'Content & Editorial', 'Brand', 'Growth', 'Demand Generation',
+        'Field Marketing', 'Channel Sales', 'Inside Sales', 'Solutions Engineering',
+        'Professional Services', 'Implementation', 'Technical Support',
+        'Account Management', 'Customer Onboarding', 'Pricing & Packaging',
+        'Investor Relations', 'Treasury', 'Tax', 'Internal Audit',
+        'Enterprise Architecture', 'Cybersecurity', 'Cloud & Platform',
+        'Mobile Engineering', 'Frontend Engineering', 'Backend Engineering',
+        'Site Reliability', 'Project Management (PMO)', 'Change Management',
+        'Mergers & Acquisitions', 'Sustainability & ESG', 'Diversity & Inclusion',
+        'Talent Acquisition', 'Learning & Development', 'Compensation & Benefits'
+      ];
+
+      const WIZARD_ROLES = [
+        'CEO', 'CFO', 'COO', 'CTO', 'CIO', 'CISO', 'CMO', 'CRO', 'CPO', 'CDO',
+        'VP Marketing', 'VP Sales', 'VP Engineering', 'VP Product', 'VP Operations',
+        'VP Customer Success', 'VP Finance', 'VP HR', 'VP IT',
+        'Marketing Director', 'Sales Director', 'Engineering Director', 'Product Director',
+        'Director of Operations', 'Director of Analytics', 'Director of Design',
+        'Director of Customer Experience', 'Director of Partnerships',
+        'Head of Product', 'Head of Growth', 'Head of Brand', 'Head of Content',
+        'Head of Demand Gen', 'Head of Data', 'Head of Security', 'Head of DevOps',
+        'Head of Talent', 'Head of Legal', 'Head of Compliance',
+        'Marketing Manager', 'Product Manager', 'Project Manager', 'Programme Manager',
+        'Account Manager', 'Customer Success Manager', 'Community Manager',
+        'Brand Manager', 'Content Manager', 'Growth Manager', 'Channel Manager',
+        'Campaign Manager', 'Events Manager', 'PR Manager', 'Social Media Manager',
+        'Engineering Lead', 'Tech Lead', 'Team Lead', 'Architect', 'Solutions Architect',
+        'Principal Engineer', 'Staff Engineer', 'DevOps Engineer', 'Platform Engineer',
+        'Data Engineer', 'ML Engineer', 'Frontend Developer', 'Backend Developer',
+        'Full Stack Developer', 'QA Engineer', 'Site Reliability Engineer',
+        'Business Analyst', 'Data Analyst', 'Financial Analyst', 'Marketing Analyst',
+        'UX Researcher', 'UX Designer', 'Product Designer', 'Graphic Designer',
+        'Copywriter', 'Content Strategist', 'SEO Specialist', 'PPC Specialist',
+        'Sales Development Rep (SDR)', 'Account Executive', 'Sales Engineer',
+        'Solutions Consultant', 'Implementation Specialist', 'Technical Writer',
+        'Procurement Specialist', 'Supply Chain Manager', 'Compliance Officer',
+        'Risk Manager', 'IT Administrator', 'Security Analyst', 'Founder', 'Co-founder'
+      ];
+
+      const DEPT_ROLE_MAP = {
+        'Marketing': ['CMO','VP Marketing','Marketing Director','Marketing Manager','Growth Manager','Brand Manager','Content Manager','Campaign Manager','Social Media Manager','Marketing Analyst','Copywriter','Content Strategist','SEO Specialist','PPC Specialist'],
+        'Sales': ['CRO','VP Sales','Sales Director','Account Executive','Sales Development Rep (SDR)','Sales Engineer','Channel Manager','Account Manager'],
+        'Product': ['CPO','VP Product','Product Director','Head of Product','Product Manager','Product Designer','UX Researcher','UX Designer'],
+        'Engineering': ['CTO','VP Engineering','Engineering Director','Engineering Lead','Tech Lead','Principal Engineer','Staff Engineer','Full Stack Developer','Frontend Developer','Backend Developer','QA Engineer','Architect'],
+        'Finance': ['CFO','VP Finance','Financial Analyst','Procurement Specialist'],
+        'Operations': ['COO','VP Operations','Director of Operations','Programme Manager','Project Manager','Supply Chain Manager'],
+        'HR': ['VP HR','Head of Talent','Talent Acquisition','Learning & Development','Compensation & Benefits'],
+        'Customer Success': ['VP Customer Success','Customer Success Manager','Account Manager','Community Manager'],
+        'IT': ['CIO','VP IT','IT Administrator','Platform Engineer'],
+        'Cybersecurity': ['CISO','Head of Security','Security Analyst','DevOps Engineer','Site Reliability Engineer'],
+        'Security': ['CISO','Head of Security','Security Analyst'],
+        'Legal': ['Head of Legal','Head of Compliance','Compliance Officer','Risk Manager'],
+        'Executive Leadership': ['CEO','CFO','COO','CTO','CIO','CISO','CMO','CRO','CPO','CDO','Founder','Co-founder'],
+        'Strategy': ['CDO','Director of Analytics','Business Analyst','Data Analyst'],
+        'Analytics & BI': ['Director of Analytics','Data Analyst','Business Analyst','Marketing Analyst','Data Engineer','ML Engineer'],
+        'UX/Design': ['Director of Design','UX Designer','UX Researcher','Product Designer','Graphic Designer'],
+        'Research & Development': ['Principal Engineer','Staff Engineer','Architect','ML Engineer','Data Engineer'],
+        'DevOps & Infrastructure': ['Head of DevOps','DevOps Engineer','Platform Engineer','Site Reliability Engineer'],
+        'Data Science': ['CDO','Head of Data','Data Engineer','ML Engineer','Data Analyst'],
+        'Customer Support': ['Customer Success Manager','Technical Support','Implementation Specialist'],
+        'Compliance & Risk': ['Head of Compliance','Compliance Officer','Risk Manager','Security Analyst'],
+        'Business Development': ['Director of Partnerships','Account Executive','Solutions Consultant'],
+        'Revenue Operations': ['CRO','Growth Manager','Marketing Analyst','Sales Director'],
+        'Content & Editorial': ['Head of Content','Content Manager','Content Strategist','Copywriter','Technical Writer'],
+        'Brand': ['Head of Brand','Brand Manager','Graphic Designer','Copywriter'],
+        'Growth': ['Head of Growth','Growth Manager','Head of Demand Gen','PPC Specialist','SEO Specialist'],
+        'Demand Generation': ['Head of Demand Gen','Campaign Manager','PPC Specialist','SEO Specialist','Marketing Manager'],
+        'Solutions Engineering': ['Solutions Architect','Solutions Consultant','Sales Engineer','Implementation Specialist'],
+        'Professional Services': ['Solutions Consultant','Implementation Specialist','Technical Writer','Project Manager']
+      };
+
+      // ===== State =====
+      let currentView = 'list'; // 'list', 'detail', 'wizard'
+      let currentIcpId = null;
+      let isLoading = false;
+      let icpList = [];
+      let editingIcp = null;
+
+      const wizardState = {
+        step: 1,
+        icpTypes: [],
+        verticalsFocus: 'none',
+        verticals: [],
+        regions: [],
+        countries: [],
+        departments: [],
+        roles: [],
+        macroProblem: '',
+        solution: '',
+        forStatement: '',
+        icpName: '',
+        scope: 'company',
+        entityId: null,
+        entityName: null
+      };
+
+      // ===== Utility Functions =====
+      function esc(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function natList(arr) {
+        if (!arr || arr.length === 0) return '';
+        if (arr.length === 1) return arr[0];
+        if (arr.length === 2) return arr.join(' and ');
+        return arr.slice(0, -1).join(', ') + ', and ' + arr[arr.length - 1];
+      }
+
+      function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diff = now - date;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days} days ago`;
+        if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+        if (days < 365) return `${Math.floor(days / 30)} months ago`;
+        return date.toLocaleDateString();
+      }
+
+      function buildForStatement(icp) {
+        const parts = [];
+
+        // ICP types
+        if (icp.icp_types && icp.icp_types.length > 0) {
+          const labels = icp.icp_types.map(id => {
+            const opt = WIZARD_ICP_OPTIONS.find(o => o.id === id);
+            return opt ? opt.label : id;
+          });
+          parts.push(natList(labels));
+        }
+
+        // Departments and roles
+        const deptParts = [];
+        if (icp.departments && icp.departments.length > 0) {
+          deptParts.push(natList(icp.departments));
+        }
+        if (icp.roles && icp.roles.length > 0) {
+          deptParts.push(natList(icp.roles));
+        }
+        if (deptParts.length > 0) {
+          parts.push(natList(deptParts) + ' in ' + (icp.departments && icp.departments.length > 0 ? natList(icp.departments) : natList(icp.roles)));
+        }
+
+        // Verticals
+        if (icp.verticals && icp.verticals.length > 0) {
+          if (icp.scope === 'focused') {
+            parts.push('in ' + natList(icp.verticals));
+          } else if (icp.scope === 'strong') {
+            parts.push('particularly in ' + natList(icp.verticals));
+          }
+        }
+
+        // Geography
+        const geoParts = [];
+        if (icp.regions && icp.regions.length > 0) {
+          geoParts.push(natList(icp.regions));
+        }
+        if (icp.countries && icp.countries.length > 0) {
+          if (geoParts.length > 0) {
+            geoParts.push('(' + natList(icp.countries) + ')');
+          } else {
+            geoParts.push(natList(icp.countries));
+          }
+        }
+        if (geoParts.length > 0) {
+          parts.push('across ' + geoParts.join(' '));
+        }
+
+        return parts.join(', ');
+      }
+
+      const sb = () => Auth.getClient();
+      const getClientId = () => Storage.getActiveClientId();
+      const getClient = () => Storage.getActiveClient();
+
+      // ===== Supabase Operations =====
+      async function icpLoadList() {
+        isLoading = true;
+        icpRender();
+        try {
+          const client = sb();
+          const { data, error } = await client
+            .from('client_icps')
+            .select('*')
+            .eq('client_id', getClientId())
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+          icpList = data || [];
+        } catch (err) {
+          console.error('Error loading ICPs:', err);
+          icpList = [];
+        }
+        isLoading = false;
+        icpRender();
+      }
+
+      async function icpLoadDetail(id) {
+        isLoading = true;
+        icpRender();
+        try {
+          const client = sb();
+          const { data, error } = await client
+            .from('client_icps')
+            .select('*')
+            .eq('id', id)
+            .eq('client_id', getClientId())
+            .single();
+
+          if (error) throw error;
+          currentIcpId = id;
+          currentView = 'detail';
+        } catch (err) {
+          console.error('Error loading ICP detail:', err);
+          currentView = 'list';
+        }
+        isLoading = false;
+        icpRender();
+      }
+
+      async function icpSaveNew(data) {
+        isLoading = true;
+        icpRender();
+        try {
+          const client = sb();
+          const { error } = await client
+            .from('client_icps')
+            .insert([{
+              client_id: getClientId(),
+              name: data.name,
+              scope: data.scope === 'company' ? 'company' : 'entity',
+              entity_id: data.entityId,
+              entity_name: data.entityName,
+              icp_types: data.icpTypes,
+              vertical_focus: data.verticalsFocus,
+              verticals: data.verticals,
+              regions: data.regions,
+              countries: data.countries,
+              departments: data.departments,
+              roles: data.roles,
+              macro_problem: data.macroProblem,
+              solution: data.solution,
+              for_statement: data.forStatement,
+              status: 'draft'
+            }]);
+
+          if (error) throw error;
+          await icpLoadList();
+          currentView = 'list';
+          isLoading = false;
+          icpRender();
+        } catch (err) {
+          console.error('Error saving ICP:', err);
+          isLoading = false;
+          icpRender();
+        }
+      }
+
+      async function icpUpdate(id, data) {
+        isLoading = true;
+        icpRender();
+        try {
+          const client = sb();
+          const { error } = await client
+            .from('client_icps')
+            .update(data)
+            .eq('id', id)
+            .eq('client_id', getClientId());
+
+          if (error) throw error;
+          await icpLoadDetail(id);
+        } catch (err) {
+          console.error('Error updating ICP:', err);
+        }
+        isLoading = false;
+        icpRender();
+      }
+
+      async function icpDelete(id) {
+        if (!confirm('Are you sure you want to delete this ICP? This cannot be undone.')) {
+          return;
+        }
+        isLoading = true;
+        icpRender();
+        try {
+          const client = sb();
+          const { error } = await client
+            .from('client_icps')
+            .delete()
+            .eq('id', id)
+            .eq('client_id', getClientId());
+
+          if (error) throw error;
+          currentView = 'list';
+          await icpLoadList();
+        } catch (err) {
+          console.error('Error deleting ICP:', err);
+        }
+        isLoading = false;
+        icpRender();
+      }
+
+      // ===== View Rendering =====
+      function icpRender() {
+        const container = document.getElementById('icpView');
+        if (!container) return;
+
+        if (isLoading && currentView !== 'list') {
+          container.innerHTML = '<div class="icp-loading"><div class="icp-spinner"></div>Loading...</div>';
+          return;
+        }
+
+        if (currentView === 'list') {
+          icpRenderList();
+        } else if (currentView === 'detail') {
+          icpRenderDetail();
+        } else if (currentView === 'wizard') {
+          icpRenderWizard();
+        }
+      }
+
+      function icpRenderList() {
+        const container = document.getElementById('icpView');
+        if (!container) return;
+
+        if (icpList.length === 0) {
+          container.innerHTML = `
+            <div class="icp-empty">
+              <h2>No ICPs yet</h2>
+              <p>Create your first Ideal Customer Profile to get started.</p>
+              <button class="icp-btn icp-btn-primary" onclick="icpShowWizard()">+ Create ICP</button>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '<div class="icp-list">';
+        icpList.forEach(icp => {
+          const scope = icp.scope === 'company' ? 'Company-wide' : (icp.entity_name || 'Entity');
+          const forPreview = (icp.for_statement || '').substring(0, 120) + (icp.for_statement && icp.for_statement.length > 120 ? '...' : '');
+          const statusClass = icp.status === 'active' ? 'active' : '';
+
+          html += `
+            <div class="icp-card" onclick="icpLoadDetail('${esc(icp.id)}')">
+              <div class="icp-card-header">
+                <h3 class="icp-card-title">${esc(icp.name)}</h3>
+                <span class="icp-badge icp-badge-status ${statusClass}">${esc(icp.status)}</span>
+              </div>
+              <div class="icp-card-meta">
+                <span class="icp-badge icp-badge-scope">${esc(scope)}</span>
+              </div>
+              <div class="icp-card-for">${esc(forPreview)}</div>
+              <div class="icp-card-date">Created ${formatDate(icp.created_at)}</div>
+            </div>
+          `;
+        });
+        html += '</div>';
+
+        container.innerHTML = html;
+      }
+
+      function icpRenderDetail() {
+        const container = document.getElementById('icpView');
+        if (!container) return;
+
+        const icp = icpList.find(i => i.id === currentIcpId);
+        if (!icp) {
+          container.innerHTML = '<p>ICP not found</p>';
+          return;
+        }
+
+        const scopeLabel = icp.scope === 'company' ? 'Company-wide' : (icp.entity_name || 'Entity');
+        const icpTypeLabels = (icp.icp_types || []).map(id => {
+          const opt = WIZARD_ICP_OPTIONS.find(o => o.id === id);
+          return opt ? opt.label : id;
+        });
+
+        let html = `
+          <div class="icp-detail-header">
+            <div class="icp-detail-title-area">
+              <button class="icp-back-btn" onclick="icpBackToList()">←</button>
+              <h2 class="icp-detail-title">${esc(icp.name)}</h2>
+            </div>
+            <div class="icp-detail-actions">
+              <select class="icp-btn icp-btn-secondary icp-btn-small" onchange="icpUpdateStatus('${esc(icp.id)}', this.value)">
+                <option value="draft" ${icp.status === 'draft' ? 'selected' : ''}>Draft</option>
+                <option value="active" ${icp.status === 'active' ? 'selected' : ''}>Active</option>
+                <option value="archived" ${icp.status === 'archived' ? 'selected' : ''}>Archived</option>
+              </select>
+              <button class="icp-btn icp-btn-secondary icp-btn-small" onclick="icpEditWizard('${esc(icp.id)}')">Edit</button>
+              <button class="icp-btn icp-btn-danger icp-btn-small" onclick="icpDelete('${esc(icp.id)}')">Delete</button>
+            </div>
+          </div>
+
+          <div class="icp-section">
+            <h3 class="icp-section-title">Who we help</h3>
+            <div class="icp-pills">
+              ${icpTypeLabels.map(label => `<span class="icp-pill">${esc(label)}</span>`).join('')}
+            </div>
+          </div>
+        `;
+
+        // Scope section
+        html += `
+          <div class="icp-section">
+            <h3 class="icp-section-title">Scope</h3>
+            <div class="icp-data-value">${esc(scopeLabel)}</div>
+          </div>
+        `;
+
+        // Verticals section
+        if (icp.verticals && icp.verticals.length > 0) {
+          const verticalFocusLabel = icp.vertical_focus === 'locked' ? 'Vertical-focused' : (icp.vertical_focus === 'strong' ? 'Strong in' : 'Not focused');
+          html += `
+            <div class="icp-section">
+              <h3 class="icp-section-title">Verticals</h3>
+              <div class="icp-row">
+                <div class="icp-data-block">
+                  <div class="icp-data-label">Focus Type</div>
+                  <div class="icp-data-value">${esc(verticalFocusLabel)}</div>
+                </div>
+                <div class="icp-data-block">
+                  <div class="icp-data-label">Verticals</div>
+                  <div class="icp-data-value">${esc(natList(icp.verticals))}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Geography section
+        if ((icp.regions && icp.regions.length > 0) || (icp.countries && icp.countries.length > 0)) {
+          html += `
+            <div class="icp-section">
+              <h3 class="icp-section-title">Geography</h3>
+              <div class="icp-row">
+                ${icp.regions && icp.regions.length > 0 ? `
+                  <div class="icp-data-block">
+                    <div class="icp-data-label">Regions</div>
+                    <div class="icp-data-value">${esc(natList(icp.regions))}</div>
+                  </div>
+                ` : ''}
+                ${icp.countries && icp.countries.length > 0 ? `
+                  <div class="icp-data-block">
+                    <div class="icp-data-label">Countries</div>
+                    <div class="icp-data-value">${esc(natList(icp.countries))}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }
+
+        // Departments and Roles
+        if ((icp.departments && icp.departments.length > 0) || (icp.roles && icp.roles.length > 0)) {
+          html += `
+            <div class="icp-section">
+              <h3 class="icp-section-title">Teams & Roles</h3>
+              <div class="icp-row">
+                ${icp.departments && icp.departments.length > 0 ? `
+                  <div class="icp-data-block">
+                    <div class="icp-data-label">Departments</div>
+                    <div class="icp-data-value">${esc(natList(icp.departments))}</div>
+                  </div>
+                ` : ''}
+                ${icp.roles && icp.roles.length > 0 ? `
+                  <div class="icp-data-block">
+                    <div class="icp-data-label">Roles</div>
+                    <div class="icp-data-value">${esc(natList(icp.roles))}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }
+
+        // Macro Problem and Solution
+        if (icp.macro_problem || icp.solution) {
+          html += `
+            <div class="icp-section">
+              <h3 class="icp-section-title">Problem & Solution</h3>
+              <div class="icp-row">
+                ${icp.macro_problem ? `
+                  <div class="icp-data-block">
+                    <div class="icp-data-label">Macro Problem</div>
+                    <div class="icp-text-block">${esc(icp.macro_problem)}</div>
+                  </div>
+                ` : ''}
+                ${icp.solution ? `
+                  <div class="icp-data-block">
+                    <div class="icp-data-label">Solution</div>
+                    <div class="icp-text-block">${esc(icp.solution)}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }
+
+        // For Statement
+        if (icp.for_statement) {
+          html += `
+            <div class="icp-section">
+              <h3 class="icp-section-title">For Statement</h3>
+              <p class="icp-for-statement">${esc(icp.for_statement)}</p>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+      }
+
+      function icpRenderWizard() {
+        const container = document.getElementById('icpView');
+        if (!container) return;
+
+        const stepCount = 8;
+        let html = `
+          <div class="icp-wizard">
+            <div class="icp-wizard-header">
+              <h2>${wizardState.step === 1 ? 'Create ICP' : 'Edit ICP'}</h2>
+              <div class="icp-wizard-progress">
+        `;
+
+        for (let i = 1; i <= stepCount; i++) {
+          const classes = ['icp-progress-dot'];
+          if (i === wizardState.step) classes.push('active');
+          if (i < wizardState.step) classes.push('completed');
+          html += `<div class="${classes.join(' ')}"></div>`;
+        }
+
+        html += `
+              </div>
+            </div>
+        `;
+
+        // Step 1: ICP Type
+        if (wizardState.step === 1) {
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">What type of customer?</h3>
+              <p class="icp-step-desc">Select the primary customer type you're targeting.</p>
+              <div class="icp-option-group">
+                ${WIZARD_ICP_OPTIONS.map(opt => `
+                  <div class="icp-option ${wizardState.icpTypes.includes(opt.id) ? 'selected' : ''}" onclick="icpWizardToggleIcpType('${esc(opt.id)}')">
+                    <div class="icp-option-label">${esc(opt.label)}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        // Step 2: Verticals
+        if (wizardState.step === 2) {
+          const verticals = wizardState.icpTypes.some(t => ['consumers', 'prosumers', 'creators', 'students', 'freelancers'].includes(t)) ? WIZARD_VERTICALS_B2C : WIZARD_VERTICALS_B2B;
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">How do you want to focus on verticals?</h3>
+              <p class="icp-step-desc">Choose your vertical strategy.</p>
+              <div class="icp-radio-group">
+                <div class="icp-radio">
+                  <input type="radio" id="vf-none" name="vfocus" value="none" ${wizardState.verticalsFocus === 'none' ? 'checked' : ''} onchange="icpWizardSetVerticalFocus('none')">
+                  <label for="vf-none">Not focused on specific verticals</label>
+                </div>
+                <div class="icp-radio">
+                  <input type="radio" id="vf-locked" name="vfocus" value="locked" ${wizardState.verticalsFocus === 'locked' ? 'checked' : ''} onchange="icpWizardSetVerticalFocus('locked')">
+                  <label for="vf-locked">Vertical-focused (strong fit in specific verticals)</label>
+                </div>
+                <div class="icp-radio">
+                  <input type="radio" id="vf-strong" name="vfocus" value="strong" ${wizardState.verticalsFocus === 'strong' ? 'checked' : ''} onchange="icpWizardSetVerticalFocus('strong')">
+                  <label for="vf-strong">Strong in these verticals (but also work elsewhere)</label>
+                </div>
+              </div>
+              ${wizardState.verticalsFocus !== 'none' ? `
+                <div style="margin-top: 20px;">
+                  <div class="icp-search">
+                    <input type="text" id="verticalSearch" placeholder="Search verticals..." onkeyup="icpWizardFilterVerticals()">
+                  </div>
+                  <div class="icp-checkbox-group" id="verticalsList">
+                    ${verticals.map(v => `
+                      <div class="icp-checkbox">
+                        <input type="checkbox" id="vert-${esc(v)}" value="${esc(v)}" ${wizardState.verticals.includes(v) ? 'checked' : ''} onchange="icpWizardToggleVertical('${esc(v)}')">
+                        <label for="vert-${esc(v)}">${esc(v)}</label>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+
+        // Step 3: Geography
+        if (wizardState.step === 3) {
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">Where are they located?</h3>
+              <p class="icp-step-desc">Select regions and countries.</p>
+              <div style="margin-bottom: 24px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--navy);">Regions</h4>
+                <div class="icp-checkbox-group">
+                  ${WIZARD_REGIONS.map(r => `
+                    <div class="icp-checkbox">
+                      <input type="checkbox" id="region-${esc(r)}" value="${esc(r)}" ${wizardState.regions.includes(r) ? 'checked' : ''} onchange="icpWizardToggleRegion('${esc(r)}')">
+                      <label for="region-${esc(r)}">${esc(r)}</label>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <div>
+                <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--navy);">Countries</h4>
+                <div class="icp-search">
+                  <input type="text" id="countrySearch" placeholder="Search countries..." onkeyup="icpWizardFilterCountries()">
+                </div>
+                <div class="icp-checkbox-group" id="countriesList">
+                  ${WIZARD_COUNTRIES_ALL.map(c => `
+                    <div class="icp-checkbox">
+                      <input type="checkbox" id="country-${esc(c)}" value="${esc(c)}" ${wizardState.countries.includes(c) ? 'checked' : ''} onchange="icpWizardToggleCountry('${esc(c)}')">
+                      <label for="country-${esc(c)}">${esc(c)}</label>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Step 4: Departments
+        if (wizardState.step === 4) {
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">Which departments?</h3>
+              <p class="icp-step-desc">Select the departments you target.</p>
+              <div class="icp-search">
+                <input type="text" id="deptSearch" placeholder="Search departments..." onkeyup="icpWizardFilterDepts()">
+              </div>
+              <div class="icp-checkbox-group" id="deptsList">
+                ${WIZARD_DEPARTMENTS.map(d => `
+                  <div class="icp-checkbox">
+                    <input type="checkbox" id="dept-${esc(d)}" value="${esc(d)}" ${wizardState.departments.includes(d) ? 'checked' : ''} onchange="icpWizardToggleDepartment('${esc(d)}')">
+                    <label for="dept-${esc(d)}">${esc(d)}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        // Step 5: Roles
+        if (wizardState.step === 5) {
+          const contextRoles = wizardState.departments.length > 0
+            ? Array.from(new Set(wizardState.departments.flatMap(d => DEPT_ROLE_MAP[d] || [])))
+            : WIZARD_ROLES;
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">Which roles?</h3>
+              <p class="icp-step-desc">Select the roles you're targeting. We've filtered to relevant roles based on your departments.</p>
+              <div class="icp-search">
+                <input type="text" id="roleSearch" placeholder="Search roles..." onkeyup="icpWizardFilterRoles()">
+              </div>
+              <div class="icp-checkbox-group" id="rolesList">
+                ${contextRoles.map(r => `
+                  <div class="icp-checkbox">
+                    <input type="checkbox" id="role-${esc(r)}" value="${esc(r)}" ${wizardState.roles.includes(r) ? 'checked' : ''} onchange="icpWizardToggleRole('${esc(r)}')">
+                    <label for="role-${esc(r)}">${esc(r)}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        // Step 6: Macro Problem
+        if (wizardState.step === 6) {
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">What's the macro problem?</h3>
+              <p class="icp-step-desc">Describe the main problem this ICP faces.</p>
+              <textarea class="icp-textarea" id="macroProblem" placeholder="E.g., Teams struggle to scale their marketing operations without tripling headcount...">${esc(wizardState.macroProblem)}</textarea>
+            </div>
+          `;
+        }
+
+        // Step 7: Solution
+        if (wizardState.step === 7) {
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">How do you solve it?</h3>
+              <p class="icp-step-desc">Describe your solution approach.</p>
+              <textarea class="icp-textarea" id="solution" placeholder="E.g., We provide an AI-powered platform that automates repetitive marketing tasks...">${esc(wizardState.solution)}</textarea>
+            </div>
+          `;
+        }
+
+        // Step 8: Preview & Name
+        if (wizardState.step === 8) {
+          html += `
+            <div class="icp-step active">
+              <h3 class="icp-step-title">Name & Finalize</h3>
+              <p class="icp-step-desc">Give your ICP a name and choose its scope.</p>
+              <div style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--navy); font-size: 14px;">ICP Name</label>
+                <input type="text" class="icp-input" id="icpName" placeholder="E.g., Enterprise Marketing Leaders" value="${esc(wizardState.icpName)}" onchange="icpWizardSetName(this.value)">
+              </div>
+
+              <div style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 12px; font-weight: 600; color: var(--navy); font-size: 14px;">Scope</label>
+                <div class="icp-scope-selector">
+                  <div class="icp-scope-option ${wizardState.scope === 'company' ? 'selected' : ''}" onclick="icpWizardSetScope('company')">
+                    <input type="radio" name="scope" value="company" ${wizardState.scope === 'company' ? 'checked' : ''}>
+                    <span class="icp-scope-label">Company-wide (applies to all brands)</span>
+                  </div>
+                  ${getClient().brandEntities && getClient().brandEntities.map(entity => `
+                    <div class="icp-scope-option ${wizardState.scope === 'entity' && wizardState.entityId === entity.id ? 'selected' : ''}" onclick="icpWizardSetScope('entity', '${esc(entity.id)}', '${esc(entity.name)}')">
+                      <input type="radio" name="scope" value="entity-${esc(entity.id)}" ${wizardState.scope === 'entity' && wizardState.entityId === entity.id ? 'checked' : ''}>
+                      <span class="icp-scope-label">${esc(entity.name)} (${esc(entity.type)})</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div style="background: var(--gray-100); border-radius: 8px; padding: 20px; margin-top: 24px;">
+                <h4 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 600; color: var(--navy);">For Statement Preview</h4>
+                <p class="icp-for-statement" style="margin: 0;">${esc(icpWizardBuildForStatement())}</p>
+              </div>
+            </div>
+          `;
+        }
+
+        // Footer buttons
+        html += `
+          <div class="icp-wizard-footer">
+            ${wizardState.step > 1 ? `<button class="icp-btn icp-btn-secondary" onclick="icpWizardPrev()">← Back</button>` : '<button class="icp-btn icp-btn-secondary" onclick="icpBackToList()">Cancel</button>'}
+            ${wizardState.step < 8 ? `<button class="icp-btn icp-btn-primary" onclick="icpWizardNext()">Next →</button>` : `<button class="icp-btn icp-btn-primary" onclick="icpWizardSave()">Create ICP</button>`}
+          </div>
+        </div>
+        `;
+
+        container.innerHTML = html;
+      }
+
+      // ===== Wizard State Management =====
+      function icpShowWizard() {
+        currentView = 'wizard';
+        editingIcp = null;
+        Object.assign(wizardState, {
+          step: 1,
+          icpTypes: [],
+          verticalsFocus: 'none',
+          verticals: [],
+          regions: [],
+          countries: [],
+          departments: [],
+          roles: [],
+          macroProblem: '',
+          solution: '',
+          forStatement: '',
+          icpName: '',
+          scope: 'company',
+          entityId: null,
+          entityName: null
+        });
+        icpRender();
+      }
+
+      function icpEditWizard(id) {
+        const icp = icpList.find(i => i.id === id);
+        if (!icp) return;
+
+        editingIcp = icp;
+        currentView = 'wizard';
+        Object.assign(wizardState, {
+          step: 1,
+          icpTypes: icp.icp_types || [],
+          verticalsFocus: icp.vertical_focus || 'none',
+          verticals: icp.verticals || [],
+          regions: icp.regions || [],
+          countries: icp.countries || [],
+          departments: icp.departments || [],
+          roles: icp.roles || [],
+          macroProblem: icp.macro_problem || '',
+          solution: icp.solution || '',
+          forStatement: icp.for_statement || '',
+          icpName: icp.name,
+          scope: icp.scope === 'company' ? 'company' : 'entity',
+          entityId: icp.entity_id,
+          entityName: icp.entity_name
+        });
+        icpRender();
+      }
+
+      function icpBackToList() {
+        currentView = 'list';
+        currentIcpId = null;
+        editingIcp = null;
+        icpRender();
+      }
+
+      function icpWizardToggleIcpType(id) {
+        const idx = wizardState.icpTypes.indexOf(id);
+        if (idx > -1) {
+          wizardState.icpTypes.splice(idx, 1);
+        } else {
+          wizardState.icpTypes.push(id);
+        }
+        icpRender();
+      }
+
+      function icpWizardSetVerticalFocus(value) {
+        wizardState.verticalsFocus = value;
+        if (value === 'none') {
+          wizardState.verticals = [];
+        }
+        icpRender();
+      }
+
+      function icpWizardToggleVertical(v) {
+        const idx = wizardState.verticals.indexOf(v);
+        if (idx > -1) {
+          wizardState.verticals.splice(idx, 1);
+        } else {
+          wizardState.verticals.push(v);
+        }
+        icpRender();
+      }
+
+      function icpWizardFilterVerticals() {
+        const search = document.getElementById('verticalSearch').value.toLowerCase();
+        const items = document.querySelectorAll('#verticalsList .icp-checkbox');
+        items.forEach(item => {
+          const label = item.querySelector('label').textContent.toLowerCase();
+          item.style.display = label.includes(search) ? '' : 'none';
+        });
+      }
+
+      function icpWizardToggleRegion(r) {
+        const idx = wizardState.regions.indexOf(r);
+        if (idx > -1) {
+          wizardState.regions.splice(idx, 1);
+        } else {
+          wizardState.regions.push(r);
+        }
+      }
+
+      function icpWizardToggleCountry(c) {
+        const idx = wizardState.countries.indexOf(c);
+        if (idx > -1) {
+          wizardState.countries.splice(idx, 1);
+        } else {
+          wizardState.countries.push(c);
+        }
+      }
+
+      function icpWizardFilterCountries() {
+        const search = document.getElementById('countrySearch').value.toLowerCase();
+        const items = document.querySelectorAll('#countriesList .icp-checkbox');
+        items.forEach(item => {
+          const label = item.querySelector('label').textContent.toLowerCase();
+          item.style.display = label.includes(search) ? '' : 'none';
+        });
+      }
+
+      function icpWizardToggleDepartment(d) {
+        const idx = wizardState.departments.indexOf(d);
+        if (idx > -1) {
+          wizardState.departments.splice(idx, 1);
+        } else {
+          wizardState.departments.push(d);
+        }
+        icpRender();
+      }
+
+      function icpWizardFilterDepts() {
+        const search = document.getElementById('deptSearch').value.toLowerCase();
+        const items = document.querySelectorAll('#deptsList .icp-checkbox');
+        items.forEach(item => {
+          const label = item.querySelector('label').textContent.toLowerCase();
+          item.style.display = label.includes(search) ? '' : 'none';
+        });
+      }
+
+      function icpWizardToggleRole(r) {
+        const idx = wizardState.roles.indexOf(r);
+        if (idx > -1) {
+          wizardState.roles.splice(idx, 1);
+        } else {
+          wizardState.roles.push(r);
+        }
+      }
+
+      function icpWizardFilterRoles() {
+        const search = document.getElementById('roleSearch').value.toLowerCase();
+        const items = document.querySelectorAll('#rolesList .icp-checkbox');
+        items.forEach(item => {
+          const label = item.querySelector('label').textContent.toLowerCase();
+          item.style.display = label.includes(search) ? '' : 'none';
+        });
+      }
+
+      function icpWizardSetName(value) {
+        wizardState.icpName = value;
+      }
+
+      function icpWizardSetScope(scope, entityId, entityName) {
+        wizardState.scope = scope;
+        wizardState.entityId = entityId || null;
+        wizardState.entityName = entityName || null;
+        icpRender();
+      }
+
+      function icpWizardBuildForStatement() {
+        const parts = [];
+
+        // ICP types
+        if (wizardState.icpTypes.length > 0) {
+          const labels = wizardState.icpTypes.map(id => {
+            const opt = WIZARD_ICP_OPTIONS.find(o => o.id === id);
+            return opt ? opt.label : id;
+          });
+          parts.push(natList(labels));
+        }
+
+        // Departments and roles
+        const peopleDescParts = [];
+        if (wizardState.departments.length > 0) {
+          peopleDescParts.push(natList(wizardState.departments));
+        }
+        if (wizardState.roles.length > 0) {
+          peopleDescParts.push(natList(wizardState.roles));
+        }
+        if (peopleDescParts.length > 0) {
+          if (wizardState.departments.length > 0 && wizardState.roles.length > 0) {
+            parts.push(natList([natList(wizardState.departments) + ' and ' + natList(wizardState.roles)]) + ' in ' + natList(wizardState.departments));
+          } else {
+            parts.push(natList(peopleDescParts) + (wizardState.departments.length > 0 ? ' in ' + natList(wizardState.departments) : ''));
+          }
+        }
+
+        // Verticals
+        if (wizardState.verticals.length > 0 && wizardState.verticalsFocus !== 'none') {
+          if (wizardState.verticalsFocus === 'locked') {
+            parts.push('in ' + natList(wizardState.verticals));
+          } else if (wizardState.verticalsFocus === 'strong') {
+            parts.push('particularly in ' + natList(wizardState.verticals));
+          }
+        }
+
+        // Geography
+        const geoParts = [];
+        if (wizardState.regions.length > 0) {
+          geoParts.push(natList(wizardState.regions));
+        }
+        if (wizardState.countries.length > 0) {
+          if (geoParts.length > 0) {
+            geoParts.push('(' + natList(wizardState.countries) + ')');
+          } else {
+            geoParts.push(natList(wizardState.countries));
+          }
+        }
+        if (geoParts.length > 0) {
+          parts.push('across ' + geoParts.join(' '));
+        }
+
+        return parts.filter(p => p).join(', ');
+      }
+
+      function icpWizardNext() {
+        // Validate current step
+        if (wizardState.step === 1 && wizardState.icpTypes.length === 0) {
+          alert('Please select at least one customer type');
+          return;
+        }
+        if (wizardState.step === 2 && wizardState.verticalsFocus !== 'none' && wizardState.verticals.length === 0) {
+          alert('Please select at least one vertical');
+          return;
+        }
+
+        // Capture step data
+        if (wizardState.step === 6) {
+          wizardState.macroProblem = document.getElementById('macroProblem')?.value || '';
+        }
+        if (wizardState.step === 7) {
+          wizardState.solution = document.getElementById('solution')?.value || '';
+        }
+
+        wizardState.step++;
+        icpRender();
+      }
+
+      function icpWizardPrev() {
+        if (wizardState.step === 6) {
+          wizardState.macroProblem = document.getElementById('macroProblem')?.value || '';
+        }
+        if (wizardState.step === 7) {
+          wizardState.solution = document.getElementById('solution')?.value || '';
+        }
+
+        wizardState.step--;
+        icpRender();
+      }
+
+      async function icpWizardSave() {
+        if (!wizardState.icpName.trim()) {
+          alert('Please enter a name for your ICP');
+          return;
+        }
+
+        const data = {
+          name: wizardState.icpName,
+          scope: wizardState.scope,
+          entityId: wizardState.entityId,
+          entityName: wizardState.entityName,
+          icpTypes: wizardState.icpTypes,
+          verticalsFocus: wizardState.verticalsFocus,
+          verticals: wizardState.verticals,
+          regions: wizardState.regions,
+          countries: wizardState.countries,
+          departments: wizardState.departments,
+          roles: wizardState.roles,
+          macroProblem: document.getElementById('macroProblem')?.value || wizardState.macroProblem || '',
+          solution: document.getElementById('solution')?.value || wizardState.solution || '',
+          forStatement: icpWizardBuildForStatement()
+        };
+
+        if (editingIcp) {
+          await icpUpdate(editingIcp.id, data);
+        } else {
+          await icpSaveNew(data);
+        }
+      }
+
+      function icpUpdateStatus(id, status) {
+        icpUpdate(id, { status });
+      }
+
+      // ===== Initial Load =====
+      icpLoadList();
+
+      // ===== Global Functions =====
+      window.icpShowWizard = icpShowWizard;
+      window.icpBackToList = icpBackToList;
+      window.icpLoadDetail = icpLoadDetail;
+      window.icpDelete = icpDelete;
+      window.icpEditWizard = icpEditWizard;
+      window.icpUpdateStatus = icpUpdateStatus;
+      window.icpWizardToggleIcpType = icpWizardToggleIcpType;
+      window.icpWizardSetVerticalFocus = icpWizardSetVerticalFocus;
+      window.icpWizardToggleVertical = icpWizardToggleVertical;
+      window.icpWizardFilterVerticals = icpWizardFilterVerticals;
+      window.icpWizardToggleRegion = icpWizardToggleRegion;
+      window.icpWizardToggleCountry = icpWizardToggleCountry;
+      window.icpWizardFilterCountries = icpWizardFilterCountries;
+      window.icpWizardToggleDepartment = icpWizardToggleDepartment;
+      window.icpWizardFilterDepts = icpWizardFilterDepts;
+      window.icpWizardToggleRole = icpWizardToggleRole;
+      window.icpWizardFilterRoles = icpWizardFilterRoles;
+      window.icpWizardSetName = icpWizardSetName;
+      window.icpWizardSetScope = icpWizardSetScope;
+      window.icpWizardNext = icpWizardNext;
+      window.icpWizardPrev = icpWizardPrev;
+      window.icpWizardSave = icpWizardSave;
+    })();
+  </script>
+</body>
+</html>
