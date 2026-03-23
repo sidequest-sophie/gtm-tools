@@ -151,46 +151,53 @@
     <div class="icp-wizard-modal">
       <div class="icp-wizard-header">
         <h3 id="icp-wizard-title">Build Your ICP</h3>
-        <div class="icp-wizard-progress" id="icp-wizard-progress">Step 1 of 8</div>
+        <div class="icp-wizard-progress" id="icp-wizard-progress">Step 1 of 7</div>
         <div class="icp-wizard-progress-bar">
           <div class="icp-wizard-progress-fill" id="icp-wizard-progress-fill" style="width:12.5%;"></div>
         </div>
       </div>
 
       <div class="icp-wizard-body" id="icp-wizard-body">
-        <!-- STEP 1: ICP Types -->
+        <!-- STEP 1: Scope -->
         <div class="icp-wizard-step active" id="icp-step-1">
-          <div class="icp-wizard-step-title">What types of customers do you serve?</div>
-          <div class="icp-wizard-step-desc">Select all that apply.</div>
-          <div class="icp-card-grid" id="icp-step1-grid"></div>
+          <div class="icp-wizard-step-title">What is this ICP for?</div>
+          <div class="icp-wizard-step-desc">Is this a company-wide ICP, or specific to a brand or product?</div>
+          <div class="icp-radio-group" id="icp-step1-scope"></div>
         </div>
 
-        <!-- STEP 2: Verticals -->
+        <!-- STEP 2: ICP Types -->
         <div class="icp-wizard-step" id="icp-step-2">
+          <div class="icp-wizard-step-title">What types of customers do you serve?</div>
+          <div class="icp-wizard-step-desc">Select all that apply.</div>
+          <div class="icp-card-grid" id="icp-step2-grid"></div>
+        </div>
+
+        <!-- STEP 3: Verticals -->
+        <div class="icp-wizard-step" id="icp-step-3">
           <div class="icp-wizard-step-title">Vertical Focus</div>
           <div class="icp-wizard-step-desc">How focused are you in specific industries?</div>
-          <div class="icp-radio-group" id="icp-step2-radio"></div>
-          <div id="icp-step2-verticals" style="display:none; margin-top:1.25rem;">
+          <div class="icp-radio-group" id="icp-step3-radio"></div>
+          <div id="icp-step3-verticals" style="display:none; margin-top:1.25rem;">
             <div class="icp-tag-picker">
-              <div class="icp-tag-list" id="icp-step2-tags"></div>
+              <div class="icp-tag-list" id="icp-step3-tags"></div>
               <div class="icp-tag-picker-controls">
-                <input type="text" class="icp-tag-input" id="icp-step2-input" placeholder="Add custom vertical…" />
+                <input type="text" class="icp-tag-input" id="icp-step3-input" placeholder="Add custom vertical…" />
                 <button class="icp-btn-dice" onclick="icpDiceVerticals()">🎲</button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- STEP 3: Geography -->
-        <div class="icp-wizard-step" id="icp-step-3">
+        <!-- STEP 4: Geography -->
+        <div class="icp-wizard-step" id="icp-step-4">
           <div class="icp-wizard-step-title">Geography</div>
           <div class="icp-wizard-step-desc">Where do your customers operate?</div>
-          <div class="icp-radio-group" id="icp-step3-radio"></div>
-          <div id="icp-step3-countries" style="display:none; margin-top:1.25rem;">
+          <div class="icp-radio-group" id="icp-step4-radio"></div>
+          <div id="icp-step4-countries" style="display:none; margin-top:1.25rem;">
             <div class="icp-tag-picker">
-              <div class="icp-tag-list" id="icp-step3-tags"></div>
+              <div class="icp-tag-list" id="icp-step4-tags"></div>
               <div class="icp-tag-picker-controls">
-                <input type="text" class="icp-tag-input" id="icp-step3-input" placeholder="Search countries…" />
+                <input type="text" class="icp-tag-input" id="icp-step4-input" placeholder="Search countries…" />
                 <button class="icp-btn-dice" onclick="icpDiceCountries()">🎲</button>
               </div>
               <div class="icp-show-all-toggle" onclick="icpToggleShowAllCountries()">Show all countries</div>
@@ -198,65 +205,43 @@
           </div>
         </div>
 
-        <!-- STEP 4: Departments -->
-        <div class="icp-wizard-step" id="icp-step-4">
+        <!-- STEP 5: Departments -->
+        <div class="icp-wizard-step" id="icp-step-5">
           <div class="icp-wizard-step-title">Departments</div>
           <div class="icp-wizard-step-desc">Which teams do you engage with?</div>
           <div class="icp-tag-picker">
-            <div class="icp-tag-list" id="icp-step4-tags"></div>
+            <div class="icp-tag-list" id="icp-step5-tags"></div>
             <div class="icp-tag-picker-controls">
-              <input type="text" class="icp-tag-input" id="icp-step4-input" placeholder="Search departments…" />
+              <input type="text" class="icp-tag-input" id="icp-step5-input" placeholder="Search departments…" />
               <button class="icp-btn-dice" onclick="icpDiceDepartments()">🎲</button>
             </div>
           </div>
         </div>
 
-        <!-- STEP 5: Roles -->
-        <div class="icp-wizard-step" id="icp-step-5">
+        <!-- STEP 6: Roles -->
+        <div class="icp-wizard-step" id="icp-step-6">
           <div class="icp-wizard-step-title">Roles</div>
           <div class="icp-wizard-step-desc">Which job titles are decision makers or influencers?</div>
           <div class="icp-tag-picker">
-            <div class="icp-tag-list" id="icp-step5-tags"></div>
+            <div class="icp-tag-list" id="icp-step6-tags"></div>
             <div class="icp-tag-picker-controls">
-              <input type="text" class="icp-tag-input" id="icp-step5-input" placeholder="Search roles…" />
+              <input type="text" class="icp-tag-input" id="icp-step6-input" placeholder="Search roles…" />
               <button class="icp-btn-dice" onclick="icpDiceRoles()">🎲</button>
             </div>
           </div>
         </div>
 
-        <!-- STEP 6: Macro Problem -->
-        <div class="icp-wizard-step" id="icp-step-6">
-          <div class="icp-wizard-step-title">The Macro Problem</div>
-          <div class="icp-wizard-step-desc">What's the core challenge your ICP faces?</div>
-          <div class="icp-textarea-wrap">
-            <textarea class="icp-textarea" id="icp-step6-textarea" placeholder="Describe the primary business problem or challenge…" style="min-height:120px;"></textarea>
-          </div>
-        </div>
-
-        <!-- STEP 7: Solution -->
+        <!-- STEP 7: Preview & Name -->
         <div class="icp-wizard-step" id="icp-step-7">
-          <div class="icp-wizard-step-title">How You Solve It</div>
-          <div class="icp-wizard-step-desc">What's your unique approach or differentiation?</div>
-          <div class="icp-textarea-wrap">
-            <textarea class="icp-textarea" id="icp-step7-textarea" placeholder="Describe your solution or approach…" style="min-height:120px;"></textarea>
-          </div>
-        </div>
-
-        <!-- STEP 8: Preview & Name -->
-        <div class="icp-wizard-step" id="icp-step-8">
-          <div class="icp-wizard-step-title">Preview & Configure</div>
+          <div class="icp-wizard-step-title">Preview & Name</div>
           <div class="icp-wizard-step-desc">Review your ICP and give it a name.</div>
           <div class="icp-preview-card">
             <div class="icp-preview-label">For Statement</div>
-            <div class="icp-preview-text" id="icp-step8-preview"></div>
+            <div class="icp-preview-text" id="icp-step7-preview"></div>
           </div>
-          <div class="icp-textarea-wrap" style="margin-bottom:1.25rem;">
+          <div class="icp-textarea-wrap" style="margin-top:1.25rem;">
             <label style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gray-500);margin-bottom:0.5rem;">ICP Name</label>
-            <input type="text" class="icp-tag-input" id="icp-step8-name" placeholder="e.g., Mid-market SaaS" />
-          </div>
-          <div>
-            <label style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gray-500);margin-bottom:0.75rem;display:block;">Scope</label>
-            <div class="icp-radio-group" id="icp-step8-scope"></div>
+            <input type="text" class="icp-tag-input" id="icp-step7-name" placeholder="e.g., Mid-market SaaS" />
           </div>
         </div>
       </div>
@@ -439,8 +424,11 @@
   let icpList = [];
   let showAllCountries = false;
 
+  const TOTAL_STEPS = 7;
   const wizardState = {
     step: 1,
+    scope: 'company',
+    entityId: null,
     icpTypes: [],
     verticalFocus: 'none',
     verticals: [],
@@ -448,12 +436,8 @@
     countries: [],
     departments: [],
     roles: [],
-    macroProblem: '',
-    solution: '',
     forStatement: '',
-    icpName: '',
-    scope: 'company',
-    entityId: null
+    icpName: ''
   };
 
   /* ════════════════════════════════════════════════════
@@ -709,28 +693,6 @@
       `;
     }
 
-    if (icp.macro_problem || icp.solution) {
-      html += `
-        <div class="icp-detail-section">
-          <div class="icp-detail-section-title">Problem & Solution</div>
-          <div class="icp-detail-grid">
-            ${icp.macro_problem ? `
-              <div class="icp-detail-block">
-                <div class="icp-detail-label">Macro Problem</div>
-                <div class="icp-detail-text-block">${esc(icp.macro_problem)}</div>
-              </div>
-            ` : ''}
-            ${icp.solution ? `
-              <div class="icp-detail-block">
-                <div class="icp-detail-label">Solution</div>
-                <div class="icp-detail-text-block">${esc(icp.solution)}</div>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      `;
-    }
-
     if (icp.for_statement) {
       html += `
         <div class="icp-detail-section">
@@ -763,8 +725,6 @@
     wizardState.countries = icp.countries || [];
     wizardState.departments = icp.departments || [];
     wizardState.roles = icp.roles || [];
-    wizardState.macroProblem = icp.macro_problem || '';
-    wizardState.solution = icp.solution || '';
     wizardState.forStatement = icp.for_statement || '';
     wizardState.icpName = icp.name || '';
     wizardState.scope = icp.scope || 'company';
@@ -788,8 +748,6 @@
     wizardState.countries = [];
     wizardState.departments = [];
     wizardState.roles = [];
-    wizardState.macroProblem = '';
-    wizardState.solution = '';
     wizardState.forStatement = '';
     wizardState.icpName = '';
     wizardState.scope = 'company';
@@ -811,7 +769,7 @@
   };
 
   window.icpWizardNext = function () {
-    if (wizardState.step < 8) wizardState.step++;
+    if (wizardState.step < TOTAL_STEPS) wizardState.step++;
     icpRenderWizard();
   };
 
@@ -833,8 +791,6 @@
       countries: wizardState.countries,
       departments: wizardState.departments,
       roles: wizardState.roles,
-      macro_problem: wizardState.macroProblem,
-      solution: wizardState.solution,
       for_statement: wizardState.forStatement,
       status: 'draft'
     };
@@ -851,13 +807,13 @@
     icpUpdateProgress();
     icpRenderStep(wizardState.step);
     document.getElementById('icp-btn-back').style.display = wizardState.step > 1 ? '' : 'none';
-    document.getElementById('icp-btn-next').style.display = wizardState.step < 8 ? '' : 'none';
-    document.getElementById('icp-btn-create').style.display = wizardState.step === 8 ? '' : 'none';
+    document.getElementById('icp-btn-next').style.display = wizardState.step < TOTAL_STEPS ? '' : 'none';
+    document.getElementById('icp-btn-create').style.display = wizardState.step === TOTAL_STEPS ? '' : 'none';
   }
 
   function icpUpdateProgress() {
-    const pct = (wizardState.step / 8) * 100;
-    document.getElementById('icp-wizard-progress').textContent = `Step ${wizardState.step} of 8`;
+    const pct = (wizardState.step / TOTAL_STEPS) * 100;
+    document.getElementById('icp-wizard-progress').textContent = `Step ${wizardState.step} of ${TOTAL_STEPS}`;
     document.getElementById('icp-wizard-progress-fill').style.width = pct + '%';
   }
 
@@ -865,16 +821,39 @@
     document.querySelectorAll('.icp-wizard-step').forEach(el => el.classList.remove('active'));
     document.getElementById('icp-step-' + step).classList.add('active');
 
-    if (step === 1) icpRenderStep1();
-    else if (step === 2) icpRenderStep2();
-    else if (step === 3) icpRenderStep3();
-    else if (step === 4) icpRenderStep4();
-    else if (step === 5) icpRenderStep5();
-    else if (step === 8) icpRenderStep8();
+    if (step === 1) icpRenderStepScope();
+    else if (step === 2) icpRenderStepIcpTypes();
+    else if (step === 3) icpRenderStepVerticals();
+    else if (step === 4) icpRenderStepGeo();
+    else if (step === 5) icpRenderStepDepts();
+    else if (step === 6) icpRenderStepRoles();
+    else if (step === 7) icpRenderStepPreview();
   }
 
-  function icpRenderStep1() {
-    const grid = document.getElementById('icp-step1-grid');
+  function icpRenderStepScope() {
+    const container = document.getElementById('icp-step1-scope');
+    const client = Storage.getActiveClient();
+    let html = `
+      <div class="icp-radio-item ${wizardState.scope === 'company' ? 'selected' : ''}" onclick="icpSetScope('company'); icpRenderStepScope();">
+        <div class="icp-radio-circle"></div>
+        <span>Company-wide</span>
+      </div>
+    `;
+    if (client?.brandEntities && client.brandEntities.length > 0) {
+      client.brandEntities.forEach(e => {
+        html += `
+          <div class="icp-radio-item ${wizardState.scope === 'entity' && wizardState.entityId === e.id ? 'selected' : ''}" onclick="icpSetScope('entity', '${esc(e.id)}'); icpRenderStepScope();">
+            <div class="icp-radio-circle"></div>
+            <span>${e.name}</span>
+          </div>
+        `;
+      });
+    }
+    container.innerHTML = html;
+  }
+
+  function icpRenderStepIcpTypes() {
+    const grid = document.getElementById('icp-step2-grid');
     grid.innerHTML = WIZARD_ICP_OPTIONS.map(opt => `
       <div class="icp-card-item ${wizardState.icpTypes.includes(opt.id) ? 'selected' : ''}" onclick="icpToggleIcpType('${opt.id}')">
         <div class="icp-card-item-label">${opt.label}</div>
@@ -882,8 +861,8 @@
     `).join('');
   }
 
-  function icpRenderStep2() {
-    const radio = document.getElementById('icp-step2-radio');
+  function icpRenderStepVerticals() {
+    const radio = document.getElementById('icp-step3-radio');
     const options = [
       { value: 'none', label: 'Not focused' },
       { value: 'locked', label: 'Vertical-focused' },
@@ -895,7 +874,7 @@
         <span>${opt.label}</span>
       </div>
     `).join('');
-    document.getElementById('icp-step2-verticals').style.display = wizardState.verticalFocus !== 'none' ? '' : 'none';
+    document.getElementById('icp-step3-verticals').style.display = wizardState.verticalFocus !== 'none' ? '' : 'none';
     if (wizardState.verticalFocus !== 'none') {
       icpRenderVerticalTags();
     }
@@ -903,7 +882,7 @@
 
   function icpRenderVerticalTags() {
     const verts = wizardState.icpTypes.includes('consumers') || wizardState.icpTypes.includes('prosumers') ? WIZARD_VERTICALS_B2C : WIZARD_VERTICALS_B2B;
-    const tags = document.getElementById('icp-step2-tags');
+    const tags = document.getElementById('icp-step3-tags');
     const displayed = wizardState.verticals.length > 0 ? wizardState.verticals : verts.slice(0, 5);
     tags.innerHTML = displayed.map(v => `
       <div class="icp-tag-item ${wizardState.verticals.includes(v) ? 'selected' : ''}" onclick="icpToggleVertical('${esc(v)}')">
@@ -927,8 +906,8 @@
     icpRenderVerticalTags();
   };
 
-  function icpRenderStep3() {
-    const radio = document.getElementById('icp-step3-radio');
+  function icpRenderStepGeo() {
+    const radio = document.getElementById('icp-step4-radio');
     radio.innerHTML = `
       <div class="icp-radio-item ${wizardState.regions.length === 0 ? 'selected' : ''}" onclick="icpSetGeoGlobal()">
         <div class="icp-radio-circle"></div>
@@ -939,7 +918,7 @@
         <span>Specific regions / countries</span>
       </div>
     `;
-    document.getElementById('icp-step3-countries').style.display = wizardState.regions.length > 0 || wizardState.countries.length > 0 ? '' : 'none';
+    document.getElementById('icp-step4-countries').style.display = wizardState.regions.length > 0 || wizardState.countries.length > 0 ? '' : 'none';
     if (wizardState.regions.length > 0 || wizardState.countries.length > 0) {
       icpRenderCountryTags();
     }
@@ -948,18 +927,18 @@
   window.icpSetGeoGlobal = function () {
     wizardState.regions = [];
     wizardState.countries = [];
-    icpRenderStep3();
+    icpRenderStepGeo();
   };
 
   window.icpSetGeoRegional = function () {
     if (wizardState.regions.length === 0 && wizardState.countries.length === 0) {
       wizardState.regions = ['North America'];
     }
-    icpRenderStep3();
+    icpRenderStepGeo();
   };
 
   function icpRenderCountryTags() {
-    const tags = document.getElementById('icp-step3-tags');
+    const tags = document.getElementById('icp-step4-tags');
     const displayed = [...wizardState.regions, ...wizardState.countries].slice(0, 6);
     tags.innerHTML = displayed.map(item => `
       <div class="icp-tag-item selected" onclick="icpRemoveGeo('${esc(item)}')">
@@ -1006,13 +985,13 @@
 
   window.icpToggleShowAllCountries = function () {
     showAllCountries = !showAllCountries;
-    const input = document.getElementById('icp-step3-input');
+    const input = document.getElementById('icp-step4-input');
     const allCountries = document.querySelectorAll('[data-country]');
     allCountries.forEach(el => el.style.display = showAllCountries ? '' : 'none');
   };
 
-  function icpRenderStep4() {
-    const tags = document.getElementById('icp-step4-tags');
+  function icpRenderStepDepts() {
+    const tags = document.getElementById('icp-step5-tags');
     const displayed = wizardState.departments.length > 0 ? wizardState.departments : WIZARD_DEPARTMENTS.slice(0, 6);
     tags.innerHTML = displayed.map(d => `
       <div class="icp-tag-item ${wizardState.departments.includes(d) ? 'selected' : ''}" onclick="icpToggleDept('${esc(d)}')">
@@ -1026,16 +1005,16 @@
     const idx = wizardState.departments.indexOf(d);
     if (idx >= 0) wizardState.departments.splice(idx, 1);
     else wizardState.departments.push(d);
-    icpRenderStep4();
+    icpRenderStepDepts();
   };
 
   window.icpDiceDepartments = function () {
     wizardState.departments = getRandom(WIZARD_DEPARTMENTS, 3);
-    icpRenderStep4();
+    icpRenderStepDepts();
   };
 
-  function icpRenderStep5() {
-    const tags = document.getElementById('icp-step5-tags');
+  function icpRenderStepRoles() {
+    const tags = document.getElementById('icp-step6-tags');
     const relevant = wizardState.departments.length > 0
       ? [...new Set(wizardState.departments.flatMap(d => DEPT_ROLE_MAP[d] || []))]
       : [];
@@ -1052,7 +1031,7 @@
     const idx = wizardState.roles.indexOf(r);
     if (idx >= 0) wizardState.roles.splice(idx, 1);
     else wizardState.roles.push(r);
-    icpRenderStep5();
+    icpRenderStepRoles();
   };
 
   window.icpDiceRoles = function () {
@@ -1061,46 +1040,26 @@
       : [];
     const pool = relevant.length > 0 ? relevant : WIZARD_ROLES;
     wizardState.roles = getRandom(pool, 3);
-    icpRenderStep5();
+    icpRenderStepRoles();
   };
 
-  function icpRenderStep8() {
+  function icpRenderStepPreview() {
     icpBuildForStatement();
-    document.getElementById('icp-step8-preview').textContent = wizardState.forStatement || '(No for statement yet)';
-    document.getElementById('icp-step8-name').value = wizardState.icpName;
-
-    const client = Storage.getActiveClient();
-    const scope = document.getElementById('icp-step8-scope');
-    let scopeHtml = `
-      <div class="icp-radio-item ${wizardState.scope === 'company' ? 'selected' : ''}" onclick="icpSetScope('company')">
-        <div class="icp-radio-circle"></div>
-        <span>Company-wide</span>
-      </div>
-    `;
-    if (client?.brandEntities && client.brandEntities.length > 0) {
-      client.brandEntities.forEach(e => {
-        scopeHtml += `
-          <div class="icp-radio-item ${wizardState.scope === 'entity' && wizardState.entityId === e.id ? 'selected' : ''}" onclick="icpSetScope('entity', '${esc(e.id)}')">
-            <div class="icp-radio-circle"></div>
-            <span>${e.name}</span>
-          </div>
-        `;
-      });
-    }
-    scope.innerHTML = scopeHtml;
+    document.getElementById('icp-step7-preview').textContent = wizardState.forStatement || '(No for statement yet)';
+    document.getElementById('icp-step7-name').value = wizardState.icpName;
   }
 
   window.icpToggleIcpType = function (id) {
     const idx = wizardState.icpTypes.indexOf(id);
     if (idx >= 0) wizardState.icpTypes.splice(idx, 1);
     else wizardState.icpTypes.push(id);
-    icpRenderStep1();
+    icpRenderStepIcpTypes();
   };
 
   window.icpSetVerticalFocus = function (focus) {
     wizardState.verticalFocus = focus;
     if (focus === 'none') wizardState.verticals = [];
-    icpRenderStep2();
+    icpRenderStepVerticals();
   };
 
   window.icpSetScope = function (scope, entityId) {
@@ -1111,15 +1070,13 @@
 
   // Capture name input
   document.addEventListener('change', e => {
-    if (e.target.id === 'icp-step8-name') {
+    if (e.target.id === 'icp-step7-name') {
       wizardState.icpName = e.target.value;
     }
   });
 
   document.addEventListener('input', e => {
-    if (e.target.id === 'icp-step6-textarea') wizardState.macroProblem = e.target.value;
-    if (e.target.id === 'icp-step7-textarea') wizardState.solution = e.target.value;
-    if (e.target.id === 'icp-step8-name') wizardState.icpName = e.target.value;
+    if (e.target.id === 'icp-step7-name') wizardState.icpName = e.target.value;
   });
 
   // Close overlay on backdrop
