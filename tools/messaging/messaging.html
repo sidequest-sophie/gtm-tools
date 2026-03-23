@@ -222,9 +222,6 @@
 
 .mh-tag-picker { display:flex; flex-direction:column; gap:0.75rem; }
 .mh-tag-list { display:flex; flex-wrap:wrap; gap:0.5rem; }
-.mh-tag-scroll-wrap { position:relative; max-height:220px; overflow-y:auto; }
-.mh-tag-scroll-wrap .mh-tag-list { padding-bottom:1.5rem; }
-.mh-tag-scroll-fade { pointer-events:none; position:sticky; bottom:0; left:0; right:0; height:48px; background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1)); z-index:1; margin-top:-48px; }
 .mh-tag-item { display:inline-flex; align-items:center; gap:0.4rem; padding:0.5rem 0.75rem; border:1.5px solid var(--gray-200); border-radius:20px; background:#fff; cursor:pointer; transition:all 0.15s; font-size:0.8rem; font-weight:600; color:var(--gray-700); white-space:nowrap; }
 .mh-tag-item:hover { border-color:var(--pink); background:rgba(217,43,150,0.02); }
 .mh-tag-item.selected { background:var(--pink); color:#fff; border-color:var(--pink); }
@@ -454,10 +451,7 @@
           <p class="mh-wizard-step-desc">Which departments do you serve?</p>
           <div class="mh-tag-picker">
             <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step4-count">0</strong></div>
-            <div class="mh-tag-scroll-wrap">
-              <div class="mh-tag-list" id="mh-step4-tags"></div>
-              <div class="mh-tag-scroll-fade"></div>
-            </div>
+            <div class="mh-tag-list" id="mh-step4-tags"></div>
             <div class="mh-tag-picker-controls">
               <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(4)">🎲</button>
               <input type="text" class="mh-tag-input" id="mh-step4-input" placeholder="Add custom department…">
@@ -472,10 +466,7 @@
           <p class="mh-wizard-step-desc">Decision-makers and influencers in your ICP.</p>
           <div class="mh-tag-picker">
             <div class="mh-wizard-selected-tags">Selected: <strong id="mh-step5-count">0</strong></div>
-            <div class="mh-tag-scroll-wrap">
-              <div class="mh-tag-list" id="mh-step5-tags"></div>
-              <div class="mh-tag-scroll-fade"></div>
-            </div>
+            <div class="mh-tag-list" id="mh-step5-tags"></div>
             <div class="mh-tag-picker-controls">
               <button class="mh-btn-dice" title="Re-roll suggestions" onclick="mhWizardReshuffle(5)">🎲</button>
               <input type="text" class="mh-tag-input" id="mh-step5-input" placeholder="Add custom role…">
@@ -1196,7 +1187,7 @@
     'Commercial Real Estate', 'Education & EdTech', 'Government & Public Sector',
     'Non-profit & NGO', 'Aerospace & Defence', 'Agriculture & AgTech',
     'Automotive & Mobility', 'Banking & Capital Markets', 'Biotechnology',
-    'Chemicals & Materials', 'Consulting & Professional Services', 'Cybersecurity',
+    'Chemicals & Materials', 'Consulting & Professional Services',
     'Data & Analytics', 'Digital Marketing & AdTech', 'eCommerce Infrastructure',
     'Environmental & Cleantech', 'Fashion & Textile', 'Food Processing & FMCG',
     'Freight & Shipping', 'Gaming & Interactive', 'HR & Workforce Management',
@@ -1245,7 +1236,7 @@
     'Professional Services', 'Implementation', 'Technical Support',
     'Account Management', 'Customer Onboarding', 'Pricing & Packaging',
     'Investor Relations', 'Treasury', 'Tax', 'Internal Audit',
-    'Enterprise Architecture', 'Information Security', 'Cloud & Platform',
+    'Enterprise Architecture', 'Cybersecurity', 'Cloud & Platform',
     'Mobile Engineering', 'Frontend Engineering', 'Backend Engineering',
     'Site Reliability', 'Project Management (PMO)', 'Change Management',
     'Mergers & Acquisitions', 'Sustainability & ESG', 'Diversity & Inclusion',
