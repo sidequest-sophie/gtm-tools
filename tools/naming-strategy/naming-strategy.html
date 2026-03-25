@@ -582,6 +582,99 @@
     font-size: 1.1rem;
   }
 
+  /* ── Mapping action bar ── */
+  .ns-mapping-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+  }
+
+  .ns-mapping-hint {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin-left: auto;
+  }
+
+  .ns-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .ns-btn-primary {
+    background: var(--pink);
+    color: var(--white);
+  }
+
+  .ns-btn-primary:hover {
+    background: var(--pink-dark, #c01882);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .ns-btn-ghost {
+    background: none;
+    color: var(--gray-600);
+    border: 1px solid var(--gray-300);
+  }
+
+  .ns-btn-ghost:hover {
+    background: var(--gray-100);
+    color: var(--navy);
+  }
+
+  /* ── Drag-and-drop states ── */
+  .ns-mapping-chip[draggable="true"] {
+    cursor: grab;
+  }
+
+  .ns-mapping-chip[draggable="true"]:active,
+  .ns-mapping-chip.ns-dragging {
+    cursor: grabbing;
+    opacity: 0.5;
+  }
+
+  .ns-unmapped-item[draggable="true"] {
+    cursor: grab;
+  }
+
+  .ns-unmapped-item.ns-dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+  }
+
+  .ns-mapping-cell.ns-drop-ready {
+    border-color: var(--pink);
+    border-style: dashed;
+  }
+
+  .ns-mapping-cell.ns-drag-over {
+    background: rgba(217, 43, 150, 0.08);
+    border-color: var(--pink);
+    border-style: solid;
+    box-shadow: inset 0 0 0 1px var(--pink);
+  }
+
+  .ns-unmapped-items.ns-drop-ready {
+    outline: 2px dashed var(--gray-400);
+    outline-offset: 4px;
+    border-radius: var(--radius-md);
+  }
+
+  .ns-unmapped-items.ns-drag-over {
+    outline-color: var(--pink);
+    background: rgba(217, 43, 150, 0.04);
+  }
+
   .ns-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -2699,6 +2792,287 @@ window.namingStrategy = {
   // TAB 3: CONCEPT MAPPING
   // ────────────────────────────────────────────────────────────────────────────
 
+  // ── Auto-classification algorithm ──
+
+  /**
+   * Classify a name into one of the grid cells.
+   * Returns a cellKey like 'descriptive_compound' or 'abstract_coined'.
+   */
+  classifyName(name) {
+    const col = this._classifyConstruction(name);
+    const row = this._classifyMeaning(name);
+    return `${row}_${col}`;
+  },
+
+  /**
+   * Construction axis: real | compound | coined | jargon
+   */
+  _classifyConstruction(name) {
+    const raw = name.trim();
+    const lower = raw.toLowerCase();
+
+    // ── Compound detection ──
+    // Multi-word names (spaces, &, hyphens used as separators between distinct words)
+    const words = raw.split(/[\s&+]+/).filter(w => w.length > 0);
+    if (words.length >= 2) {
+      // Two+ distinct meaningful words → compound
+      // But exclude things like "HTB AI Range" which are more jargon-ish
+      // Check if most words are common English or action-oriented
+      const meaningfulWords = words.filter(w => w.length > 1 && !/^(for|the|and|of|in|to|a|an|by|&)$/i.test(w));
+      if (meaningfulWords.length >= 2) return 'compound';
+    }
+
+    // camelCase / PascalCase with multiple humps: e.g. "LetsDefend", "AutoTrader"
+    const camelParts = raw.match(/[A-Z][a-z]+/g);
+    if (camelParts && camelParts.length >= 2) return 'compound';
+
+    // ── Industry jargon detection ──
+    const jargonPatterns = [
+      /^(api|sdk|ssl|tls|dns|ssh|tcp|udp|http|oauth|saml|sso|siem|edr|xdr|soar|iam|rbac|ci|cd|devsecops|soc|noc|vlan|vpn|cdn|cms|crm|erp|saas|paas|iaas|mlops|devops)$/i,
+      /\b(cyber|infosec|pentest|malware|phishing|ransomware|endpoint|firewall|zero.?trust|blockchain|fintech|edtech|medtech|biotech|nanotech|regtech|proptech|insurtech|govtech|cleantech|agritech)\b/i,
+    ];
+    if (jargonPatterns.some(p => p.test(lower))) return 'jargon';
+
+    // ── Real word detection ──
+    // Common English words (broad list to catch single-word real names)
+    const realWords = new Set([
+      'academy','access','agent','alert','anchor','arc','arena','atlas','badge','base','beacon',
+      'blade','bolt','bridge','canvas','capture','castle','catalyst','challenge','cipher','circuit',
+      'citadel','clash','cloud','code','compass','core','craft','crown','crusade','cube','data',
+      'defender','delta','discovery','dock','dome','door','drive','edge','element','ember','engine',
+      'enterprise','envoy','falcon','field','flag','flame','fleet','flow','force','forge','fortress',
+      'frontier','fusion','gate','grid','guard','guardian','guide','hacker','harbor','haven','hawk',
+      'horizon','hub','hunt','index','insight','iron','island','jet','junction','key','lab','labs',
+      'lance','launch','layer','league','lens','light','link','machine','machines','maestro','map',
+      'maps','mark','matrix','mesh','mind','mission','module','modules','monitor','nest','network',
+      'nexus','node','nova','nucleus','one','ops','orbit','oracle','outlook','owl','path','patrol',
+      'peak','pilot','pioneer','platform','point','portal','post','prime','prism','probe','profile',
+      'prospect','pulse','pursuit','quest','radar','range','ranger','rank','recon','relay','report',
+      'resilience','response','ring','rise','rocket','sage','scope','scout','search','sector',
+      'security','sentinel','series','shadow','shark','shell','shield','shift','signal','sky','slate',
+      'snap','space','spaces','spark','spectrum','sphere','sprint','squad','stack','star','station',
+      'storm','stream','strike','summit','surge','survey','swift','sword','system','talent','tank',
+      'target','team','teams','titan','tower','trace','track','trail','trigger','trust','tunnel',
+      'vault','venture','vortex','warden','watch','wave','weather','web','wire','wizard','wolf',
+      'word','works','world','zone',
+      // Common real words used in brand names
+      'book','box','brain','cat','control','course','courses','crisis','current','dash','deck',
+      'dedicated','development','door','drop','eye','face','find','fish','flash','fox','game',
+      'general','global','gold','green','group','hand','head','health','heart','help','hero','hive',
+      'home','house','ice','ink','jar','job','jobs','king','lake','lead','leaf','life','lock','loop',
+      'mail','market','match','meta','milk','mind','mine','mint','moon','mountain','mud','night',
+      'north','note','ocean','office','open','order','owl','pack','page','pan','paper','park','pay',
+      'pen','photo','pick','pin','pipe','pixel','plan','plant','play','plus','pocket','pool','pop',
+      'power','press','pro','public','pure','rain','ram','ray','red','river','road','robin','rock',
+      'root','round','run','sail','salt','sand','sea','seed','server','set','shop','side','sight',
+      'silk','silver','simple','site','six','sky','slide','smart','smoke','snap','snow','soft',
+      'song','sort','south','speed','spot','spring','spy','square','stage','steel','step','stock',
+      'stone','stop','store','street','strong','studio','sun','surf','sweet','table','tag','tape',
+      'task','tea','tech','tent','test','think','thread','tide','timber','time','tip','tool','tools',
+      'top','touch','tour','trade','tree','trend','tribe','trip','true','tune','turn','twist',
+      'type','unit','up','urban','valley','view','vine','vision','vital','voice','walk','wall',
+      'water','way','west','white','wild','win','wind','wing','wise','work','wrap','yard','year',
+      'zen','zero','zip','zoom'
+    ]);
+    // Single word, found in list → real word
+    if (words.length === 1 && realWords.has(lower)) return 'real';
+    // Also check if it's a plain dictionary word by checking the word list
+    if (words.length === 1 && /^[a-z]+$/i.test(raw) && realWords.has(lower)) return 'real';
+
+    // ── Coined detection ──
+    // Single word that isn't a real word → likely coined
+    if (words.length === 1) return 'coined';
+
+    // Fallback for multi-word that didn't match compound
+    return 'compound';
+  },
+
+  /**
+   * Meaning axis: abstract | suggestive | descriptive
+   */
+  _classifyMeaning(name) {
+    const raw = name.trim();
+    const lower = raw.toLowerCase();
+    const words = lower.split(/[\s&+\-_]+/).filter(w => w.length > 0);
+
+    // ── Descriptive: name literally says what it does/is ──
+    const descriptivePatterns = [
+      // Action verbs + nouns describing function
+      /\b(manage|management|manager|report|reporting|analytics|monitor|monitoring|search|assessment|certification|certifications|training|learning|development|tracking|testing|deployment|configuration|settings|admin|control|dashboard|scheduler|automation|integration|builder|creator|editor|viewer|checker|scanner|validator|generator|converter|calculator|simulator|emulator|debugger|profiler|compiler|installer|updater|downloader|uploader|recorder|player|browser|finder|explorer|organizer|planner|scheduler|analyzer|detector|inspector|auditor|reviewer|verifier|authenticator|authorizer|provisioner)\b/i,
+      // Names that describe the thing directly
+      /\b(modules|courses|exams|vouchers|paths|boards?|lists?|roles?|users?|jobs?|candidates?|workforce|resilience|centralized|user.management|lab.settings|reporting|access)\b/i,
+    ];
+
+    // Compound descriptive: multiple words where most are descriptive
+    const descriptiveWords = new Set([
+      'access','admin','analytics','assessment','audit','board','build','candidate','centralized',
+      'certification','certifications','check','compute','configuration','control','course','courses',
+      'crisis','dashboard','data','dedicated','deploy','deployment','detect','development','direct',
+      'enterprise','exam','exams','find','hire','index','install','integration','job','jobs','lab',
+      'labs','list','log','manage','management','map','module','modules','monitor','network','open',
+      'operate','operational','order','path','paths','platform','professional','provision','public',
+      'query','range','record','report','reporting','resilience','response','role','roles','run',
+      'scan','schedule','search','secure','security','serve','server','service','session','setting',
+      'settings','skill','space','spaces','status','store','system','talent','task','test','tool',
+      'tools','track','train','training','transfer','update','upload','user','users','validate',
+      'verify','view','voucher','vouchers','workflow','workforce'
+    ]);
+
+    let descriptiveScore = 0;
+    let totalWords = words.filter(w => w.length > 2).length || 1;
+    words.forEach(w => {
+      if (descriptiveWords.has(w)) descriptiveScore++;
+    });
+    if (descriptivePatterns.some(p => p.test(lower))) descriptiveScore += 2;
+    if (descriptiveScore / totalWords >= 0.5 && descriptiveScore >= 2) return 'descriptive';
+    if (descriptiveScore >= 3) return 'descriptive';
+
+    // ── Suggestive: hints at benefit/quality without directly describing ──
+    const suggestivePatterns = [
+      /\b(pro|elite|advance|advanced|premium|plus|max|ultra|smart|turbo|boost|power|super|hyper|prime|alpha|omega|titan|nexus|apex|summit|peak|vanguard|frontier|horizon|venture|quest|pioneer|guardian|sentinel|defender|fortress|shield|armor|aegis|bastion|citadel|stronghold|watchtower|hawk|eagle|falcon|wolf|panther|cobra|viper|phoenix|dragon|griffin|titan|spartan|ninja|samurai|ronin|gladiator|centurion|strike|force|storm|thunder|lightning|flash|blaze|flame|ember|spark|pulse|wave|surge|nova|stellar|cosmic|quantum|atomic|fusion|catalyst|ignite|accelerate|propel|launch|rocket|orbit|velocity|momentum|agile|swift|rapid|turbo|instant|deep|stealth)\b/i,
+    ];
+
+    let suggestiveScore = 0;
+    if (suggestivePatterns.some(p => p.test(lower))) suggestiveScore += 2;
+
+    // Names containing "for" (e.g., "HTB for Business") are suggestive — they reposition an abstract name
+    if (/\bfor\b/i.test(lower)) suggestiveScore += 1;
+
+    // HTB/abbreviation + qualifier patterns
+    if (/^[A-Z]{2,5}\s+(for|pro|plus|enterprise|business)/i.test(raw)) suggestiveScore += 1;
+
+    if (suggestiveScore >= 2) return 'suggestive';
+
+    // ── Default: abstract ──
+    // Single coined/real word with no clear function or benefit → abstract
+    // Also short acronyms (HTB, CTF, etc.)
+    if (/^[A-Z]{2,6}$/.test(raw)) return 'abstract';
+
+    // If the name is very short and not descriptive/suggestive, it's abstract
+    if (words.length <= 2 && descriptiveScore === 0 && suggestiveScore === 0) return 'abstract';
+
+    // Moderate descriptive signal but not enough for "descriptive" → suggestive
+    if (descriptiveScore >= 1) return 'suggestive';
+
+    return 'abstract';
+  },
+
+  /**
+   * Auto-map all unmapped items using the classification algorithm.
+   * Only maps items that don't already have a cell assigned.
+   */
+  autoMapItems() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const entities = client.brandEntities || [];
+    const jargonOn = this.isJargonEnabled();
+    let changed = false;
+
+    entities.forEach(entity => {
+      if (!entity.cell) {
+        let cellKey = this.classifyName(entity.name);
+        // If jargon is off but we classified as jargon, shift to nearest column
+        if (!jargonOn && cellKey.endsWith('_jargon')) {
+          cellKey = cellKey.replace('_jargon', '_real');
+        }
+        entity.cell = cellKey;
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      Storage.updateClient(client.id, { brandEntities: entities });
+    }
+    this.renderMappingTab();
+    this.renderProblemsTab();
+  },
+
+  /**
+   * Clear all cell assignments so items go back to unmapped.
+   */
+  clearAllMappings() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+
+    const entities = client.brandEntities || [];
+    entities.forEach(entity => { entity.cell = ''; });
+    Storage.updateClient(client.id, { brandEntities: entities });
+    this.renderMappingTab();
+    this.renderProblemsTab();
+  },
+
+  // ── Drag-and-drop helpers ──
+
+  _setupMappingDragDrop(container) {
+    const self = this;
+
+    // Make chips and unmapped items draggable
+    container.querySelectorAll('.ns-mapping-chip, .ns-unmapped-item').forEach(el => {
+      el.setAttribute('draggable', 'true');
+
+      el.addEventListener('dragstart', (e) => {
+        const itemId = el.dataset.id;
+        if (itemId) {
+          e.dataTransfer.setData('text/plain', itemId);
+        }
+        el.classList.add('ns-dragging');
+        // Show drop zones
+        container.querySelectorAll('.ns-mapping-cell').forEach(c => c.classList.add('ns-drop-ready'));
+        // Also show unmapped panel as drop target
+        const unmappedPanel = container.querySelector('.ns-unmapped-items');
+        if (unmappedPanel) unmappedPanel.classList.add('ns-drop-ready');
+      });
+
+      el.addEventListener('dragend', () => {
+        el.classList.remove('ns-dragging');
+        container.querySelectorAll('.ns-drop-ready, .ns-drag-over').forEach(c => {
+          c.classList.remove('ns-drop-ready', 'ns-drag-over');
+        });
+      });
+    });
+
+    // Make cells accept drops
+    container.querySelectorAll('.ns-mapping-cell').forEach(cell => {
+      cell.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        cell.classList.add('ns-drag-over');
+      });
+      cell.addEventListener('dragleave', () => {
+        cell.classList.remove('ns-drag-over');
+      });
+      cell.addEventListener('drop', (e) => {
+        e.preventDefault();
+        cell.classList.remove('ns-drag-over');
+        const itemId = e.dataTransfer.getData('text/plain');
+        const cellKey = cell.dataset.cell;
+        if (itemId && cellKey) {
+          self.assignItemToCell(itemId, cellKey);
+        }
+      });
+    });
+
+    // Make unmapped panel accept drops (to unmap items)
+    const unmappedPanel = container.querySelector('.ns-unmapped-items');
+    if (unmappedPanel) {
+      unmappedPanel.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        unmappedPanel.classList.add('ns-drag-over');
+      });
+      unmappedPanel.addEventListener('dragleave', () => {
+        unmappedPanel.classList.remove('ns-drag-over');
+      });
+      unmappedPanel.addEventListener('drop', (e) => {
+        e.preventDefault();
+        unmappedPanel.classList.remove('ns-drag-over');
+        const itemId = e.dataTransfer.getData('text/plain');
+        if (itemId) {
+          self.unmapItem(itemId);
+        }
+      });
+    }
+  },
+
   renderMappingTab() {
     const client = Storage.getActiveClient();
     const container = document.getElementById('nsMappingContainer');
@@ -2720,6 +3094,20 @@ window.namingStrategy = {
     });
 
     let html = '';
+
+    // Action bar
+    const unmappedCount = totalItems - mappedItems;
+    if (totalItems > 0) {
+      html += '<div class="ns-mapping-actions">';
+      if (unmappedCount > 0) {
+        html += `<button class="ns-btn ns-btn-primary" id="nsAutoMapBtn">✨ Auto-Map ${unmappedCount} Item${unmappedCount !== 1 ? 's' : ''}</button>`;
+      }
+      if (mappedItems > 0) {
+        html += `<button class="ns-btn ns-btn-ghost" id="nsClearMappingsBtn">Clear All</button>`;
+      }
+      html += '<span class="ns-mapping-hint">Drag items between cells to reclassify</span>';
+      html += '</div>';
+    }
 
     // Warning banner if too clustered
     if (totalItems > 0 && mappedItems > 0) {
@@ -2779,7 +3167,7 @@ window.namingStrategy = {
         html += `<div class="ns-mapping-cell" data-cell="${cellKey}"><div class="ns-mapping-cell-chips">`;
         itemsInCell.forEach((item, idx) => {
           const colorClass = ontCats.indexOf(this.getItemCategory(client, item.id)) % 6;
-          html += `<div class="ns-mapping-chip" data-category="${colorClass}">${item.name}<button class="ns-mapping-chip-delete" data-unmap="${item.id}">×</button></div>`;
+          html += `<div class="ns-mapping-chip" data-category="${colorClass}" data-id="${item.id}" draggable="true">${item.name}<button class="ns-mapping-chip-delete" data-unmap="${item.id}">×</button></div>`;
         });
         html += '</div></div>';
       }
@@ -2801,7 +3189,7 @@ window.namingStrategy = {
       html += '<div class="ns-unmapped-panel"><div class="ns-unmapped-title">Unmapped Items (' + unmappedItems.length + ')</div><div class="ns-unmapped-items">';
       unmappedItems.forEach(item => {
         const colorClass = ontCats.indexOf(this.getItemCategory(client, item.id)) % 6;
-        html += `<div class="ns-unmapped-item" data-category="${colorClass}" data-id="${item.id}">${item.name}</div>`;
+        html += `<div class="ns-unmapped-item" data-category="${colorClass}" data-id="${item.id}" draggable="true">${item.name}</div>`;
       });
       html += '</div></div>';
     }
@@ -2817,7 +3205,21 @@ window.namingStrategy = {
 
     container.innerHTML = html;
 
-    // Event listeners
+    // Event listeners — Auto-map & Clear buttons
+    const autoMapBtn = document.getElementById('nsAutoMapBtn');
+    if (autoMapBtn) {
+      autoMapBtn.addEventListener('click', () => this.autoMapItems());
+    }
+    const clearBtn = document.getElementById('nsClearMappingsBtn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        if (confirm('Clear all mappings? Items will return to Unmapped.')) {
+          this.clearAllMappings();
+        }
+      });
+    }
+
+    // Click-to-unmap on chip delete buttons
     container.querySelectorAll('.ns-mapping-cell').forEach(cell => {
       cell.addEventListener('click', (e) => {
         if (e.target.closest('.ns-mapping-chip-delete')) {
@@ -2827,12 +3229,18 @@ window.namingStrategy = {
       });
     });
 
+    // Click unmapped item to manually assign via modal
     container.querySelectorAll('.ns-unmapped-item').forEach(item => {
       item.addEventListener('click', (e) => {
+        // Don't open modal if this was a drag
+        if (e.currentTarget.classList.contains('ns-dragging')) return;
         const itemId = e.currentTarget.dataset.id;
         this.showCellSelector(itemId);
       });
     });
+
+    // Drag-and-drop
+    this._setupMappingDragDrop(container);
   },
 
   showCellSelector(itemId) {
