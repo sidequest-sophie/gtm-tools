@@ -429,7 +429,6 @@
     step: 1,
     scope: 'company',
     entityId: null,
-    featureId: null,
     icpTypes: [],
     verticalFocus: 'none',
     verticals: [],
@@ -583,7 +582,7 @@
       return;
     }
     container.innerHTML = icpList.map(icp => {
-      const scope = icp.scope === 'company' ? 'Company-wide' : icp.scope === 'feature' ? (icp.entity_name || '') + ' → ' + (icp.feature_name || 'Feature') : (icp.entity_name || 'Entity');
+      const scope = icp.scope === 'company' ? 'Company-wide' : (icp.entity_name || 'Entity');
       const bc = icp.status === 'active' ? 'icp-badge-active' : icp.status === 'archived' ? 'icp-badge-archived' : 'icp-badge-draft';
       const forPreview = (icp.for_statement || '').substring(0, 120) + (icp.for_statement && icp.for_statement.length > 120 ? '…' : '');
       return `<div class="icp-card" onclick="icpOpen('${esc(icp.id)}')">
@@ -611,7 +610,7 @@
 
   function icpRenderDetail(icp) {
     const container = document.getElementById('icp-detail-container');
-    const scopeLabel = icp.scope === 'company' ? 'Company-wide' : icp.scope === 'feature' ? (icp.entity_name || '') + ' → ' + (icp.feature_name || 'Feature') : (icp.entity_name || 'Entity');
+    const scopeLabel = icp.scope === 'company' ? 'Company-wide' : (icp.entity_name || 'Entity');
     const icpTypeLabels = (icp.icp_types || []).map(id => {
       const opt = WIZARD_ICP_OPTIONS.find(o => o.id === id);
       return opt ? opt.label : id;
@@ -730,7 +729,6 @@
     wizardState.icpName = icp.name || '';
     wizardState.scope = icp.scope || 'company';
     wizardState.entityId = icp.entity_id;
-    wizardState.featureId = icp.feature_id || null;
     document.getElementById('icp-wizard-title').textContent = 'Edit ICP';
     document.getElementById('icp-btn-create').textContent = 'Update ICP';
     icpRenderWizard();
@@ -754,7 +752,6 @@
     wizardState.icpName = '';
     wizardState.scope = 'company';
     wizardState.entityId = null;
-    wizardState.featureId = null;
     showAllCountries = false;
     document.getElementById('icp-wizard-title').textContent = 'Build Your ICP';
     document.getElementById('icp-btn-create').textContent = 'Create ICP';
@@ -784,22 +781,12 @@
     icpBuildForStatement();
     const client = Storage.getActiveClient();
     const entity = client?.brandEntities?.find(e => e.id === wizardState.entityId);
-    let entityName = null;
-    let featureName = null;
-    if (wizardState.scope === 'entity' && entity) {
-      entityName = entity.name;
-    } else if (wizardState.scope === 'feature' && entity) {
-      entityName = entity.name;
-      const feature = (entity.features || []).find(f => f.id === wizardState.featureId);
-      featureName = feature ? feature.name : null;
-    }
+    const entityName = entity ? entity.name : null;
     const payload = {
       name: wizardState.icpName,
       scope: wizardState.scope,
       entity_id: wizardState.entityId,
       entity_name: entityName,
-      feature_id: wizardState.featureId,
-      feature_name: featureName,
       icp_types: wizardState.icpTypes,
       vertical_focus: wizardState.verticalFocus,
       verticals: wizardState.verticals,
@@ -856,26 +843,31 @@
       </div>
     `;
     if (client?.brandEntities && client.brandEntities.length > 0) {
-      client.brandEntities.forEach(e => {
-        const isEntity = wizardState.scope === 'entity' && wizardState.entityId === e.id;
-        html += `
-          <div class="icp-radio-item ${isEntity ? 'selected' : ''}" onclick="icpSetScope('entity', '${esc(e.id)}'); icpRenderStepScope();">
-            <div class="icp-radio-circle"></div>
-            <span>${e.name}</span>
-          </div>
-        `;
-        if (e.features && e.features.length > 0) {
-          e.features.forEach(f => {
-            const isFeature = wizardState.scope === 'feature' && wizardState.featureId === f.id;
-            html += `
-              <div class="icp-radio-item ${isFeature ? 'selected' : ''}" style="margin-left:1.75rem;padding:0.55rem 0.85rem;" onclick="icpSetScope('feature', '${esc(e.id)}', '${esc(f.id)}'); icpRenderStepScope();">
-                <div class="icp-radio-circle"></div>
-                <span style="font-size:0.85rem;">${e.name} → ${f.name}</span>
-              </div>
-            `;
-          });
-        }
+      const TYPE_ICONS = { Brand:'🏷️', Family:'🗂️', Line:'📏', Product:'📦', Feature:'⚙️', Content:'📝', Service:'🛠️', Platform:'🖥️', Solution:'💡', Module:'🔩' };
+      const entities = client.brandEntities;
+      const validIds = new Set(entities.map(e => e.id));
+      const byParent = {};
+      entities.forEach(e => {
+        const pid = (e.parentEntityId && validIds.has(e.parentEntityId)) ? e.parentEntityId : '';
+        if (!byParent[pid]) byParent[pid] = [];
+        byParent[pid].push(e);
       });
+      function renderScopeNodes(parentId, depth) {
+        const children = byParent[parentId] || [];
+        children.forEach(e => {
+          const icon = TYPE_ICONS[e.type] || '📋';
+          const isSelected = wizardState.scope === 'entity' && wizardState.entityId === e.id;
+          const indent = depth * 1.5;
+          html += `
+            <div class="icp-radio-item ${isSelected ? 'selected' : ''}" style="margin-left:${indent}rem;${depth > 0 ? 'padding:0.55rem 0.85rem;' : ''}" onclick="icpSetScope('entity', '${esc(e.id)}'); icpRenderStepScope();">
+              <div class="icp-radio-circle"></div>
+              <span>${icon} ${e.name}</span>
+            </div>
+          `;
+          renderScopeNodes(e.id, depth + 1);
+        });
+      }
+      renderScopeNodes('', 0);
     }
     container.innerHTML = html;
   }
@@ -1090,18 +1082,9 @@
     icpRenderStepVerticals();
   };
 
-  window.icpSetScope = function (scope, entityId, featureId) {
+  window.icpSetScope = function (scope, entityId) {
     wizardState.scope = scope;
-    if (scope === 'entity') {
-      wizardState.entityId = entityId;
-      wizardState.featureId = null;
-    } else if (scope === 'feature') {
-      wizardState.entityId = entityId;
-      wizardState.featureId = featureId;
-    } else {
-      wizardState.entityId = null;
-      wizardState.featureId = null;
-    }
+    wizardState.entityId = scope === 'entity' ? entityId : null;
   };
 
   // Capture name input
