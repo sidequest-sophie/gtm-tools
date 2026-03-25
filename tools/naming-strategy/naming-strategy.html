@@ -1939,11 +1939,10 @@
     <!-- Categories -->
     <div class="ns-settings-section">
       <div class="ns-settings-section-title">Categories</div>
-      <div class="ns-categories-list" id="nsCategoriesList"></div>
-      <div class="ns-new-category-form">
-        <input type="text" class="ns-new-category-input" id="nsNewCategoryInput" placeholder="New category" />
-        <button class="ns-new-category-btn" id="nsNewCategoryBtn">Add</button>
+      <div style="font-size:0.85rem; color:var(--gray-600); line-height:1.5;">
+        Categories are derived from your <strong>Brand Ontology</strong> in Company Settings. Add entities there (Brand, Product, Feature, Service, etc.) and they'll appear here automatically.
       </div>
+      <div class="ns-categories-list" id="nsCategoriesList"></div>
     </div>
 
   </div>
@@ -1968,6 +1967,26 @@ window.namingStrategy = {
   currentIndustryFilter: 'all',
   settingsOpen: false,
   editingCategoryId: null,
+
+  // ── Ontology bridge: derive categories & items from brandEntities ──
+  getOntologyData(client) {
+    const entities = client?.brandEntities || [];
+    const TYPE_ORDER = ['Brand','Family','Line','Product','Feature','Content','Service','Platform','Solution','Module'];
+    const typeSet = new Set(entities.map(e => e.type));
+    const categories = TYPE_ORDER.filter(t => typeSet.has(t));
+    const items = {};
+    categories.forEach(cat => {
+      items[cat] = entities
+        .filter(e => e.type === cat)
+        .map(e => ({ id: e.id, name: e.name, cell: e.cell || '' }));
+    });
+    return { categories, items };
+  },
+
+  getItemCategoryFromOntology(client, itemId) {
+    const entity = (client?.brandEntities || []).find(e => e.id === itemId);
+    return entity ? entity.type : '';
+  },
 
   // Example brand data for Tab 1
   examplesData: {
@@ -2215,11 +2234,8 @@ window.namingStrategy = {
       if (e.key === 'Enter') this.addNewClient();
     });
 
-    // Category management
-    document.getElementById('nsNewCategoryBtn').addEventListener('click', () => this.addNewCategory());
-    document.getElementById('nsNewCategoryInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') this.addNewCategory();
-    });
+    // Category list (read-only, derived from ontology)
+    this.renderCategoriesList();
   },
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -2557,21 +2573,22 @@ window.namingStrategy = {
       return;
     }
 
+    const { categories, items } = this.getOntologyData(client);
     let html = '<div class="ns-audit-sections">';
 
-    client.categories.forEach((category, catIdx) => {
-      const items = client.items[category] || [];
+    categories.forEach((category, catIdx) => {
+      const catItems = items[category] || [];
       const colorClass = catIdx % 6;
 
       html += `
         <div class="ns-category-section">
           <div class="ns-category-header">
             <div class="ns-category-title">${category}</div>
-            <div class="ns-category-badge">${items.length}</div>
+            <div class="ns-category-badge">${catItems.length}</div>
           </div>
           <div class="ns-lozenges" id="lozenges-${category}">`;
 
-      items.forEach(item => {
+      catItems.forEach(item => {
         html += `<div class="ns-lozenge" data-category="${colorClass}" data-id="${item.id}" data-item="${item.name}">
           ${item.name}
           <button class="ns-lozenge-delete" data-delete="${item.id}">×</button>
@@ -2613,9 +2630,11 @@ window.namingStrategy = {
     container.querySelectorAll('[data-delete]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const itemId = e.target.dataset.delete;
-        const lozenge = e.target.closest('.ns-lozenge');
-        const category = lozenge.closest('.ns-category-section').querySelector('[data-category]').dataset.category;
-        Storage.deleteItemFromCategory(category, itemId);
+        const cl = Storage.getActiveClient();
+        if (cl) {
+          cl.brandEntities = (cl.brandEntities || []).filter(ent => ent.id !== itemId);
+          Storage.updateClient(cl.id, { brandEntities: cl.brandEntities });
+        }
         this.renderAuditTab();
       });
     });
@@ -2629,35 +2648,47 @@ window.namingStrategy = {
 
     // Check max items limit
     const maxItems = this.getMaxCompanyItems();
-    if (maxItems > 0) {
-      let currentTotal = 0;
-      Object.values(client.items).forEach(catItems => { currentTotal += catItems.length; });
-      if (currentTotal >= maxItems) {
-        alert(`This client is limited to ${maxItems} items. Remove some items before adding more.`);
-        return;
-      }
+    const entities = client.brandEntities || [];
+    if (maxItems > 0 && entities.length >= maxItems) {
+      alert(`This client is limited to ${maxItems} items. Remove some items before adding more.`);
+      return;
     }
 
     // Parse comma or newline separated items
-    let items = input
+    let names = input
       .split(/[,\n]/)
       .map(item => item.trim())
       .filter(item => item.length > 0);
 
     // Truncate if adding would exceed limit
     if (maxItems > 0) {
-      let currentTotal = 0;
-      Object.values(client.items).forEach(catItems => { currentTotal += catItems.length; });
-      const remaining = maxItems - currentTotal;
-      if (items.length > remaining) {
-        items = items.slice(0, remaining);
+      const remaining = maxItems - entities.length;
+      if (names.length > remaining) {
+        names = names.slice(0, remaining);
         alert(`Only ${remaining} item(s) added — client limit of ${maxItems} reached.`);
       }
     }
 
-    items.forEach(item => {
-      Storage.addItemToCategory(category, item, '');
+    // category = entity type (e.g. "Product", "Feature")
+    names.forEach(name => {
+      entities.push({
+        id: Storage.uuid(),
+        type: category,
+        name: name,
+        canonicalName: name.toLowerCase().replace(/\s+/g, '-'),
+        aliases: [],
+        lifecycleStatus: 'Active',
+        description: '',
+        url: '',
+        useCases: [],
+        packagingRole: [],
+        parentEntityId: '',
+        relatedEntityIds: [],
+        status: 'active',
+        createdAt: new Date().toISOString()
+      });
     });
+    Storage.updateClient(client.id, { brandEntities: entities });
 
     this.renderAuditTab();
     this.renderMappingTab();
@@ -2677,10 +2708,11 @@ window.namingStrategy = {
       return;
     }
 
+    const { categories: ontCats, items: ontItems } = this.getOntologyData(client);
     // Count total items and mapped items
     let totalItems = 0;
     let mappedItems = 0;
-    Object.values(client.items).forEach(categoryItems => {
+    Object.values(ontItems).forEach(categoryItems => {
       categoryItems.forEach(item => {
         totalItems++;
         if (item.cell) mappedItems++;
@@ -2692,7 +2724,7 @@ window.namingStrategy = {
     // Warning banner if too clustered
     if (totalItems > 0 && mappedItems > 0) {
       const cellCounts = {};
-      Object.values(client.items).forEach(categoryItems => {
+      Object.values(ontItems).forEach(categoryItems => {
         categoryItems.forEach(item => {
           if (item.cell) {
             cellCounts[item.cell] = (cellCounts[item.cell] || 0) + 1;
@@ -2736,7 +2768,7 @@ window.namingStrategy = {
         const cellKey = cellKeys[rowIdx][colIdx];
         const itemsInCell = [];
 
-        Object.values(client.items).forEach(categoryItems => {
+        Object.values(ontItems).forEach(categoryItems => {
           categoryItems.forEach(item => {
             if (item.cell === cellKey) {
               itemsInCell.push(item);
@@ -2746,7 +2778,7 @@ window.namingStrategy = {
 
         html += `<div class="ns-mapping-cell" data-cell="${cellKey}"><div class="ns-mapping-cell-chips">`;
         itemsInCell.forEach((item, idx) => {
-          const colorClass = client.categories.indexOf(this.getItemCategory(client, item.id)) % 6;
+          const colorClass = ontCats.indexOf(this.getItemCategory(client, item.id)) % 6;
           html += `<div class="ns-mapping-chip" data-category="${colorClass}">${item.name}<button class="ns-mapping-chip-delete" data-unmap="${item.id}">×</button></div>`;
         });
         html += '</div></div>';
@@ -2757,7 +2789,7 @@ window.namingStrategy = {
 
     // Unmapped items
     const unmappedItems = [];
-    Object.values(client.items).forEach(categoryItems => {
+    Object.values(ontItems).forEach(categoryItems => {
       categoryItems.forEach(item => {
         if (!item.cell) {
           unmappedItems.push(item);
@@ -2768,7 +2800,7 @@ window.namingStrategy = {
     if (unmappedItems.length > 0) {
       html += '<div class="ns-unmapped-panel"><div class="ns-unmapped-title">Unmapped Items (' + unmappedItems.length + ')</div><div class="ns-unmapped-items">';
       unmappedItems.forEach(item => {
-        const colorClass = client.categories.indexOf(this.getItemCategory(client, item.id)) % 6;
+        const colorClass = ontCats.indexOf(this.getItemCategory(client, item.id)) % 6;
         html += `<div class="ns-unmapped-item" data-category="${colorClass}" data-id="${item.id}">${item.name}</div>`;
       });
       html += '</div></div>';
@@ -2805,14 +2837,8 @@ window.namingStrategy = {
 
   showCellSelector(itemId) {
     const client = Storage.getActiveClient();
-    const items = [];
-    Object.values(client.items).forEach(categoryItems => {
-      categoryItems.forEach(item => {
-        if (item.id === itemId) items.push(item);
-      });
-    });
-    const item = items[0];
-    if (!item) return;
+    const entity = (client?.brandEntities || []).find(e => e.id === itemId);
+    if (!entity) return;
 
     const cells = [
       { key: 'abstract_jargon', label: 'Abstract + Industry Jargon' },
@@ -2855,17 +2881,10 @@ window.namingStrategy = {
 
   assignItemToCell(itemId, cellKey) {
     const client = Storage.getActiveClient();
-    let found = false;
-    Object.values(client.items).forEach(categoryItems => {
-      categoryItems.forEach(item => {
-        if (item.id === itemId) {
-          item.cell = cellKey;
-          found = true;
-        }
-      });
-    });
-    if (found) {
-      Storage.updateClient(client.id, client);
+    const entity = (client?.brandEntities || []).find(e => e.id === itemId);
+    if (entity) {
+      entity.cell = cellKey;
+      Storage.updateClient(client.id, { brandEntities: client.brandEntities });
       this.renderMappingTab();
       this.renderProblemsTab();
     }
@@ -2873,24 +2892,17 @@ window.namingStrategy = {
 
   unmapItem(itemId) {
     const client = Storage.getActiveClient();
-    Object.values(client.items).forEach(categoryItems => {
-      categoryItems.forEach(item => {
-        if (item.id === itemId) {
-          item.cell = '';
-        }
-      });
-    });
-    Storage.updateClient(client.id, client);
+    const entity = (client?.brandEntities || []).find(e => e.id === itemId);
+    if (entity) {
+      entity.cell = '';
+      Storage.updateClient(client.id, { brandEntities: client.brandEntities });
+    }
     this.renderMappingTab();
     this.renderProblemsTab();
   },
 
   getItemCategory(client, itemId) {
-    for (const category of client.categories) {
-      const item = client.items[category].find(i => i.id === itemId);
-      if (item) return category;
-    }
-    return '';
+    return this.getItemCategoryFromOntology(client, itemId);
   },
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -2944,7 +2956,8 @@ window.namingStrategy = {
     let mappedItems = 0;
     const allItems = [];
 
-    Object.values(client.items).forEach(categoryItems => {
+    const { items: ontItems } = this.getOntologyData(client);
+    Object.values(ontItems).forEach(categoryItems => {
       categoryItems.forEach(item => {
         totalItems++;
         allItems.push(item);
@@ -3229,8 +3242,7 @@ window.namingStrategy = {
   },
 
   renderProposedResults(client, approach, construct, approachLabels, constructLabels) {
-    const categories = client.categories || [];
-    const items = client.items || {};
+    const { categories, items } = this.getOntologyData(client);
 
     // Check if client has any items
     const hasItems = categories.some(cat => items[cat] && items[cat].length > 0);
@@ -3353,81 +3365,24 @@ window.namingStrategy = {
 
   renderCategoriesList() {
     const client = Storage.getActiveClient();
+    const list = document.getElementById('nsCategoriesList');
+    if (!list) return;
     if (!client) {
-      document.getElementById('nsCategoriesList').innerHTML = '<div style="color: var(--gray-500); font-size: 0.9rem;">No client selected</div>';
+      list.innerHTML = '<div style="color: var(--gray-500); font-size: 0.9rem;">No client selected</div>';
       return;
     }
 
-    const list = document.getElementById('nsCategoriesList');
-    list.innerHTML = client.categories.map((cat, idx) => `
+    const { categories, items } = this.getOntologyData(client);
+    if (categories.length === 0) {
+      list.innerHTML = '<div style="color: var(--gray-400); font-size: 0.82rem; font-style:italic; margin-top:0.5rem;">No entities defined yet.</div>';
+      return;
+    }
+    list.innerHTML = categories.map(cat => `
       <div class="ns-category-item">
-        <div class="ns-category-item-drag">⋮⋮</div>
         <div class="ns-category-item-name">${cat}</div>
-        <div class="ns-category-item-actions">
-          <button class="ns-category-item-action" data-edit="${idx}" title="Edit">
-            <svg viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-          </button>
-          <button class="ns-category-item-action" data-delete="${idx}" title="Delete">
-            <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h16zM10 11v6M14 11v6"/></svg>
-          </button>
-        </div>
+        <div style="font-size:0.75rem; color:var(--gray-400);">${(items[cat] || []).length} item${(items[cat] || []).length !== 1 ? 's' : ''}</div>
       </div>
     `).join('');
-
-    list.querySelectorAll('[data-edit]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.edit);
-        const oldName = client.categories[idx];
-        const newName = prompt('Rename category:', oldName);
-        if (newName && newName !== oldName) {
-          client.categories[idx] = newName;
-          if (client.items[oldName]) {
-            client.items[newName] = client.items[oldName];
-            delete client.items[oldName];
-          }
-          Storage.updateClient(client.id, client);
-          this.renderAll();
-          this.renderCategoriesList();
-        }
-      });
-    });
-
-    list.querySelectorAll('[data-delete]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.delete);
-        const catName = client.categories[idx];
-        const itemCount = (client.items[catName] || []).length;
-        if (itemCount > 0) {
-          if (!confirm(`This category has ${itemCount} item(s). Delete anyway?`)) return;
-        }
-        client.categories.splice(idx, 1);
-        delete client.items[catName];
-        Storage.updateClient(client.id, client);
-        this.renderAll();
-        this.renderCategoriesList();
-      });
-    });
-  },
-
-  addNewCategory() {
-    const input = document.getElementById('nsNewCategoryInput');
-    const name = input.value.trim();
-    if (!name) return;
-
-    const client = Storage.getActiveClient();
-    if (!client) return;
-
-    if (client.categories.includes(name)) {
-      alert('Category already exists');
-      return;
-    }
-
-    client.categories.push(name);
-    client.items[name] = [];
-    Storage.updateClient(client.id, client);
-    input.value = '';
-    this.renderAll();
-    this.renderCategoriesList();
   },
 
   // ────────────────────────────────────────────────────────────────────────────
