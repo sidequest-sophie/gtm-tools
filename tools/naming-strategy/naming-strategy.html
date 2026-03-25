@@ -675,6 +675,112 @@
     background: rgba(217, 43, 150, 0.04);
   }
 
+  /* ── Triage cards ── */
+  .ns-triage-card {
+    padding: var(--spacing-lg);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .ns-triage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .ns-triage-counter {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .ns-triage-skip-all {
+    background: none;
+    border: none;
+    color: var(--pink);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .ns-triage-skip-all:hover {
+    background: rgba(217, 43, 150, 0.08);
+  }
+
+  .ns-triage-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.25rem;
+  }
+
+  .ns-triage-subtitle {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.4;
+  }
+
+  .ns-triage-option {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+
+  .ns-triage-option:hover {
+    border-color: var(--pink);
+    background: rgba(217, 43, 150, 0.03);
+  }
+
+  .ns-triage-recommended {
+    border-color: var(--pink);
+    background: rgba(217, 43, 150, 0.03);
+  }
+
+  .ns-triage-option-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pink);
+    margin-bottom: 0.25rem;
+  }
+
+  .ns-triage-option-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.375rem;
+  }
+
+  .ns-triage-option-reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .ns-triage-reason {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    line-height: 1.4;
+  }
+
+  .ns-triage-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--spacing-md);
+  }
+
   .ns-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -2793,6 +2899,19 @@ window.namingStrategy = {
   // ────────────────────────────────────────────────────────────────────────────
 
   // ── Auto-classification algorithm ──
+  //
+  // Based on the Landor / How Brands Are Built (Rob Meyerson) naming framework:
+  //
+  // ROW (Meaning relationship — how the name relates to the product):
+  //   Descriptive  → directly states what it does; a competitor could use the same term
+  //   Suggestive   → hints at a quality/benefit; requires a "mental leap"
+  //   Abstract     → no semantic connection to the product; an "empty vessel"
+  //
+  // COLUMN (Word construction — how the name was built):
+  //   Real Word    → a single existing English dictionary word
+  //   Compound     → two or more recognisable words combined
+  //   Coined       → invented word, acronym, or blend where parts aren't clearly recognisable
+  //   Jargon       → specialist/industry terminology an outsider wouldn't know
 
   /**
    * Classify a name into one of the grid cells.
@@ -2805,161 +2924,368 @@ window.namingStrategy = {
   },
 
   /**
-   * Construction axis: real | compound | coined | jargon
+   * Construction axis: how was the word built?
+   * real | compound | coined | jargon
    */
   _classifyConstruction(name) {
     const raw = name.trim();
     const lower = raw.toLowerCase();
 
-    // ── Compound detection ──
-    // Multi-word names (spaces, &, hyphens used as separators between distinct words)
-    const words = raw.split(/[\s&+]+/).filter(w => w.length > 0);
-    if (words.length >= 2) {
-      // Two+ distinct meaningful words → compound
-      // But exclude things like "HTB AI Range" which are more jargon-ish
-      // Check if most words are common English or action-oriented
-      const meaningfulWords = words.filter(w => w.length > 1 && !/^(for|the|and|of|in|to|a|an|by|&)$/i.test(w));
-      if (meaningfulWords.length >= 2) return 'compound';
+    // Tokenise: split on spaces, &, +, commas
+    const tokens = raw.split(/[\s&+,]+/).filter(w => w.length > 0);
+
+    // Strip filler words to count meaningful tokens
+    const fillers = new Set(['for','the','and','of','in','to','a','an','by','or','is','its','our']);
+    const meaningful = tokens.filter(t => !fillers.has(t.toLowerCase()));
+
+    // ── 1. Pure acronym (2-6 uppercase letters) → Coined ──
+    if (/^[A-Z]{2,6}$/.test(raw)) return 'coined';
+
+    // ── 2. Multi-word: 2+ meaningful tokens → Compound ──
+    if (meaningful.length >= 2) return 'compound';
+
+    // ── 3. Single token analysis ──
+    if (meaningful.length === 1) {
+      const word = meaningful[0];
+      const wordLower = word.toLowerCase();
+
+      // camelCase / PascalCase with 2+ humps → Compound (e.g. LetsDefend, AutoTrader, MailChimp)
+      const camelParts = word.match(/[A-Z][a-z]+/g);
+      if (camelParts && camelParts.length >= 2) return 'compound';
+
+      // Known jargon terms (specialist vocabulary outsiders wouldn't know)
+      const jargonTerms = new Set([
+        'api','sdk','ssl','tls','dns','ssh','tcp','udp','http','oauth','saml','sso',
+        'siem','edr','xdr','soar','iam','rbac','devops','devsecops','mlops','cicd',
+        'soc','noc','vlan','vpn','cdn','saas','paas','iaas','ctf','pwn','pwnbox',
+        'pentest','pentesting','malware','phishing','ransomware','endpoint','firewall',
+        'blockchain','terraform','ansible','grafana','kafka','tableau','palantir',
+        'sentry','babel','kubernetes','docker'
+      ]);
+      if (jargonTerms.has(wordLower)) return 'jargon';
+
+      // Broad dictionary of common English words → Real Word
+      const realWords = new Set([
+        'academy','access','agent','alert','anchor','arc','arena','assistants','atlas',
+        'badge','base','beacon','blade','board','bolt','book','box','brain','bridge',
+        'canvas','capture','castle','catalyst','challenge','challenges','cipher','circuit',
+        'citadel','clash','cloud','code','compass','control','core','course','courses',
+        'craft','crisis','crown','crusade','cube','current','dash','data','deck',
+        'dedicated','defender','delta','development','discovery','dock','dome','door',
+        'drive','edge','element','ember','engine','enterprise','envoy','explorer',
+        'eye','face','falcon','field','find','flag','flame','flash','fleet','flow',
+        'force','forge','fortress','fox','frontier','fusion','game','gate','gold',
+        'green','grid','group','guard','guardian','guide','hacker','harbor','haven',
+        'hawk','head','health','heart','help','hero','hive','home','horizon','house',
+        'hub','hunt','index','insight','iron','island','jar','jet','job','jobs',
+        'junction','key','king','lab','labs','lake','lance','launch','layer','lead',
+        'leaf','league','lens','life','light','link','lock','loop','machine','machines',
+        'maestro','mail','map','maps','mark','market','match','matrix','mesh','meta',
+        'milk','mind','mine','mint','mission','module','modules','monitor','moon',
+        'mountain','nest','network','nexus','node','north','note','nova','nucleus',
+        'ocean','office','one','ops','oracle','orbit','order','outlook','owl','pack',
+        'page','pan','paper','park','path','paths','patrol','pay','peak','pen','photo',
+        'pick','pilot','pin','pioneer','pipe','pixel','plan','plant','platform','play',
+        'plus','pocket','point','pool','pop','portal','post','power','press','prime',
+        'prism','probe','profile','prospect','pulse','pursuit','quest','radar','rain',
+        'ram','range','ranger','rank','ray','recon','red','relay','report','resilience',
+        'response','ring','rise','river','road','robin','rock','rocket','root','round',
+        'run','sage','sail','salt','sand','scope','scout','sea','search','sector',
+        'security','seed','sentinel','series','server','set','shadow','shark','shell','sherlock','sherlocks',
+        'shield','shift','shop','side','sight','signal','silk','silver','site','sky',
+        'slate','slide','smart','smoke','snap','snow','soft','song','sort','south',
+        'space','spaces','spark','spectrum','speed','sphere','spot','spring','sprint',
+        'spy','squad','square','stack','stage','star','station','steel','step','stock',
+        'stone','stop','store','storm','stream','street','strike','strong','studio',
+        'summit','sun','surf','surge','survey','sweet','swift','sword','system','table',
+        'tag','talent','tank','tape','target','task','tea','team','teams','tech','tent',
+        'test','think','thread','tide','timber','time','tip','titan','tool','tools',
+        'top','touch','tour','tower','trace','track','trade','trail','tree','trend',
+        'tribe','trigger','trip','true','trust','tune','tunnel','turn','twist','type',
+        'unit','up','urban','valley','vault','venture','view','vine','vision','vital',
+        'voice','vortex','walk','wall','warden','watch','water','wave','way','weather',
+        'web','west','white','wild','win','wind','wing','wire','wise','wizard','wolf',
+        'word','work','works','world','wrap','yard','year','zen','zero','zone','zoom',
+        'pro','elite','premium','ultra','deep','stealth','classic','original'
+      ]);
+      if (realWords.has(wordLower)) return 'real';
+
+      // Plural/common suffix of a known word → still Real Word
+      const stem = wordLower.replace(/(s|es|ing|tion|ment|er|or|ness|ity|ous|ive|al|ly)$/, '');
+      if (stem.length >= 3 && realWords.has(stem)) return 'real';
+
+      // Otherwise single unrecognised token → Coined
+      return 'coined';
     }
 
-    // camelCase / PascalCase with multiple humps: e.g. "LetsDefend", "AutoTrader"
-    const camelParts = raw.match(/[A-Z][a-z]+/g);
-    if (camelParts && camelParts.length >= 2) return 'compound';
-
-    // ── Industry jargon detection ──
-    const jargonPatterns = [
-      /^(api|sdk|ssl|tls|dns|ssh|tcp|udp|http|oauth|saml|sso|siem|edr|xdr|soar|iam|rbac|ci|cd|devsecops|soc|noc|vlan|vpn|cdn|cms|crm|erp|saas|paas|iaas|mlops|devops)$/i,
-      /\b(cyber|infosec|pentest|malware|phishing|ransomware|endpoint|firewall|zero.?trust|blockchain|fintech|edtech|medtech|biotech|nanotech|regtech|proptech|insurtech|govtech|cleantech|agritech)\b/i,
-    ];
-    if (jargonPatterns.some(p => p.test(lower))) return 'jargon';
-
-    // ── Real word detection ──
-    // Common English words (broad list to catch single-word real names)
-    const realWords = new Set([
-      'academy','access','agent','alert','anchor','arc','arena','atlas','badge','base','beacon',
-      'blade','bolt','bridge','canvas','capture','castle','catalyst','challenge','cipher','circuit',
-      'citadel','clash','cloud','code','compass','core','craft','crown','crusade','cube','data',
-      'defender','delta','discovery','dock','dome','door','drive','edge','element','ember','engine',
-      'enterprise','envoy','falcon','field','flag','flame','fleet','flow','force','forge','fortress',
-      'frontier','fusion','gate','grid','guard','guardian','guide','hacker','harbor','haven','hawk',
-      'horizon','hub','hunt','index','insight','iron','island','jet','junction','key','lab','labs',
-      'lance','launch','layer','league','lens','light','link','machine','machines','maestro','map',
-      'maps','mark','matrix','mesh','mind','mission','module','modules','monitor','nest','network',
-      'nexus','node','nova','nucleus','one','ops','orbit','oracle','outlook','owl','path','patrol',
-      'peak','pilot','pioneer','platform','point','portal','post','prime','prism','probe','profile',
-      'prospect','pulse','pursuit','quest','radar','range','ranger','rank','recon','relay','report',
-      'resilience','response','ring','rise','rocket','sage','scope','scout','search','sector',
-      'security','sentinel','series','shadow','shark','shell','shield','shift','signal','sky','slate',
-      'snap','space','spaces','spark','spectrum','sphere','sprint','squad','stack','star','station',
-      'storm','stream','strike','summit','surge','survey','swift','sword','system','talent','tank',
-      'target','team','teams','titan','tower','trace','track','trail','trigger','trust','tunnel',
-      'vault','venture','vortex','warden','watch','wave','weather','web','wire','wizard','wolf',
-      'word','works','world','zone',
-      // Common real words used in brand names
-      'book','box','brain','cat','control','course','courses','crisis','current','dash','deck',
-      'dedicated','development','door','drop','eye','face','find','fish','flash','fox','game',
-      'general','global','gold','green','group','hand','head','health','heart','help','hero','hive',
-      'home','house','ice','ink','jar','job','jobs','king','lake','lead','leaf','life','lock','loop',
-      'mail','market','match','meta','milk','mind','mine','mint','moon','mountain','mud','night',
-      'north','note','ocean','office','open','order','owl','pack','page','pan','paper','park','pay',
-      'pen','photo','pick','pin','pipe','pixel','plan','plant','play','plus','pocket','pool','pop',
-      'power','press','pro','public','pure','rain','ram','ray','red','river','road','robin','rock',
-      'root','round','run','sail','salt','sand','sea','seed','server','set','shop','side','sight',
-      'silk','silver','simple','site','six','sky','slide','smart','smoke','snap','snow','soft',
-      'song','sort','south','speed','spot','spring','spy','square','stage','steel','step','stock',
-      'stone','stop','store','street','strong','studio','sun','surf','sweet','table','tag','tape',
-      'task','tea','tech','tent','test','think','thread','tide','timber','time','tip','tool','tools',
-      'top','touch','tour','trade','tree','trend','tribe','trip','true','tune','turn','twist',
-      'type','unit','up','urban','valley','view','vine','vision','vital','voice','walk','wall',
-      'water','way','west','white','wild','win','wind','wing','wise','work','wrap','yard','year',
-      'zen','zero','zip','zoom'
-    ]);
-    // Single word, found in list → real word
-    if (words.length === 1 && realWords.has(lower)) return 'real';
-    // Also check if it's a plain dictionary word by checking the word list
-    if (words.length === 1 && /^[a-z]+$/i.test(raw) && realWords.has(lower)) return 'real';
-
-    // ── Coined detection ──
-    // Single word that isn't a real word → likely coined
-    if (words.length === 1) return 'coined';
-
-    // Fallback for multi-word that didn't match compound
+    // Fallback
     return 'compound';
   },
 
   /**
-   * Meaning axis: abstract | suggestive | descriptive
+   * Meaning axis: what is the name's semantic relationship to the product?
+   *
+   * Decision logic:
+   *   1. If the name directly states a product function/category → Descriptive
+   *   2. If the name evokes a quality or uses metaphor/allusion → Suggestive
+   *   3. If there is no semantic link to the product → Abstract
+   *
+   * Key test: "Could a competitor legitimately use this term to describe
+   * their own offering?" → Descriptive. "Does it require a mental leap?" → Suggestive.
    */
   _classifyMeaning(name) {
     const raw = name.trim();
     const lower = raw.toLowerCase();
-    const words = lower.split(/[\s&+\-_]+/).filter(w => w.length > 0);
+    // Strip "for Business/Enterprise/Consumer" suffixes for core analysis
+    const coreName = lower
+      .replace(/\bfor\s+(business|enterprise|consumer|teams|education)\b/gi, '')
+      .replace(/\b(htb|api)\b/gi, '')
+      .trim();
+    const words = coreName.split(/[\s&+\-_,]+/).filter(w => w.length > 0);
+    const fillers = new Set(['for','the','and','of','in','to','a','an','by','or','is','its','our','']);
+    const contentWords = words.filter(w => !fillers.has(w) && w.length > 1);
 
-    // ── Descriptive: name literally says what it does/is ──
-    const descriptivePatterns = [
-      // Action verbs + nouns describing function
-      /\b(manage|management|manager|report|reporting|analytics|monitor|monitoring|search|assessment|certification|certifications|training|learning|development|tracking|testing|deployment|configuration|settings|admin|control|dashboard|scheduler|automation|integration|builder|creator|editor|viewer|checker|scanner|validator|generator|converter|calculator|simulator|emulator|debugger|profiler|compiler|installer|updater|downloader|uploader|recorder|player|browser|finder|explorer|organizer|planner|scheduler|analyzer|detector|inspector|auditor|reviewer|verifier|authenticator|authorizer|provisioner)\b/i,
-      // Names that describe the thing directly
-      /\b(modules|courses|exams|vouchers|paths|boards?|lists?|roles?|users?|jobs?|candidates?|workforce|resilience|centralized|user.management|lab.settings|reporting|access)\b/i,
-    ];
+    // ────────────────────────────────────────────────────
+    // DESCRIPTIVE: name directly states what it does/is
+    // A consumer immediately understands the product category.
+    // ────────────────────────────────────────────────────
 
-    // Compound descriptive: multiple words where most are descriptive
-    const descriptiveWords = new Set([
-      'access','admin','analytics','assessment','audit','board','build','candidate','centralized',
-      'certification','certifications','check','compute','configuration','control','course','courses',
-      'crisis','dashboard','data','dedicated','deploy','deployment','detect','development','direct',
-      'enterprise','exam','exams','find','hire','index','install','integration','job','jobs','lab',
-      'labs','list','log','manage','management','map','module','modules','monitor','network','open',
-      'operate','operational','order','path','paths','platform','professional','provision','public',
-      'query','range','record','report','reporting','resilience','response','role','roles','run',
-      'scan','schedule','search','secure','security','serve','server','service','session','setting',
-      'settings','skill','space','spaces','status','store','system','talent','task','test','tool',
-      'tools','track','train','training','transfer','update','upload','user','users','validate',
-      'verify','view','voucher','vouchers','workflow','workforce'
+    // Words that directly name a product function, category, or activity
+    const descriptiveTerms = new Set([
+      // Product/service categories
+      'academy','access','admin','administration','analytics','api','assessment','assessments',
+      'assistants','agents','audit','authentication','automation',
+      'board','builder','calculator','candidate','candidates','catalog','catalogue',
+      'centralized','certification','certifications','checker','classroom','compiler',
+      'configuration','console','converter','course','courses','curriculum',
+      'dashboard','database','debugger','dedicated','deployment','detector','development',
+      'directory','documentation','docs',
+      'editor','emulator','enterprise','exam','exams','explorer','export',
+      'feed','finder','flag','forum',
+      'generator','governance',
+      'helpdesk','hosting',
+      'import','index','inspector','installer','integration','inventory',
+      'job','jobs',
+      'lab','labs','learning','library','license','licensing','list','log','logger','logging',
+      'machine','machines','management','manager','marketplace','migration','module','modules',
+      'monitor','monitoring',
+      'network','notification','notifications',
+      'onboarding','operations','operational',
+      'path','paths','pipeline','platform','planner','portal','preview','professional',
+      'profiler','profile','profiles','program','programs','project','projects','provisioner',
+      'query',
+      'range','recorder','registry','report','reporting','repository','resilience','resource',
+      'resources','role','roles','roster','routing',
+      'scan','scanner','schedule','scheduler','scoring','search','security','server','service',
+      'services','session','sessions','setting','settings','simulator','skill','skills',
+      'status','storage','store','suite','support','sync','system',
+      'talent','task','tasks','template','templates','terminal','test','testing','tool','tools',
+      'track','tracker','tracking','training','transfer',
+      'update','updater','upload','uploader','user','users',
+      'validate','validator','vault','verify','verifier','viewer','voucher','vouchers',
+      'workforce','workflow','workspace',
+      // Direct activity / function words
+      'centralize','compute','configure','connect','create','customise',
+      'customize','debug','deploy','detect','discover','download','export','filter','find',
+      'generate','hire','import','inspect','install','integrate','launch','manage','map',
+      'migrate','monitor','operate','optimize','organise','organize','plan','preview',
+      'process','provision','publish','query','recruit','remediate','report','respond',
+      'review','route','run','scan','schedule','score','search','secure','serve','setup',
+      'simulate','stream','sync','tag','test','track','train','transfer','transform',
+      'update','upload','validate','verify','view'
     ]);
 
-    let descriptiveScore = 0;
-    let totalWords = words.filter(w => w.length > 2).length || 1;
-    words.forEach(w => {
-      if (descriptiveWords.has(w)) descriptiveScore++;
+    // ────────────────────────────────────────────────────
+    // SUGGESTIVE: check FIRST — if a name contains any
+    // evocative/metaphorical word, the naming *decision*
+    // was suggestive, even if other words are descriptive.
+    // e.g. "Pro Labs" → the choice to use "Pro" is suggestive.
+    // ────────────────────────────────────────────────────
+
+    const suggestiveTerms = new Set([
+      // Quality / aspiration words
+      'pro','elite','advance','advanced','premium','plus','max','ultra','smart','turbo',
+      'boost','power','super','hyper','prime','classic','original','essential','infinite',
+      'ultimate','master','expert','genius',
+      // Metaphorical / allusive (evoke strength, speed, protection, exploration)
+      'alpha','omega','titan','nexus','apex','summit','peak','vanguard','frontier',
+      'horizon','venture','quest','pioneer','guardian','sentinel','defender','fortress',
+      'shield','armor','aegis','bastion','citadel','stronghold','watchtower',
+      'hawk','eagle','falcon','wolf','panther','cobra','viper','phoenix','dragon',
+      'griffin','spartan','ninja','samurai','ronin','gladiator','centurion',
+      'strike','force','storm','thunder','lightning','flash','blaze','flame','ember',
+      'spark','pulse','wave','surge','nova','stellar','cosmic','quantum','atomic',
+      'fusion','catalyst','ignite','accelerate','propel','rocket','orbit','velocity',
+      'momentum','agile','swift','rapid','instant','deep','stealth',
+      'compass','oracle','sage','prism','spectrum','beacon','lighthouse',
+      // Action metaphors (evocative, not literal product function)
+      'hack','hacking','battle','battleground','battlegrounds','combat','warfare','hunt',
+      'hunting','chase','pursuit','conquest','crusade','raid','siege','ambush',
+      'challenge','challenges','arena','colosseum','gauntlet','forge','crucible',
+      'detective','sherlock','sherlocks','sleuth','recon','reconnaissance',
+      // Military / tactical metaphors (evocative in cybersecurity context)
+      'threat','defensive','offensive','red','blue','purple','crisis','capture',
+      'flag','exploit','breach','vault','bunker','armory','command','ops',
+      // Branding qualifiers
+      'season','seasons','series','edition','signature','select','curated','company'
+    ]);
+
+    let suggestiveCount = 0;
+    contentWords.forEach(w => {
+      if (suggestiveTerms.has(w)) suggestiveCount++;
     });
-    if (descriptivePatterns.some(p => p.test(lower))) descriptiveScore += 2;
-    if (descriptiveScore / totalWords >= 0.5 && descriptiveScore >= 2) return 'descriptive';
-    if (descriptiveScore >= 3) return 'descriptive';
 
-    // ── Suggestive: hints at benefit/quality without directly describing ──
-    const suggestivePatterns = [
-      /\b(pro|elite|advance|advanced|premium|plus|max|ultra|smart|turbo|boost|power|super|hyper|prime|alpha|omega|titan|nexus|apex|summit|peak|vanguard|frontier|horizon|venture|quest|pioneer|guardian|sentinel|defender|fortress|shield|armor|aegis|bastion|citadel|stronghold|watchtower|hawk|eagle|falcon|wolf|panther|cobra|viper|phoenix|dragon|griffin|titan|spartan|ninja|samurai|ronin|gladiator|centurion|strike|force|storm|thunder|lightning|flash|blaze|flame|ember|spark|pulse|wave|surge|nova|stellar|cosmic|quantum|atomic|fusion|catalyst|ignite|accelerate|propel|launch|rocket|orbit|velocity|momentum|agile|swift|rapid|turbo|instant|deep|stealth)\b/i,
-    ];
+    // "for Business/Enterprise/Consumer" patterns are suggestive repositioning
+    if (/\bfor\s+(business|enterprise|consumer|teams|education)\b/i.test(lower)) {
+      suggestiveCount++;
+    }
 
-    let suggestiveScore = 0;
-    if (suggestivePatterns.some(p => p.test(lower))) suggestiveScore += 2;
+    // Acronym + qualifier (e.g. "HTB for Enterprise", "HTB Seasons")
+    if (/^[A-Z]{2,5}\s/i.test(raw) && suggestiveCount > 0) suggestiveCount++;
 
-    // Names containing "for" (e.g., "HTB for Business") are suggestive — they reposition an abstract name
-    if (/\bfor\b/i.test(lower)) suggestiveScore += 1;
+    // camelCase names with "defend/attack/hack" component → suggestive
+    if (/defend|attack|hack|breach|strike|guard|shield/i.test(coreName)) suggestiveCount++;
 
-    // HTB/abbreviation + qualifier patterns
-    if (/^[A-Z]{2,5}\s+(for|pro|plus|enterprise|business)/i.test(raw)) suggestiveScore += 1;
+    if (suggestiveCount >= 1) return 'suggestive';
 
-    if (suggestiveScore >= 2) return 'suggestive';
+    // ────────────────────────────────────────────────────
+    // DESCRIPTIVE: name directly states what it does.
+    // Only reached if no suggestive signal was found.
+    // ────────────────────────────────────────────────────
 
-    // ── Default: abstract ──
-    // Single coined/real word with no clear function or benefit → abstract
-    // Also short acronyms (HTB, CTF, etc.)
+    let descriptiveCount = 0;
+    contentWords.forEach(w => {
+      if (descriptiveTerms.has(w)) descriptiveCount++;
+      const stem = w.replace(/(s|es|ing|tion|ment|er|ance|ence)$/, '');
+      if (stem.length >= 3 && descriptiveTerms.has(stem)) descriptiveCount++;
+    });
+    descriptiveCount = Math.min(descriptiveCount, contentWords.length);
+
+    const descriptiveRatio = contentWords.length > 0 ? descriptiveCount / contentWords.length : 0;
+    if (contentWords.length >= 2 && descriptiveRatio >= 0.5) return 'descriptive';
+    if (contentWords.length === 1 && descriptiveCount >= 1) return 'descriptive';
+
+    // ────────────────────────────────────────────────────
+    // ABSTRACT: no semantic connection to the product.
+    // Pure brand vessel — meaning must be learned.
+    // ────────────────────────────────────────────────────
+
+    // Standalone acronyms with no descriptive/suggestive signal
     if (/^[A-Z]{2,6}$/.test(raw)) return 'abstract';
 
-    // If the name is very short and not descriptive/suggestive, it's abstract
-    if (words.length <= 2 && descriptiveScore === 0 && suggestiveScore === 0) return 'abstract';
+    // Single word with no descriptive or suggestive match → abstract
+    if (contentWords.length <= 1 && descriptiveCount === 0 && suggestiveCount === 0) return 'abstract';
 
-    // Moderate descriptive signal but not enough for "descriptive" → suggestive
-    if (descriptiveScore >= 1) return 'suggestive';
+    // Multi-word but no descriptive or suggestive signal → abstract
+    if (descriptiveCount === 0 && suggestiveCount === 0) return 'abstract';
 
-    return 'abstract';
+    // Fallback: if we got some slight signal, lean suggestive over abstract
+    return 'suggestive';
   },
 
   /**
-   * Auto-map all unmapped items using the classification algorithm.
-   * Only maps items that don't already have a cell assigned.
+   * Return detailed classification with scores for each axis option.
+   * Used to detect ambiguity and power the triage UI.
+   */
+  classifyNameDetailed(name) {
+    const raw = name.trim();
+    const lower = raw.toLowerCase();
+    const col = this._classifyConstruction(raw);
+    const coreName = lower
+      .replace(/\bfor\s+(business|enterprise|consumer|teams|education)\b/gi, '')
+      .replace(/\b(htb|api)\b/gi, '')
+      .trim();
+    const words = coreName.split(/[\s&+\-_,]+/).filter(w => w.length > 0);
+    const fillers = new Set(['for','the','and','of','in','to','a','an','by','or','is','its','our','']);
+    const contentWords = words.filter(w => !fillers.has(w) && w.length > 1);
+
+    // Re-run the scoring logic to get raw scores
+    const descriptiveTerms = this._getDescriptiveTerms();
+    const suggestiveTerms = this._getSuggestiveTerms();
+
+    let suggestiveScore = 0;
+    let descriptiveScore = 0;
+    const suggestiveReasons = [];
+    const descriptiveReasons = [];
+
+    contentWords.forEach(w => {
+      if (suggestiveTerms.has(w)) {
+        suggestiveScore++;
+        suggestiveReasons.push(`"${w}" is evocative/metaphorical`);
+      }
+      if (descriptiveTerms.has(w)) {
+        descriptiveScore++;
+        descriptiveReasons.push(`"${w}" directly names a function`);
+      }
+      const stem = w.replace(/(s|es|ing|tion|ment|er|ance|ence)$/, '');
+      if (stem.length >= 3 && descriptiveTerms.has(stem) && !descriptiveTerms.has(w)) {
+        descriptiveScore++;
+        descriptiveReasons.push(`"${w}" derives from "${stem}" (functional)`);
+      }
+    });
+
+    if (/\bfor\s+(business|enterprise|consumer|teams|education)\b/i.test(lower)) {
+      suggestiveScore++;
+      suggestiveReasons.push('"for [audience]" is a suggestive repositioning pattern');
+    }
+    if (/defend|attack|hack|breach|strike|guard|shield/i.test(coreName)) {
+      suggestiveScore++;
+      suggestiveReasons.push('contains a combat/security metaphor');
+    }
+
+    const abstractScore = (contentWords.length <= 1 && descriptiveScore === 0 && suggestiveScore === 0) ? 2
+      : (descriptiveScore === 0 && suggestiveScore === 0) ? 1 : 0;
+    const abstractReasons = abstractScore > 0 ? ['no descriptive or suggestive signal detected — name is an empty brand vessel'] : [];
+
+    // Determine primary and alternatives
+    const row = this._classifyMeaning(raw);
+    const cellKey = `${row}_${col}`;
+
+    // Build alternatives with reasons
+    const alternatives = [];
+    const rowLabels = { abstract: 'Abstract', suggestive: 'Suggestive', descriptive: 'Descriptive' };
+    const allRows = ['suggestive', 'descriptive', 'abstract'];
+    const scores = { suggestive: suggestiveScore, descriptive: descriptiveScore, abstract: abstractScore };
+    const reasons = { suggestive: suggestiveReasons, descriptive: descriptiveReasons, abstract: abstractReasons };
+
+    allRows.forEach(r => {
+      if (r !== row && scores[r] > 0) {
+        alternatives.push({
+          row: r,
+          cellKey: `${r}_${col}`,
+          label: `${rowLabels[r]} + ${col.charAt(0).toUpperCase() + col.slice(1)}`,
+          score: scores[r],
+          reasons: reasons[r]
+        });
+      }
+    });
+
+    // Is it ambiguous? If the winning row's score is close to an alternative
+    const winningScore = scores[row] || 0;
+    const isAmbiguous = alternatives.some(a => a.score > 0 && (winningScore - a.score) <= 1);
+
+    return {
+      cellKey,
+      row,
+      col,
+      label: `${rowLabels[row]} + ${col.charAt(0).toUpperCase() + col.slice(1)}`,
+      reasons: reasons[row],
+      alternatives,
+      isAmbiguous
+    };
+  },
+
+  _getDescriptiveTerms() {
+    return new Set(['academy','access','admin','administration','analytics','api','assessment','assessments','assistants','agents','audit','authentication','automation','board','builder','calculator','candidate','candidates','catalog','catalogue','centralized','certification','certifications','checker','classroom','compiler','configuration','console','converter','course','courses','curriculum','dashboard','database','debugger','dedicated','deployment','detector','development','directory','documentation','docs','editor','emulator','enterprise','exam','exams','explorer','export','feed','finder','forum','generator','governance','helpdesk','hosting','import','index','inspector','installer','integration','inventory','job','jobs','lab','labs','learning','library','license','licensing','list','log','logger','logging','machine','machines','management','manager','marketplace','migration','module','modules','monitor','monitoring','network','notification','notifications','onboarding','operations','operational','path','paths','pipeline','platform','planner','portal','preview','professional','profiler','profile','profiles','program','programs','project','projects','provisioner','query','range','recorder','registry','report','reporting','repository','resilience','resource','resources','role','roles','roster','routing','scan','scanner','schedule','scheduler','scoring','search','security','server','service','services','session','sessions','setting','settings','simulator','skill','skills','status','storage','store','suite','support','sync','system','talent','task','tasks','template','templates','terminal','test','testing','tool','tools','track','tracker','tracking','training','transfer','update','updater','upload','uploader','user','users','validate','validator','vault','verify','verifier','viewer','voucher','vouchers','workforce','workflow','workspace','centralize','compute','configure','connect','create','customise','customize','debug','deploy','detect','discover','download','export','filter','find','generate','hire','import','inspect','install','integrate','launch','manage','map','migrate','monitor','operate','optimize','organise','organize','plan','preview','process','provision','publish','query','recruit','remediate','report','respond','review','route','run','scan','schedule','score','search','secure','serve','setup','simulate','stream','sync','tag','test','track','train','transfer','transform','update','upload','validate','verify','view']);
+  },
+
+  _getSuggestiveTerms() {
+    return new Set(['pro','elite','advance','advanced','premium','plus','max','ultra','smart','turbo','boost','power','super','hyper','prime','classic','original','essential','infinite','ultimate','master','expert','genius','alpha','omega','titan','nexus','apex','summit','peak','vanguard','frontier','horizon','venture','quest','pioneer','guardian','sentinel','defender','fortress','shield','armor','aegis','bastion','citadel','stronghold','watchtower','hawk','eagle','falcon','wolf','panther','cobra','viper','phoenix','dragon','griffin','spartan','ninja','samurai','ronin','gladiator','centurion','strike','force','storm','thunder','lightning','flash','blaze','flame','ember','spark','pulse','wave','surge','nova','stellar','cosmic','quantum','atomic','fusion','catalyst','ignite','accelerate','propel','rocket','orbit','velocity','momentum','agile','swift','rapid','instant','deep','stealth','compass','oracle','sage','prism','spectrum','beacon','lighthouse','hack','hacking','battle','battleground','battlegrounds','combat','warfare','hunt','hunting','chase','pursuit','conquest','crusade','raid','siege','ambush','challenge','challenges','arena','colosseum','gauntlet','forge','crucible','detective','sherlock','sherlocks','sleuth','recon','reconnaissance','threat','defensive','offensive','red','blue','purple','crisis','capture','flag','exploit','breach','vault','bunker','armory','command','ops','season','seasons','series','edition','signature','select','curated','company']);
+  },
+
+  /**
+   * Auto-map unmapped items. Confident classifications are assigned directly.
+   * Ambiguous items are collected and shown in a triage panel.
    */
   autoMapItems() {
     const client = Storage.getActiveClient();
@@ -2968,22 +3294,138 @@ window.namingStrategy = {
     const entities = client.brandEntities || [];
     const jargonOn = this.isJargonEnabled();
     let changed = false;
+    const triageItems = [];
 
     entities.forEach(entity => {
       if (!entity.cell) {
-        let cellKey = this.classifyName(entity.name);
-        // If jargon is off but we classified as jargon, shift to nearest column
+        const result = this.classifyNameDetailed(entity.name);
+        let cellKey = result.cellKey;
         if (!jargonOn && cellKey.endsWith('_jargon')) {
           cellKey = cellKey.replace('_jargon', '_real');
         }
-        entity.cell = cellKey;
-        changed = true;
+
+        if (result.isAmbiguous && result.alternatives.length > 0) {
+          // Don't auto-assign — queue for triage
+          triageItems.push({ entity, result, cellKey });
+        } else {
+          entity.cell = cellKey;
+          changed = true;
+        }
       }
     });
 
     if (changed) {
       Storage.updateClient(client.id, { brandEntities: entities });
     }
+
+    if (triageItems.length > 0) {
+      this.renderMappingTab();
+      this.showTriagePanel(triageItems);
+    } else {
+      this.renderMappingTab();
+      this.renderProblemsTab();
+    }
+  },
+
+  /**
+   * Show triage panel for ambiguous items. Each card shows the
+   * recommended cell with reasoning, plus alternatives the user can pick.
+   */
+  showTriagePanel(triageItems) {
+    this._triageItems = triageItems;
+    this._triageIndex = 0;
+    this._renderTriageCard();
+  },
+
+  _renderTriageCard() {
+    const items = this._triageItems;
+    if (!items || this._triageIndex >= items.length) {
+      // All triaged — close and refresh
+      this.closeModal();
+      this.renderMappingTab();
+      this.renderProblemsTab();
+      return;
+    }
+
+    const { entity, result, cellKey } = items[this._triageIndex];
+    const remaining = items.length - this._triageIndex;
+    const jargonOn = this.isJargonEnabled();
+
+    const rowLabels = { abstract: 'Abstract', suggestive: 'Suggestive', descriptive: 'Descriptive' };
+    const colLabels = { real: 'Real Word', compound: 'Compound', coined: 'Coined', jargon: 'Industry Jargon' };
+
+    let html = `
+      <div class="ns-triage-card">
+        <div class="ns-triage-header">
+          <div class="ns-triage-counter">${this._triageIndex + 1} of ${items.length} to review</div>
+          <button class="ns-triage-skip-all" onclick="window.namingStrategy.triageAutoAssignAll()">Auto-assign remaining</button>
+        </div>
+        <div class="ns-triage-name">${entity.name}</div>
+        <div class="ns-triage-subtitle">This name could fit in multiple categories. Where does it belong?</div>
+
+        <div class="ns-triage-option ns-triage-recommended" onclick="window.namingStrategy.triageSelect('${entity.id}', '${cellKey}')">
+          <div class="ns-triage-option-badge">Recommended</div>
+          <div class="ns-triage-option-label">${rowLabels[result.row]} + ${colLabels[result.col]}</div>
+          <div class="ns-triage-option-reasons">`;
+    result.reasons.forEach(r => {
+      html += `<div class="ns-triage-reason">• ${r}</div>`;
+    });
+    html += `</div></div>`;
+
+    result.alternatives.forEach(alt => {
+      let altCellKey = alt.cellKey;
+      if (!jargonOn && altCellKey.endsWith('_jargon')) altCellKey = altCellKey.replace('_jargon', '_real');
+      html += `
+        <div class="ns-triage-option" onclick="window.namingStrategy.triageSelect('${entity.id}', '${altCellKey}')">
+          <div class="ns-triage-option-label">${alt.label}</div>
+          <div class="ns-triage-option-reasons">`;
+      alt.reasons.forEach(r => {
+        html += `<div class="ns-triage-reason">• ${r}</div>`;
+      });
+      html += `</div></div>`;
+    });
+
+    html += `
+        <div class="ns-triage-actions">
+          <button class="ns-btn ns-btn-ghost" onclick="window.namingStrategy.triageSkip()">Skip</button>
+        </div>
+      </div>`;
+
+    const modal = document.getElementById('nsModal');
+    modal.innerHTML = html;
+    document.getElementById('nsModalOverlay').classList.add('open');
+  },
+
+  triageSelect(entityId, cellKey) {
+    const client = Storage.getActiveClient();
+    const entity = (client?.brandEntities || []).find(e => e.id === entityId);
+    if (entity) {
+      entity.cell = cellKey;
+      Storage.updateClient(client.id, { brandEntities: client.brandEntities });
+    }
+    this._triageIndex++;
+    this._renderTriageCard();
+  },
+
+  triageSkip() {
+    this._triageIndex++;
+    this._renderTriageCard();
+  },
+
+  triageAutoAssignAll() {
+    const client = Storage.getActiveClient();
+    const jargonOn = this.isJargonEnabled();
+    const items = this._triageItems || [];
+
+    for (let i = this._triageIndex; i < items.length; i++) {
+      const { entity, cellKey } = items[i];
+      let key = cellKey;
+      if (!jargonOn && key.endsWith('_jargon')) key = key.replace('_jargon', '_real');
+      entity.cell = key;
+    }
+    Storage.updateClient(client.id, { brandEntities: client.brandEntities });
+    this._triageItems = [];
+    this.closeModal();
     this.renderMappingTab();
     this.renderProblemsTab();
   },
