@@ -244,6 +244,7 @@
     padding-left: 0.85rem;
     border-left: 2px solid #e5e7eb;
   }
+  .cc-tree-branch.collapsed { display: none; }
   .cc-tree-branch + .cc-tree-branch { margin-top: 0; }
   .cc-entity-type-icon {
     font-size: 0.9rem;
@@ -251,6 +252,28 @@
     width: 18px;
     text-align: center;
   }
+
+  /* ── Collapse toggle ── */
+  .cc-tree-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border: none; background: none;
+    color: #9ca3af; cursor: pointer; font-size: 0.65rem; flex-shrink: 0;
+    padding: 0; transition: transform 0.15s ease;
+  }
+  .cc-tree-toggle:hover { color: #d92b96; }
+  .cc-tree-toggle.expanded { transform: rotate(90deg); }
+  .cc-tree-toggle-spacer { width: 18px; flex-shrink: 0; }
+
+  /* ── Drag and drop ── */
+  .cc-entity-item[draggable="true"] .cc-entity-header { cursor: grab; }
+  .cc-entity-item[draggable="true"]:active .cc-entity-header { cursor: grabbing; }
+  .cc-entity-item.drag-over > .cc-entity-header { background: rgba(217,43,150,0.08); border-radius: 8px 8px 0 0; }
+  .cc-drop-zone {
+    height: 0; transition: height 0.15s ease, background 0.15s ease;
+    border-radius: 6px; margin: 0 0.25rem;
+  }
+  .cc-drop-zone.drag-active { height: 6px; background: rgba(217,43,150,0.15); margin: 2px 0.25rem; }
+  .cc-entity-item.dragging { opacity: 0.4; }
 
   /* ── v2 Lifecycle status badges ── */
   .cc-status-badge {
@@ -1265,6 +1288,14 @@ window.clientConfig = {
     if (el) el.classList.toggle('open');
   },
 
+  toggleBranch(entityId) {
+    const branch = document.getElementById('branch-' + entityId);
+    const btn = document.querySelector('#ent-' + entityId + ' > .cc-entity-header .cc-tree-toggle');
+    if (!branch) return;
+    branch.classList.toggle('collapsed');
+    if (btn) btn.classList.toggle('expanded', !branch.classList.contains('collapsed'));
+  },
+
   addFeature(entityId) {
     const input = document.getElementById('ent_' + entityId + '_newfeature');
     const name = (input?.value || '').trim();
@@ -1336,6 +1367,94 @@ window.clientConfig = {
     const packagingOptions = ['Core','Add-on','Bundle-only','Not sold standalone','Premium Service'];
 
     container.innerHTML = this._renderEntityTree(entities, typeOptions, statusOptions, packagingOptions);
+    this._setupDragDrop(container);
+  },
+
+  _setupDragDrop(container) {
+    let draggedId = null;
+
+    container.addEventListener('dragstart', e => {
+      const item = e.target.closest('.cc-entity-item[draggable]');
+      if (!item) return;
+      draggedId = item.dataset.entityId;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', draggedId);
+    });
+
+    container.addEventListener('dragend', e => {
+      const item = e.target.closest('.cc-entity-item[draggable]');
+      if (item) item.classList.remove('dragging');
+      container.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      container.querySelectorAll('.drag-active').forEach(el => el.classList.remove('drag-active'));
+      draggedId = null;
+    });
+
+    container.addEventListener('dragover', e => {
+      if (!draggedId) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+
+      // Highlight drop targets
+      const item = e.target.closest('.cc-entity-item[draggable]');
+      const dropZone = e.target.closest('.cc-drop-zone');
+      container.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      container.querySelectorAll('.drag-active').forEach(el => el.classList.remove('drag-active'));
+
+      if (item && item.dataset.entityId !== draggedId) {
+        item.classList.add('drag-over');
+      } else if (dropZone) {
+        dropZone.classList.add('drag-active');
+      }
+    });
+
+    container.addEventListener('dragleave', e => {
+      const item = e.target.closest('.cc-entity-item[draggable]');
+      if (item) item.classList.remove('drag-over');
+      const dropZone = e.target.closest('.cc-drop-zone');
+      if (dropZone) dropZone.classList.remove('drag-active');
+    });
+
+    container.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!draggedId) return;
+      const dropZone = e.target.closest('.cc-drop-zone');
+      const item = e.target.closest('.cc-entity-item[draggable]');
+      if (dropZone && dropZone.dataset.dropPos === 'root') {
+        // Drop on root zone → make top-level
+        this.reparentEntity(draggedId, '');
+      } else if (item && item.dataset.entityId !== draggedId) {
+        // Drop ON an entity → make it a child
+        this.reparentEntity(draggedId, item.dataset.entityId);
+      }
+      container.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      container.querySelectorAll('.drag-active').forEach(el => el.classList.remove('drag-active'));
+      draggedId = null;
+    });
+  },
+
+  reparentEntity(entityId, newParentId) {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    const entities = client.brandEntities || [];
+    const entity = entities.find(e => e.id === entityId);
+    if (!entity) return;
+
+    // Prevent circular: can't parent under self or own descendants
+    const isDescendant = (parentId, checkId) => {
+      const children = entities.filter(e => e.parentEntityId === parentId);
+      for (const child of children) {
+        if (child.id === checkId) return true;
+        if (isDescendant(child.id, checkId)) return true;
+      }
+      return false;
+    };
+    if (newParentId && (newParentId === entityId || isDescendant(entityId, newParentId))) return;
+
+    entity.parentEntityId = newParentId || '';
+    Storage.updateClient(client.id, { brandEntities: entities });
+    this.renderOntologyTab();
+    this.renderCategoriesTab();
   },
 
   _renderEntityTree(entities, typeOptions, statusOptions, packagingOptions) {
@@ -1351,7 +1470,8 @@ window.clientConfig = {
     });
 
     const roots = byParent[''] || [];
-    return roots.map(e => this._renderEntityNode(e, entities, byParent, typeOptions, statusOptions, packagingOptions, 0)).join('');
+    const rootHtml = roots.map(e => this._renderEntityNode(e, entities, byParent, typeOptions, statusOptions, packagingOptions, 0)).join('');
+    return `<div class="cc-drop-zone" data-drop-target="" data-drop-pos="root" style="min-height:4px;"></div>` + rootHtml;
   },
 
   _renderEntityNode(e, allEntities, byParent, typeOptions, statusOptions, packagingOptions, depth) {
@@ -1366,12 +1486,18 @@ window.clientConfig = {
 
     const children   = byParent[e.id] || [];
     const childrenHtml = children.length
-      ? `<div class="cc-tree-branch">${children.map(c => this._renderEntityNode(c, allEntities, byParent, typeOptions, statusOptions, packagingOptions, depth + 1)).join('')}</div>`
+      ? `<div class="cc-tree-branch" id="branch-${e.id}">${children.map(c => this._renderEntityNode(c, allEntities, byParent, typeOptions, statusOptions, packagingOptions, depth + 1)).join('')}</div>`
       : '';
 
+    const toggleBtn = children.length
+      ? `<button class="cc-tree-toggle expanded" onclick="event.stopPropagation(); clientConfig.toggleBranch('${e.id}')" title="Collapse">▶</button>`
+      : `<span class="cc-tree-toggle-spacer"></span>`;
+
     const cardHtml = `
-      <div class="cc-entity-item" id="ent-${e.id}" style="margin-bottom:0.4rem;">
+      <div class="cc-drop-zone" data-drop-target="${e.id}" data-drop-pos="before"></div>
+      <div class="cc-entity-item" id="ent-${e.id}" draggable="true" data-entity-id="${e.id}" style="margin-bottom:0;">
         <div class="cc-entity-header" onclick="clientConfig.toggleEntity('${e.id}')">
+          ${toggleBtn}
           <span class="cc-entity-type-icon">${icon}</span>
           <span class="cc-entity-type">${this.esc(e.type)}</span>
           <span class="cc-entity-name">${this.esc(e.name)}</span>
