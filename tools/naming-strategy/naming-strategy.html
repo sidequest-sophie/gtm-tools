@@ -675,6 +675,124 @@
     background: rgba(217, 43, 150, 0.04);
   }
 
+  /* ── Goals panel ── */
+  .ns-goals-panel {
+    background: var(--white, #fff);
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .ns-goals-header {
+    margin-bottom: 1rem;
+  }
+  .ns-goals-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--gray-900, #111827);
+    margin-bottom: 0.25rem;
+  }
+  .ns-goals-subtitle {
+    font-size: 0.78rem;
+    color: var(--gray-500, #6b7280);
+  }
+  .ns-goals-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+  @media (max-width: 768px) {
+    .ns-goals-options { grid-template-columns: repeat(2, 1fr); }
+  }
+  .ns-goals-option {
+    background: var(--white, #fff);
+    border: 1.5px solid var(--gray-200, #e5e7eb);
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+  }
+  .ns-goals-option:hover {
+    border-color: var(--primary, #2563eb);
+    background: rgba(37, 99, 235, 0.03);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .ns-goals-option-icon {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .ns-goals-option-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--gray-900, #111827);
+    margin-bottom: 0.25rem;
+  }
+  .ns-goals-option-desc {
+    font-size: 0.7rem;
+    color: var(--gray-500, #6b7280);
+    line-height: 1.45;
+  }
+
+  /* Goal current badge */
+  .ns-goals-current {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.78rem;
+  }
+  .ns-goals-current-label {
+    color: var(--gray-500, #6b7280);
+    font-weight: 500;
+  }
+  .ns-goals-current-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    background: var(--gray-100, #f3f4f6);
+    color: var(--gray-700, #374151);
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+  .ns-goals-change-btn {
+    background: none;
+    border: none;
+    color: var(--primary, #2563eb);
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+  }
+  .ns-goals-change-btn:hover { text-decoration: underline; }
+
+  /* Insight banners */
+  .ns-insight-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+  }
+  .ns-insight-icon {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+  }
+  .ns-insight-positive {
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--gray-700, #374151);
+  }
+  .ns-insight-warning {
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    color: var(--gray-700, #374151);
+  }
+
   /* ── Reasoning popover ── */
   .ns-chip-label {
     cursor: pointer;
@@ -3664,6 +3782,49 @@ window.namingStrategy = {
 
     let html = '';
 
+    // ── Goals panel: show if naming goals not yet set ──
+    const goals = client.namingGoals;
+    if (!goals && totalItems > 0) {
+      html += `<div class="ns-goals-panel">
+        <div class="ns-goals-header">
+          <div class="ns-goals-title">What's your naming strategy goal?</div>
+          <div class="ns-goals-subtitle">This shapes the advice you'll see on this grid.</div>
+        </div>
+        <div class="ns-goals-options">
+          <button class="ns-goals-option" data-goal="cohesive">
+            <div class="ns-goals-option-icon">🎯</div>
+            <div class="ns-goals-option-label">Cohesive</div>
+            <div class="ns-goals-option-desc">Names should feel like one family. Clustering in similar cells is intentional.</div>
+          </button>
+          <button class="ns-goals-option" data-goal="distinctive">
+            <div class="ns-goals-option-icon">🌈</div>
+            <div class="ns-goals-option-label">Distinctive</div>
+            <div class="ns-goals-option-desc">Each product should stand on its own. Spread across cells for variety.</div>
+          </button>
+          <button class="ns-goals-option" data-goal="clarity">
+            <div class="ns-goals-option-icon">💡</div>
+            <div class="ns-goals-option-label">Clarity-first</div>
+            <div class="ns-goals-option-desc">Users should instantly know what each product does. Descriptive names preferred.</div>
+          </button>
+          <button class="ns-goals-option" data-goal="memorable">
+            <div class="ns-goals-option-icon">✨</div>
+            <div class="ns-goals-option-label">Memorable</div>
+            <div class="ns-goals-option-desc">Names should be catchy and stick. Suggestive and abstract names preferred.</div>
+          </button>
+        </div>
+      </div>`;
+    }
+
+    // Show current goal as an editable badge if set
+    if (goals) {
+      const goalLabels = { cohesive: '🎯 Cohesive', distinctive: '🌈 Distinctive', clarity: '💡 Clarity-first', memorable: '✨ Memorable' };
+      html += `<div class="ns-goals-current">
+        <span class="ns-goals-current-label">Strategy goal:</span>
+        <span class="ns-goals-current-badge">${goalLabels[goals] || goals}</span>
+        <button class="ns-goals-change-btn" id="nsChangeGoalBtn">Change</button>
+      </div>`;
+    }
+
     // Action bar
     const unmappedCount = totalItems - mappedItems;
     if (totalItems > 0) {
@@ -3681,23 +3842,55 @@ window.namingStrategy = {
       html += '</div>';
     }
 
-    // Warning banner if too clustered
-    if (totalItems > 0 && mappedItems > 0) {
+    // Goal-aware insight banner
+    if (totalItems > 0 && mappedItems > 0 && goals) {
       const cellCounts = {};
+      const rowCounts = { abstract: 0, suggestive: 0, descriptive: 0 };
       Object.values(ontItems).forEach(categoryItems => {
         categoryItems.forEach(item => {
           if (item.cell) {
             cellCounts[item.cell] = (cellCounts[item.cell] || 0) + 1;
+            const rowKey = item.cell.split('_')[0];
+            if (rowCounts[rowKey] !== undefined) rowCounts[rowKey]++;
           }
         });
       });
       const cellArray = Object.values(cellCounts).sort((a, b) => b - a);
       const topTwo = cellArray.slice(0, 2).reduce((a, b) => a + b, 0);
       const clusteredPercent = Math.round((topTwo / mappedItems) * 100);
+      const occupiedCells = Object.keys(cellCounts).length;
+      const descriptivePercent = Math.round((rowCounts.descriptive / mappedItems) * 100);
+      const suggestivePercent = Math.round((rowCounts.suggestive / mappedItems) * 100);
+      const abstractPercent = Math.round((rowCounts.abstract / mappedItems) * 100);
 
-      if (clusteredPercent > 50) {
-        html += `<div class="ns-warning-banner"><div class="ns-warning-icon">⚠️</div><div>${clusteredPercent}% of items are in just 2 cells. Consider diversifying naming strategy.</div></div>`;
+      let insight = '';
+      if (goals === 'cohesive') {
+        if (clusteredPercent > 60) {
+          insight = `<div class="ns-insight-banner ns-insight-positive"><div class="ns-insight-icon">✅</div><div>${clusteredPercent}% of names cluster in 2 cells — consistent with your cohesive naming goal. Your portfolio reads as one family.</div></div>`;
+        } else if (occupiedCells > 6) {
+          insight = `<div class="ns-insight-banner ns-insight-warning"><div class="ns-insight-icon">💡</div><div>Names are spread across ${occupiedCells} cells. For a cohesive strategy, consider consolidating toward fewer naming patterns.</div></div>`;
+        }
+      } else if (goals === 'distinctive') {
+        if (occupiedCells >= 4) {
+          insight = `<div class="ns-insight-banner ns-insight-positive"><div class="ns-insight-icon">✅</div><div>Names spread across ${occupiedCells} cells — good variety for a distinctive strategy. Each product has its own character.</div></div>`;
+        } else if (clusteredPercent > 70) {
+          insight = `<div class="ns-insight-banner ns-insight-warning"><div class="ns-insight-icon">💡</div><div>${clusteredPercent}% of names cluster in 2 cells. For distinctiveness, consider introducing different naming styles for key products.</div></div>`;
+        }
+      } else if (goals === 'clarity') {
+        if (descriptivePercent >= 50) {
+          insight = `<div class="ns-insight-banner ns-insight-positive"><div class="ns-insight-icon">✅</div><div>${descriptivePercent}% of names are descriptive — users can immediately understand what each product does.</div></div>`;
+        } else {
+          insight = `<div class="ns-insight-banner ns-insight-warning"><div class="ns-insight-icon">💡</div><div>Only ${descriptivePercent}% of names are descriptive. For clarity, consider renaming suggestive/abstract products to better communicate their function.</div></div>`;
+        }
+      } else if (goals === 'memorable') {
+        const memorablePercent = suggestivePercent + abstractPercent;
+        if (memorablePercent >= 40) {
+          insight = `<div class="ns-insight-banner ns-insight-positive"><div class="ns-insight-icon">✅</div><div>${memorablePercent}% of names are suggestive or abstract — these are the most memorable and distinctive naming styles.</div></div>`;
+        } else {
+          insight = `<div class="ns-insight-banner ns-insight-warning"><div class="ns-insight-icon">💡</div><div>Only ${memorablePercent}% of names are suggestive or abstract. Descriptive names are clear but less memorable — consider more evocative options for hero products.</div></div>`;
+        }
       }
+      if (insight) html += insight;
     }
 
     // Grid
@@ -3776,6 +3969,28 @@ window.namingStrategy = {
     }
 
     container.innerHTML = html;
+
+    // Event listeners — Goals panel
+    container.querySelectorAll('.ns-goals-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const goal = btn.dataset.goal;
+        const c = Storage.getActiveClient();
+        if (c) {
+          Storage.updateClient(c.id, { namingGoals: goal });
+          this.renderMappingTab();
+        }
+      });
+    });
+    const changeGoalBtn = document.getElementById('nsChangeGoalBtn');
+    if (changeGoalBtn) {
+      changeGoalBtn.addEventListener('click', () => {
+        const c = Storage.getActiveClient();
+        if (c) {
+          Storage.updateClient(c.id, { namingGoals: null });
+          this.renderMappingTab();
+        }
+      });
+    }
 
     // Event listeners — Auto-map, Re-map & Clear buttons
     const autoMapBtn = document.getElementById('nsAutoMapBtn');
