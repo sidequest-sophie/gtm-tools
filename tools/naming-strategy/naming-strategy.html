@@ -675,6 +675,112 @@
     background: rgba(217, 43, 150, 0.04);
   }
 
+  /* ── Reasoning popover ── */
+  .ns-chip-label {
+    cursor: pointer;
+  }
+  .ns-chip-label:hover {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 2px;
+  }
+  .ns-reasoning-popover-wrapper {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  .ns-reasoning-popover {
+    pointer-events: auto;
+    background: var(--white, #fff);
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    padding: 1rem;
+    z-index: 10000;
+    max-height: 340px;
+    overflow-y: auto;
+    animation: nsPopoverIn 0.15s ease-out;
+  }
+  @keyframes nsPopoverIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .ns-reasoning-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.625rem;
+  }
+  .ns-reasoning-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--gray-900, #111827);
+  }
+  .ns-reasoning-close {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--gray-400, #9ca3af);
+    padding: 0 0.25rem;
+    line-height: 1;
+  }
+  .ns-reasoning-close:hover { color: var(--gray-700, #374151); }
+  .ns-reasoning-classification {
+    display: flex;
+    gap: 0.375rem;
+    margin-bottom: 0.75rem;
+  }
+  .ns-reasoning-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .ns-reasoning-badge-primary {
+    background: var(--primary, #2563eb);
+    color: white;
+  }
+  .ns-reasoning-badge-secondary {
+    background: var(--gray-100, #f3f4f6);
+    color: var(--gray-700, #374151);
+    border: 1px solid var(--gray-200, #e5e7eb);
+  }
+  .ns-reasoning-badge-outline {
+    background: transparent;
+    color: var(--gray-600, #4b5563);
+    border: 1px dashed var(--gray-300, #d1d5db);
+  }
+  .ns-reasoning-section {
+    margin-bottom: 0.625rem;
+  }
+  .ns-reasoning-section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500, #6b7280);
+    margin-bottom: 0.375rem;
+  }
+  .ns-reasoning-reason {
+    font-size: 0.78rem;
+    color: var(--gray-600, #4b5563);
+    line-height: 1.5;
+    padding-left: 0.25rem;
+  }
+  .ns-reasoning-alt {
+    margin-bottom: 0.375rem;
+  }
+  .ns-reasoning-alt-reason {
+    padding-left: 0.5rem;
+    color: var(--gray-500, #6b7280);
+    font-size: 0.72rem;
+  }
+
   /* ── Triage cards ── */
   .ns-triage-card {
     padding: var(--spacing-lg);
@@ -3633,7 +3739,7 @@ window.namingStrategy = {
         html += `<div class="ns-mapping-cell" data-cell="${cellKey}"><div class="ns-mapping-cell-chips">`;
         itemsInCell.forEach((item, idx) => {
           const colorClass = ontCats.indexOf(this.getItemCategory(client, item.id)) % 6;
-          html += `<div class="ns-mapping-chip" data-category="${colorClass}" data-id="${item.id}" draggable="true">${item.name}<button class="ns-mapping-chip-delete" data-unmap="${item.id}">×</button></div>`;
+          html += `<div class="ns-mapping-chip" data-category="${colorClass}" data-id="${item.id}" data-name="${item.name.replace(/"/g, '&quot;')}" draggable="true"><span class="ns-chip-label">${item.name}</span><button class="ns-mapping-chip-delete" data-unmap="${item.id}">×</button></div>`;
         });
         html += '</div></div>';
       }
@@ -3713,8 +3819,122 @@ window.namingStrategy = {
       });
     });
 
+    // Click chip label to show reasoning popover
+    container.querySelectorAll('.ns-mapping-chip .ns-chip-label').forEach(label => {
+      label.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const chip = e.target.closest('.ns-mapping-chip');
+        if (!chip || chip.classList.contains('ns-dragging')) return;
+        const name = chip.dataset.name;
+        if (name) this.showReasoningPopover(name, chip);
+      });
+    });
+
+    // Close popover on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.ns-reasoning-popover') && !e.target.closest('.ns-chip-label')) {
+        this.closeReasoningPopover();
+      }
+    }, { once: false });
+
     // Drag-and-drop
     this._setupMappingDragDrop(container);
+  },
+
+  /**
+   * Show a reasoning popover anchored to a chip, explaining why it was classified this way.
+   */
+  showReasoningPopover(name, anchorEl) {
+    // Remove any existing popover
+    this.closeReasoningPopover();
+
+    const result = this.classifyNameDetailed(name);
+    const rowLabels = { abstract: 'Abstract', suggestive: 'Suggestive', descriptive: 'Descriptive' };
+    const colLabels = { real: 'Real Word', compound: 'Compound', coined: 'Coined', jargon: 'Industry Jargon' };
+
+    let html = `<div class="ns-reasoning-popover">`;
+    html += `<div class="ns-reasoning-header">`;
+    html += `<span class="ns-reasoning-name">${name}</span>`;
+    html += `<button class="ns-reasoning-close" onclick="window.namingStrategy.closeReasoningPopover()">×</button>`;
+    html += `</div>`;
+
+    // Current classification
+    html += `<div class="ns-reasoning-classification">`;
+    html += `<span class="ns-reasoning-badge ns-reasoning-badge-primary">${rowLabels[result.row] || result.row}</span>`;
+    html += `<span class="ns-reasoning-badge ns-reasoning-badge-secondary">${colLabels[result.col] || result.col}</span>`;
+    html += `</div>`;
+
+    // Reasons
+    if (result.reasons && result.reasons.length > 0) {
+      html += `<div class="ns-reasoning-section">`;
+      html += `<div class="ns-reasoning-section-title">Why this classification</div>`;
+      result.reasons.forEach(r => {
+        html += `<div class="ns-reasoning-reason">• ${r}</div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Alternatives
+    if (result.alternatives && result.alternatives.length > 0) {
+      html += `<div class="ns-reasoning-section">`;
+      html += `<div class="ns-reasoning-section-title">Could also be</div>`;
+      result.alternatives.forEach(alt => {
+        html += `<div class="ns-reasoning-alt">`;
+        html += `<span class="ns-reasoning-badge ns-reasoning-badge-outline">${rowLabels[alt.row] || alt.row}</span>`;
+        if (alt.reasons && alt.reasons.length > 0) {
+          alt.reasons.forEach(r => {
+            html += `<div class="ns-reasoning-reason ns-reasoning-alt-reason">• ${r}</div>`;
+          });
+        }
+        html += `</div>`;
+      });
+      html += `</div>`;
+    }
+
+    if ((!result.reasons || result.reasons.length === 0) && (!result.alternatives || result.alternatives.length === 0)) {
+      html += `<div class="ns-reasoning-section"><div class="ns-reasoning-reason">No strong descriptive or suggestive signals — classified as abstract (empty brand vessel).</div></div>`;
+    }
+
+    html += `</div>`;
+
+    // Insert into DOM
+    const popover = document.createElement('div');
+    popover.className = 'ns-reasoning-popover-wrapper';
+    popover.innerHTML = html;
+    document.body.appendChild(popover);
+
+    // Position relative to anchor
+    const rect = anchorEl.getBoundingClientRect();
+    const popoverEl = popover.querySelector('.ns-reasoning-popover');
+    const popWidth = 320;
+
+    // Prefer below the chip, flip above if no room
+    let top = rect.bottom + 8;
+    let left = rect.left + (rect.width / 2) - (popWidth / 2);
+
+    // Keep within viewport
+    if (left < 8) left = 8;
+    if (left + popWidth > window.innerWidth - 8) left = window.innerWidth - popWidth - 8;
+    if (top + 200 > window.innerHeight) top = rect.top - 8; // will use transform below
+
+    popoverEl.style.position = 'fixed';
+    popoverEl.style.top = top + 'px';
+    popoverEl.style.left = left + 'px';
+    popoverEl.style.width = popWidth + 'px';
+
+    // If we flipped above, translate up by popover height
+    if (top === rect.top - 8) {
+      popoverEl.style.transform = 'translateY(-100%)';
+    }
+
+    this._activePopover = popover;
+  },
+
+  closeReasoningPopover() {
+    if (this._activePopover) {
+      this._activePopover.remove();
+      this._activePopover = null;
+    }
   },
 
   showCellSelector(itemId) {
