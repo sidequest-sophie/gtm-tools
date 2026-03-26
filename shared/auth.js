@@ -1,6 +1,6 @@
 /**
  * Auth Module
- * Supabase authentication wrapper for Category Leaders GTM Tools
+ * Supabase authentication wrapper for Category Leaders CMO Toolkit
  * Handles Google OAuth, Magic Link, Email/Password, and session management.
  */
 
