@@ -3126,6 +3126,7 @@ window.namingStrategy = {
       // Military / tactical metaphors (evocative in cybersecurity context)
       'threat','defensive','offensive','red','blue','purple','crisis','capture',
       'flag','exploit','breach','vault','bunker','armory','command','ops',
+      'pwn','pwnbox','ctf',
       // Branding qualifiers
       'season','seasons','series','edition','signature','select','curated','company'
     ]);
@@ -3135,16 +3136,17 @@ window.namingStrategy = {
       if (suggestiveTerms.has(w)) suggestiveCount++;
     });
 
-    // "for Business/Enterprise/Consumer" patterns are suggestive repositioning
-    if (/\bfor\s+(business|enterprise|consumer|teams|education)\b/i.test(lower)) {
-      suggestiveCount++;
-    }
-
-    // Acronym + qualifier (e.g. "HTB for Enterprise", "HTB Seasons")
-    if (/^[A-Z]{2,5}\s/i.test(raw) && suggestiveCount > 0) suggestiveCount++;
-
     // camelCase names with "defend/attack/hack" component → suggestive
     if (/defend|attack|hack|breach|strike|guard|shield/i.test(coreName)) suggestiveCount++;
+
+    // "for Business/Enterprise/Consumer" — only suggestive if the core name already has
+    // a suggestive signal OR the name is just a short acronym + audience (e.g. "HTB for Enterprise").
+    // Otherwise "Academy Modules for Business" stays descriptive.
+    const hasForAudience = /\bfor\s+(business|enterprise|consumer|teams|education)\b/i.test(lower);
+    const isAcronymForAudience = /^[A-Z]{2,5}\s+for\s+/i.test(raw);
+    if (hasForAudience && (suggestiveCount > 0 || isAcronymForAudience)) {
+      suggestiveCount++;
+    }
 
     if (suggestiveCount >= 1) return 'suggestive';
 
@@ -3224,13 +3226,17 @@ window.namingStrategy = {
       }
     });
 
-    if (/\bfor\s+(business|enterprise|consumer|teams|education)\b/i.test(lower)) {
-      suggestiveScore++;
-      suggestiveReasons.push('"for [audience]" is a suggestive repositioning pattern');
-    }
+    // camelCase/embedded combat metaphors
     if (/defend|attack|hack|breach|strike|guard|shield/i.test(coreName)) {
       suggestiveScore++;
       suggestiveReasons.push('contains a combat/security metaphor');
+    }
+    // "for Business" only boosts if already suggestive or acronym+for pattern
+    const _hasForAudience = /\bfor\s+(business|enterprise|consumer|teams|education)\b/i.test(lower);
+    const _isAcronymFor = /^[A-Z]{2,5}\s+for\s+/i.test(raw);
+    if (_hasForAudience && (suggestiveScore > 0 || _isAcronymFor)) {
+      suggestiveScore++;
+      suggestiveReasons.push('"for [audience]" reinforces suggestive repositioning');
     }
 
     const abstractScore = (contentWords.length <= 1 && descriptiveScore === 0 && suggestiveScore === 0) ? 2
@@ -3280,7 +3286,7 @@ window.namingStrategy = {
   },
 
   _getSuggestiveTerms() {
-    return new Set(['pro','elite','advance','advanced','premium','plus','max','ultra','smart','turbo','boost','power','super','hyper','prime','classic','original','essential','infinite','ultimate','master','expert','genius','alpha','omega','titan','nexus','apex','summit','peak','vanguard','frontier','horizon','venture','quest','pioneer','guardian','sentinel','defender','fortress','shield','armor','aegis','bastion','citadel','stronghold','watchtower','hawk','eagle','falcon','wolf','panther','cobra','viper','phoenix','dragon','griffin','spartan','ninja','samurai','ronin','gladiator','centurion','strike','force','storm','thunder','lightning','flash','blaze','flame','ember','spark','pulse','wave','surge','nova','stellar','cosmic','quantum','atomic','fusion','catalyst','ignite','accelerate','propel','rocket','orbit','velocity','momentum','agile','swift','rapid','instant','deep','stealth','compass','oracle','sage','prism','spectrum','beacon','lighthouse','hack','hacking','battle','battleground','battlegrounds','combat','warfare','hunt','hunting','chase','pursuit','conquest','crusade','raid','siege','ambush','challenge','challenges','arena','colosseum','gauntlet','forge','crucible','detective','sherlock','sherlocks','sleuth','recon','reconnaissance','threat','defensive','offensive','red','blue','purple','crisis','capture','flag','exploit','breach','vault','bunker','armory','command','ops','season','seasons','series','edition','signature','select','curated','company']);
+    return new Set(['pro','elite','advance','advanced','premium','plus','max','ultra','smart','turbo','boost','power','super','hyper','prime','classic','original','essential','infinite','ultimate','master','expert','genius','alpha','omega','titan','nexus','apex','summit','peak','vanguard','frontier','horizon','venture','quest','pioneer','guardian','sentinel','defender','fortress','shield','armor','aegis','bastion','citadel','stronghold','watchtower','hawk','eagle','falcon','wolf','panther','cobra','viper','phoenix','dragon','griffin','spartan','ninja','samurai','ronin','gladiator','centurion','strike','force','storm','thunder','lightning','flash','blaze','flame','ember','spark','pulse','wave','surge','nova','stellar','cosmic','quantum','atomic','fusion','catalyst','ignite','accelerate','propel','rocket','orbit','velocity','momentum','agile','swift','rapid','instant','deep','stealth','compass','oracle','sage','prism','spectrum','beacon','lighthouse','hack','hacking','battle','battleground','battlegrounds','combat','warfare','hunt','hunting','chase','pursuit','conquest','crusade','raid','siege','ambush','challenge','challenges','arena','colosseum','gauntlet','forge','crucible','detective','sherlock','sherlocks','sleuth','recon','reconnaissance','threat','defensive','offensive','red','blue','purple','crisis','capture','flag','exploit','breach','vault','bunker','armory','command','ops','pwn','pwnbox','ctf','season','seasons','series','edition','signature','select','curated','company']);
   },
 
   /**
@@ -3325,6 +3331,21 @@ window.namingStrategy = {
       this.renderMappingTab();
       this.renderProblemsTab();
     }
+  },
+
+  /**
+   * Re-classify ALL items (including already-mapped ones) using the latest algorithm.
+   * Clears existing cells first, then runs auto-map from scratch.
+   */
+  remapAllItems() {
+    const client = Storage.getActiveClient();
+    if (!client) return;
+    const entities = client.brandEntities || [];
+    // Clear all existing cell assignments
+    entities.forEach(entity => { entity.cell = ''; });
+    Storage.updateClient(client.id, { brandEntities: entities });
+    // Re-run auto-map on all items (now unmapped)
+    this.autoMapItems();
   },
 
   /**
@@ -3543,6 +3564,9 @@ window.namingStrategy = {
       html += '<div class="ns-mapping-actions">';
       if (unmappedCount > 0) {
         html += `<button class="ns-btn ns-btn-primary" id="nsAutoMapBtn">✨ Auto-Map ${unmappedCount} Item${unmappedCount !== 1 ? 's' : ''}</button>`;
+      } else if (mappedItems > 0) {
+        // All items already mapped — offer re-classification with updated algorithm
+        html += `<button class="ns-btn ns-btn-primary" id="nsRemapAllBtn">🔄 Re-Map All</button>`;
       }
       if (mappedItems > 0) {
         html += `<button class="ns-btn ns-btn-ghost" id="nsClearMappingsBtn">Clear All</button>`;
@@ -3647,10 +3671,18 @@ window.namingStrategy = {
 
     container.innerHTML = html;
 
-    // Event listeners — Auto-map & Clear buttons
+    // Event listeners — Auto-map, Re-map & Clear buttons
     const autoMapBtn = document.getElementById('nsAutoMapBtn');
     if (autoMapBtn) {
       autoMapBtn.addEventListener('click', () => this.autoMapItems());
+    }
+    const remapAllBtn = document.getElementById('nsRemapAllBtn');
+    if (remapAllBtn) {
+      remapAllBtn.addEventListener('click', () => {
+        if (confirm('Re-classify all items using the latest algorithm? This will overwrite any manual corrections.')) {
+          this.remapAllItems();
+        }
+      });
     }
     const clearBtn = document.getElementById('nsClearMappingsBtn');
     if (clearBtn) {
