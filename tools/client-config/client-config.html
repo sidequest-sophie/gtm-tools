@@ -268,6 +268,13 @@
   .cc-entity-item[draggable="true"] .cc-entity-header { cursor: grab; }
   .cc-entity-item[draggable="true"]:active .cc-entity-header { cursor: grabbing; }
   .cc-entity-item.drag-over > .cc-entity-header { background: rgba(217,43,150,0.08); border-radius: 8px 8px 0 0; }
+  /* Prevent draggable parent from stealing focus/selection from inputs */
+  .cc-entity-detail input,
+  .cc-entity-detail textarea,
+  .cc-entity-detail select {
+    -webkit-user-select: text;
+    user-select: text;
+  }
   .cc-drop-zone {
     height: 0; transition: height 0.15s ease, background 0.15s ease;
     border-radius: 6px; margin: 0 0.25rem;
@@ -1344,6 +1351,16 @@ window.clientConfig = {
     container.addEventListener('dragstart', e => {
       const item = e.target.closest('.cc-entity-item[draggable]');
       if (!item) return;
+
+      // Don't start drag from interactive elements (inputs, buttons, selects, textareas)
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON' ||
+          e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('select') ||
+          e.target.closest('.cc-entity-detail')) {
+        e.preventDefault();
+        return;
+      }
+
       draggedId = item.dataset.entityId;
       item.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
@@ -1458,7 +1475,7 @@ window.clientConfig = {
       : '';
 
     const toggleBtn = children.length
-      ? `<button class="cc-tree-toggle expanded" onclick="event.stopPropagation(); clientConfig.toggleBranch('${e.id}')" title="Collapse">▶</button>`
+      ? `<button class="cc-tree-toggle expanded" draggable="false" onclick="event.stopPropagation(); event.preventDefault(); clientConfig.toggleBranch('${e.id}')" title="Collapse">▶</button>`
       : `<span class="cc-tree-toggle-spacer"></span>`;
 
     const cardHtml = `
