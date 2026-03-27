@@ -1775,9 +1775,11 @@
     color: var(--gray-500);
     transition: all 0.15s ease;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 50px;
+    gap: 0.35rem;
+    min-height: 70px;
   }
   .ns-pg-cell:hover {
     background: var(--gray-50);
@@ -1788,6 +1790,33 @@
     color: var(--pink);
     font-weight: 600;
     box-shadow: inset 0 0 0 2px var(--pink);
+  }
+
+  /* Changeometer */
+  .ns-change-meter {
+    width: 80%;
+    height: 4px;
+    background: var(--gray-100, #f3f4f6);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .ns-change-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  .ns-change-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--gray-500, #6b7280);
+    white-space: nowrap;
+  }
+  .ns-pg-cell.selected .ns-change-label {
+    color: var(--pink);
+  }
+  .ns-change-count {
+    font-weight: 400;
+    opacity: 0.7;
   }
 
   /* Rename Results Panel */
@@ -4516,6 +4545,29 @@ window.namingStrategy = {
     const approachLabels = { abstract: 'Abstract', suggestive: 'Suggestive', descriptive: 'Descriptive' };
     const constructLabels = { jargon: 'Industry Jargon', real: 'Real Word', compound: 'Compound', coined: 'Coined' };
 
+    // Pre-calculate change stats for each cell
+    const { categories: ontCats, items: ontItems } = this.getOntologyData(client);
+    const allItems = [];
+    ontCats.forEach(cat => {
+      (ontItems[cat] || []).forEach(item => {
+        allItems.push({ name: item.name, cat });
+      });
+    });
+    const totalItemCount = allItems.length;
+
+    const cellStats = {};
+    approaches.forEach(a => {
+      constructs.forEach(c => {
+        const key = a + '_' + c;
+        let changed = 0;
+        allItems.forEach(({ name, cat }) => {
+          const proposed = this.generateProposedName(name, cat, a, c);
+          if (proposed !== name) changed++;
+        });
+        cellStats[key] = { changed, total: totalItemCount };
+      });
+    });
+
     const colCount = constructs.length;
     let gridHtml = `<div class="ns-proposed-grid" style="grid-template-columns: 100px repeat(${colCount}, 1fr)">`;
     gridHtml += '<div class="ns-pg-corner"></div>';
@@ -4526,8 +4578,18 @@ window.namingStrategy = {
       constructs.forEach(c => {
         const key = a + '_' + c;
         const isSelected = this.selectedProposedCell === key;
+        const stats = cellStats[key];
+        const pct = totalItemCount > 0 ? Math.round((stats.changed / stats.total) * 100) : 0;
+        // Colour intensity based on change percentage
+        const hue = pct <= 30 ? '142' : pct <= 60 ? '38' : '0'; // green → amber → red
+        const sat = pct <= 30 ? '60%' : pct <= 60 ? '80%' : '70%';
+        const barColor = `hsl(${hue}, ${sat}, 50%)`;
         gridHtml += `<div class="ns-pg-cell ${isSelected ? 'selected' : ''}" data-cell="${key}">
           <span>${approachLabels[a]} +<br>${constructLabels[c]}</span>
+          <div class="ns-change-meter">
+            <div class="ns-change-bar" style="width: ${pct}%; background: ${barColor}"></div>
+          </div>
+          <div class="ns-change-label">${pct}% change <span class="ns-change-count">(${stats.changed}/${stats.total})</span></div>
         </div>`;
       });
     });
