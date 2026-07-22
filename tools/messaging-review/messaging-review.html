@@ -1,0 +1,663 @@
+<style>
+  .mrv-wrap { max-width: 880px; margin: 0 auto; }
+
+  .mrv-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:1.25rem; }
+  .mrv-head h2 { margin:0 0 0.2rem; font-size:1.35rem; color:var(--navy); }
+  .mrv-head p { margin:0; color:var(--gray-500); font-size:0.85rem; }
+
+  .mrv-card { background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1.1rem 1.25rem; margin-bottom:0.9rem; }
+  .mrv-doc-card { cursor:pointer; transition:border-color .15s, box-shadow .15s; }
+  .mrv-doc-card:hover { border-color:var(--pink); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .mrv-doc-card h3 { margin:0 0 0.25rem; font-size:1.02rem; color:var(--navy); }
+  .mrv-doc-card p { margin:0 0 0.5rem; font-size:0.85rem; color:var(--gray-500); }
+  .mrv-meta { display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; font-size:0.75rem; color:var(--gray-400); }
+
+  .mrv-badge { display:inline-block; border-radius:20px; padding:0.1rem 0.6rem; font-size:0.7rem; font-weight:700; }
+  .mrv-badge-suggest { background:rgba(217,43,150,0.1); color:var(--pink); }
+  .mrv-badge-comment { background:rgba(16,64,96,0.1); color:var(--navy); }
+  .mrv-badge-role { background:var(--gray-100); color:var(--gray-600); }
+
+  .mrv-btn { display:inline-block; padding:0.42rem 0.9rem; border-radius:7px; border:1px solid var(--gray-300);
+             background:#fff; color:var(--gray-700); font-size:0.8rem; font-weight:600; cursor:pointer; }
+  .mrv-btn:hover { border-color:var(--pink); color:var(--pink); }
+  .mrv-btn-primary { background:var(--pink); border-color:var(--pink); color:#fff; }
+  .mrv-btn-primary:hover { background:var(--pink-hover, #b8237d); color:#fff; }
+  .mrv-btn-sm { padding:0.25rem 0.6rem; font-size:0.75rem; }
+  .mrv-btn-ghost { border-color:transparent; background:transparent; color:var(--gray-400); }
+  .mrv-btn-ghost:hover { color:var(--pink); border-color:var(--gray-200); }
+  .mrv-btn-danger { color:#c0392b; }
+  .mrv-btn-danger:hover { border-color:#c0392b; color:#c0392b; }
+
+  .mrv-md { font-size:0.92rem; color:var(--gray-800); line-height:1.55; }
+  .mrv-md h2 { font-size:1.15rem; margin:0.2rem 0 0.5rem; color:var(--navy); }
+  .mrv-md h3 { font-size:1rem;   margin:0.2rem 0 0.5rem; color:var(--navy); }
+  .mrv-md h4, .mrv-md h5 { font-size:0.9rem; margin:0.2rem 0 0.4rem; color:var(--gray-600); }
+  .mrv-md p { margin:0 0 0.6rem; }
+  .mrv-md ul, .mrv-md ol { margin:0 0 0.6rem; padding-left:1.3rem; }
+  .mrv-md code { background:var(--gray-100); border-radius:4px; padding:0.05rem 0.3rem; font-size:0.82rem; }
+
+  .mrv-block-actions { display:flex; flex-wrap:wrap; gap:0.45rem; align-items:center;
+                       border-top:1px solid var(--gray-100); padding-top:0.6rem; margin-top:0.4rem; }
+  .mrv-block-tools { margin-left:auto; display:flex; gap:0.15rem; }
+
+  .mrv-form { margin-top:0.7rem; display:flex; flex-direction:column; gap:0.55rem; }
+  .mrv-form textarea, .mrv-form input, .mrv-form select {
+    width:100%; box-sizing:border-box; border:1px solid var(--gray-300); border-radius:7px;
+    padding:0.5rem 0.7rem; font:inherit; font-size:0.85rem; color:var(--gray-800); background:#fff; }
+  .mrv-form textarea { resize:vertical; min-height:90px; }
+  .mrv-form-row { display:flex; gap:0.5rem; align-items:center; }
+
+  .mrv-thread { margin-top:0.75rem; display:flex; flex-direction:column; gap:0.55rem; }
+  .mrv-note-card { background:var(--gray-50, #fafafa); border:1px solid var(--gray-200); border-radius:8px;
+                   padding:0.6rem 0.85rem; font-size:0.85rem; }
+  .mrv-suggestion { border-left:3px solid var(--pink); }
+  .mrv-comment { border-left:3px solid var(--navy); }
+  .mrv-comment.mrv-resolved { opacity:0.55; }
+  .mrv-thread-head { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; font-size:0.78rem; }
+  .mrv-thread-head strong { color:var(--navy); }
+  .mrv-thread-head .mrv-when { color:var(--gray-400); }
+  .mrv-proposed { border:1px dashed var(--pink); border-radius:8px; padding:0.6rem 0.85rem; margin:0.5rem 0; background:#fff; }
+  .mrv-author-note { color:var(--gray-500); font-style:italic; margin:0.3rem 0; }
+
+  .mrv-empty { text-align:center; color:var(--gray-400); font-size:0.88rem; padding:2rem 0; }
+  .mrv-hint { font-size:0.75rem; color:var(--gray-400); }
+
+  .mrv-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  .mrv-table th { text-align:left; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.05em;
+                  color:var(--gray-400); padding:0.4rem 0.5rem; border-bottom:1px solid var(--gray-200); }
+  .mrv-table td { padding:0.5rem; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
+
+  .mrv-tabs { display:flex; gap:0.4rem; margin-bottom:1rem; }
+  .mrv-tab { padding:0.35rem 0.9rem; border-radius:20px; font-size:0.8rem; font-weight:600; cursor:pointer;
+             color:var(--gray-500); background:var(--gray-100); border:none; }
+  .mrv-tab.active { background:var(--navy); color:#fff; }
+
+  details.mrv-details > summary { list-style:none; cursor:pointer; }
+  details.mrv-details > summary::-webkit-details-marker { display:none; }
+</style>
+
+<div class="mrv-wrap">
+
+  <!-- ── Document list view ── -->
+  <div id="mrv-v-list">
+    <div class="mrv-head">
+      <div>
+        <h2>Messaging Review</h2>
+        <p>Read, comment, suggest and curate messaging documents<span id="mrv-client-label"></span>.</p>
+      </div>
+      <div id="mrv-list-actions"></div>
+    </div>
+    <div class="mrv-tabs" id="mrv-tabs" style="display:none;">
+      <button class="mrv-tab active" onclick="mrvShowDocsTab()">Documents</button>
+      <button class="mrv-tab" onclick="mrvShowAdminTab()">People &amp; access</button>
+    </div>
+    <div id="mrv-list-container"><p class="mrv-empty">Loading…</p></div>
+  </div>
+
+  <!-- ── Admin view (people & access) ── -->
+  <div id="mrv-v-admin" style="display:none;">
+    <div class="mrv-head">
+      <div>
+        <h2>People &amp; access</h2>
+        <p>Who can see and shape this client's messaging documents.</p>
+      </div>
+      <button class="mrv-btn" onclick="mrvGoList()">← Documents</button>
+    </div>
+    <div id="mrv-admin-container"><p class="mrv-empty">Loading…</p></div>
+  </div>
+
+  <!-- ── Document view ── -->
+  <div id="mrv-v-doc" style="display:none;">
+    <div class="mrv-head">
+      <div>
+        <button class="mrv-btn mrv-btn-sm" onclick="mrvGoList()" style="margin-bottom:0.6rem;">← All documents</button>
+        <h2 id="mrv-doc-title"></h2>
+        <p id="mrv-doc-desc"></p>
+      </div>
+      <div id="mrv-doc-actions"></div>
+    </div>
+    <div id="mrv-doc-container"></div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ════════════════════════════════════════════
+     STATE
+     ════════════════════════════════════════════ */
+  const ROLE_LABELS = { viewer:'Read', commenter:'Comment & suggest', editor:'Edit', curator:'Curate & accept' };
+  const ROLE_RANK = { viewer:1, commenter:2, editor:3, curator:4 };
+
+  let myRole = null;        // effective review role for active client
+  let canAdminPeople = false; // owner/admin/superadmin → can edit member roles
+  let docId = null;
+  let profileCache = {};    // user_id -> profile
+
+  const sb  = () => Auth.getClient();
+  const cid = () => Storage.getActiveClientId();
+  const atLeast = (min) => ROLE_RANK[myRole] >= ROLE_RANK[min];
+
+  /* ════════════════════════════════════════════
+     HELPERS
+     ════════════════════════════════════════════ */
+  function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fmtWhen(d) {
+    return new Date(d).toLocaleString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+  }
+
+  // Minimal safe markdown: input escaped first, then headings/bold/italic/code/links/lists.
+  function md(src) {
+    const inline = (s) => s
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    const lines = esc(String(src ?? '').replace(/\r\n/g, '\n')).split('\n');
+    const out = []; let list = null; let para = [];
+    const flushPara = () => { if (para.length) { out.push('<p>' + inline(para.join('<br/>')) + '</p>'); para = []; } };
+    const flushList = () => { if (list) { out.push('</' + list + '>'); list = null; } };
+    for (const raw of lines) {
+      const line = raw.trimEnd();
+      const h = line.match(/^(#{1,4})\s+(.*)$/);
+      const b = line.match(/^[-*]\s+(.*)$/);
+      const n = line.match(/^\d+[.)]\s+(.*)$/);
+      if (!line.trim()) { flushPara(); flushList(); }
+      else if (h) { flushPara(); flushList(); const lv = h[1].length + 1; out.push(`<h${lv}>` + inline(h[2]) + `</h${lv}>`); }
+      else if (b) { flushPara(); if (list !== 'ul') { flushList(); out.push('<ul>'); list = 'ul'; } out.push('<li>' + inline(b[1]) + '</li>'); }
+      else if (n) { flushPara(); if (list !== 'ol') { flushList(); out.push('<ol>'); list = 'ol'; } out.push('<li>' + inline(n[1]) + '</li>'); }
+      else { flushList(); para.push(line); }
+    }
+    flushPara(); flushList();
+    return out.join('\n');
+  }
+
+  async function loadProfiles(ids) {
+    const missing = [...new Set(ids)].filter(id => id && !profileCache[id]);
+    if (missing.length) {
+      const { data } = await sb().from('profiles').select('id, display_name, email').in('id', missing);
+      (data || []).forEach(p => { profileCache[p.id] = p; });
+    }
+  }
+  const who = (id) => {
+    const p = profileCache[id];
+    return p ? (p.display_name || p.email || 'Unknown') : 'Unknown';
+  };
+
+  /* ════════════════════════════════════════════
+     VIEW SWITCHING
+     ════════════════════════════════════════════ */
+  function showOnly(id) {
+    ['mrv-v-list','mrv-v-doc','mrv-v-admin'].forEach(v => {
+      document.getElementById(v).style.display = v === id ? '' : 'none';
+    });
+  }
+  function setTab(i) {
+    document.querySelectorAll('.mrv-tab').forEach((t, n) => t.classList.toggle('active', n === i));
+  }
+  window.mrvGoList = function () { docId = null; setTab(0); showOnly('mrv-v-list'); mrvRenderList(); };
+  window.mrvShowDocsTab = function () { setTab(0); showOnly('mrv-v-list'); mrvRenderList(); };
+  window.mrvShowAdminTab = function () { setTab(1); showOnly('mrv-v-admin'); mrvRenderAdmin(); };
+
+  /* ════════════════════════════════════════════
+     BOOT
+     ════════════════════════════════════════════ */
+  window.messagingReview = {
+    async init() {
+      showOnly('mrv-v-list');
+      const container = document.getElementById('mrv-list-container');
+      if (!cid()) {
+        container.innerHTML = '<p class="mrv-empty">No active client selected.</p>';
+        return;
+      }
+      // Effective role comes from the database (RLS is the real enforcement)
+      const { data: role, error } = await sb().rpc('effective_review_role', { p_client_id: cid() });
+      if (error || !role) {
+        container.innerHTML = '<p class="mrv-empty">You don\'t have access to messaging review for this client.</p>';
+        return;
+      }
+      myRole = role;
+
+      // Can this user manage people? (client owner/admin or superadmin)
+      canAdminPeople = Auth.isSuperAdmin();
+      if (!canAdminPeople) {
+        const clients = await Storage.getClientsAsync();
+        const active = (clients || []).find(c => c.id === cid());
+        canAdminPeople = ['owner','admin'].includes(active && active._memberRole);
+      }
+
+      const clients = await Storage.getClientsAsync();
+      const active = (clients || []).find(c => c.id === cid());
+      const label = document.getElementById('mrv-client-label');
+      if (label && active) label.textContent = ' for ' + active.name;
+
+      document.getElementById('mrv-tabs').style.display = atLeast('curator') ? '' : 'none';
+      mrvRenderList();
+    }
+  };
+
+  /* ════════════════════════════════════════════
+     DOCUMENT LIST
+     ════════════════════════════════════════════ */
+  async function mrvRenderList() {
+    const container = document.getElementById('mrv-list-container');
+    const actions = document.getElementById('mrv-list-actions');
+    actions.innerHTML = atLeast('editor')
+      ? '<button class="mrv-btn mrv-btn-primary" onclick="mrvNewDocForm()">+ New document</button>' : '';
+
+    const { data: docs } = await sb().from('review_documents')
+      .select('*, review_blocks(count), review_suggestions(count), review_comments(count)')
+      .eq('client_id', cid())
+      .order('updated_at', { ascending: false });
+
+    if (!docs || !docs.length) {
+      container.innerHTML = '<p class="mrv-empty">No documents yet.' + (atLeast('editor') ? ' Create the first one.' : '') + '</p>';
+      return;
+    }
+
+    // Counts of open items need separate filtered queries (head-count per doc is overkill; fetch summaries)
+    const ids = docs.map(d => d.id);
+    const [sugg, comm] = await Promise.all([
+      sb().from('review_suggestions').select('document_id').in('document_id', ids).eq('status', 'pending'),
+      sb().from('review_comments').select('document_id').in('document_id', ids).eq('resolved', false),
+    ]);
+    const suggCount = {}; (sugg.data || []).forEach(r => suggCount[r.document_id] = (suggCount[r.document_id] || 0) + 1);
+    const commCount = {}; (comm.data || []).forEach(r => commCount[r.document_id] = (commCount[r.document_id] || 0) + 1);
+
+    container.innerHTML = docs.map(d => {
+      const blocks = (d.review_blocks && d.review_blocks[0] && d.review_blocks[0].count) || 0;
+      const s = suggCount[d.id] || 0, c = commCount[d.id] || 0;
+      return `<div class="mrv-card mrv-doc-card" onclick="mrvOpenDoc('${d.id}')">
+        <h3>${esc(d.title)}</h3>
+        ${d.description ? `<p>${esc(d.description)}</p>` : ''}
+        <div class="mrv-meta">
+          <span>${blocks} section${blocks === 1 ? '' : 's'}</span>
+          ${s ? `<span class="mrv-badge mrv-badge-suggest">${s} open suggestion${s === 1 ? '' : 's'}</span>` : ''}
+          ${c ? `<span class="mrv-badge mrv-badge-comment">${c} open comment${c === 1 ? '' : 's'}</span>` : ''}
+          <span>updated ${fmtWhen(d.updated_at)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.mrvNewDocForm = function () {
+    const container = document.getElementById('mrv-list-container');
+    container.insertAdjacentHTML('afterbegin', `<div class="mrv-card" id="mrv-new-doc">
+      <div class="mrv-form">
+        <input id="mrv-new-title" placeholder="Document title" maxlength="120" />
+        <input id="mrv-new-desc" placeholder="Short description (optional)" maxlength="240" />
+        <div class="mrv-form-row">
+          <button class="mrv-btn mrv-btn-primary" onclick="mrvCreateDoc()">Create</button>
+          <button class="mrv-btn" onclick="document.getElementById('mrv-new-doc').remove()">Cancel</button>
+        </div>
+      </div>
+    </div>`);
+    document.getElementById('mrv-new-title').focus();
+  };
+
+  window.mrvCreateDoc = async function () {
+    const title = document.getElementById('mrv-new-title').value.trim();
+    if (!title) return;
+    const description = document.getElementById('mrv-new-desc').value.trim();
+    const { data, error } = await sb().from('review_documents')
+      .insert({ client_id: cid(), title, description, created_by: Auth.getUser().id })
+      .select().single();
+    if (error) { alert('Could not create document: ' + error.message); return; }
+    mrvOpenDoc(data.id);
+  };
+
+  /* ════════════════════════════════════════════
+     DOCUMENT VIEW
+     ════════════════════════════════════════════ */
+  window.mrvOpenDoc = async function (id) {
+    docId = id;
+    showOnly('mrv-v-doc');
+    document.getElementById('mrv-doc-container').innerHTML = '<p class="mrv-empty">Loading…</p>';
+    await mrvRenderDoc();
+  };
+
+  async function mrvRenderDoc() {
+    const [{ data: doc }, { data: blocks }, { data: suggestions }, { data: comments }] = await Promise.all([
+      sb().from('review_documents').select('*').eq('id', docId).single(),
+      sb().from('review_blocks').select('*').eq('document_id', docId).order('position'),
+      sb().from('review_suggestions').select('*').eq('document_id', docId).eq('status', 'pending').order('created_at'),
+      sb().from('review_comments').select('*').eq('document_id', docId).order('created_at'),
+    ]);
+    if (!doc) { mrvGoList(); return; }
+
+    await loadProfiles([
+      ...(suggestions || []).map(s => s.author_id),
+      ...(comments || []).map(c => c.author_id),
+    ]);
+
+    document.getElementById('mrv-doc-title').textContent = doc.title;
+    document.getElementById('mrv-doc-desc').textContent = doc.description || '';
+    document.getElementById('mrv-doc-actions').innerHTML = atLeast('curator')
+      ? `<button class="mrv-btn mrv-btn-sm mrv-btn-danger" onclick="mrvDeleteDoc()">Delete document</button>` : '';
+
+    const bl = blocks || [];
+    const html = bl.map((block, i) => {
+      const bSugg = (suggestions || []).filter(s => s.block_id === block.id);
+      const bComm = (comments || []).filter(c => c.block_id === block.id);
+      const open = bComm.filter(c => !c.resolved);
+      const resolved = bComm.filter(c => c.resolved);
+
+      return `<div class="mrv-card">
+        <div class="mrv-md">${md(block.content)}</div>
+        <div class="mrv-block-actions">
+          ${atLeast('commenter') ? `
+            <button class="mrv-btn mrv-btn-sm" onclick="mrvToggleForm('comment','${block.id}')">💬 Comment</button>
+            <button class="mrv-btn mrv-btn-sm" onclick="mrvToggleForm('suggest','${block.id}')">✏️ Suggest edit</button>` : ''}
+          ${atLeast('editor') ? `
+            <button class="mrv-btn mrv-btn-sm" onclick="mrvToggleForm('edit','${block.id}')">Edit</button>
+            <span class="mrv-block-tools">
+              ${i > 0 ? `<button class="mrv-btn mrv-btn-sm mrv-btn-ghost" title="Move up" onclick="mrvMoveBlock('${block.id}','up')">↑</button>` : ''}
+              ${i < bl.length - 1 ? `<button class="mrv-btn mrv-btn-sm mrv-btn-ghost" title="Move down" onclick="mrvMoveBlock('${block.id}','down')">↓</button>` : ''}
+              <button class="mrv-btn mrv-btn-sm mrv-btn-ghost mrv-btn-danger" title="Delete section" onclick="mrvDeleteBlock('${block.id}')">✕</button>
+            </span>` : ''}
+        </div>
+        <div id="mrv-form-${block.id}"></div>
+        ${bSugg.length ? `<div class="mrv-thread">` + bSugg.map(s => `
+          <div class="mrv-note-card mrv-suggestion">
+            <div class="mrv-thread-head">
+              <span class="mrv-badge mrv-badge-suggest">Suggestion</span>
+              <strong>${esc(who(s.author_id))}</strong>
+              <span class="mrv-when">${fmtWhen(s.created_at)}</span>
+            </div>
+            ${s.note ? `<p class="mrv-author-note">“${esc(s.note)}”</p>` : ''}
+            <div class="mrv-md mrv-proposed">${md(s.proposed_content)}</div>
+            ${atLeast('curator') ? `<div class="mrv-form-row">
+              <button class="mrv-btn mrv-btn-sm mrv-btn-primary" onclick="mrvResolveSuggestion('${s.id}', true)">✓ Accept</button>
+              <button class="mrv-btn mrv-btn-sm" onclick="mrvResolveSuggestion('${s.id}', false)">Reject</button>
+            </div>` : ''}
+          </div>`).join('') + `</div>` : ''}
+        ${open.length ? `<div class="mrv-thread">` + open.map(c => `
+          <div class="mrv-note-card mrv-comment">
+            <div class="mrv-thread-head">
+              <strong>${esc(who(c.author_id))}</strong>
+              <span class="mrv-when">${fmtWhen(c.created_at)}</span>
+              ${atLeast('curator') ? `<button class="mrv-btn mrv-btn-sm mrv-btn-ghost" style="margin-left:auto;" onclick="mrvResolveComment('${c.id}')">Resolve</button>` : ''}
+            </div>
+            <p style="margin:0.35rem 0 0; white-space:pre-wrap;">${esc(c.body)}</p>
+          </div>`).join('') + `</div>` : ''}
+        ${resolved.length ? `<details class="mrv-details" style="margin-top:0.6rem;">
+          <summary class="mrv-hint">${resolved.length} resolved comment${resolved.length === 1 ? '' : 's'}</summary>
+          <div class="mrv-thread">` + resolved.map(c => `
+            <div class="mrv-note-card mrv-comment mrv-resolved">
+              <div class="mrv-thread-head"><strong>${esc(who(c.author_id))}</strong>
+                <span class="mrv-when">${fmtWhen(c.created_at)}</span></div>
+              <p style="margin:0.35rem 0 0; white-space:pre-wrap;">${esc(c.body)}</p>
+            </div>`).join('') + `</div>
+        </details>` : ''}
+      </div>`;
+    }).join('');
+
+    const docComments = (comments || []).filter(c => !c.block_id);
+    const addSection = atLeast('editor') ? `
+      <div class="mrv-card">
+        <details class="mrv-details">
+          <summary class="mrv-btn">+ Add section</summary>
+          <div class="mrv-form">
+            <textarea id="mrv-add-content" placeholder="Markdown supported: # headings, **bold**, *italic*, - lists, [links](https://…)"></textarea>
+            <div class="mrv-form-row"><button class="mrv-btn mrv-btn-primary" onclick="mrvAddBlock()">Add section</button></div>
+          </div>
+        </details>
+      </div>` : '';
+
+    const docCommentsHtml = `
+      <div class="mrv-card">
+        <h3 style="margin:0 0 0.6rem; font-size:1rem; color:var(--navy);">Document comments</h3>
+        ${docComments.length ? docComments.map(c => `
+          <div class="mrv-note-card mrv-comment${c.resolved ? ' mrv-resolved' : ''}" style="margin-bottom:0.5rem;">
+            <div class="mrv-thread-head">
+              <strong>${esc(who(c.author_id))}</strong>
+              <span class="mrv-when">${fmtWhen(c.created_at)}</span>
+              ${!c.resolved && atLeast('curator') ? `<button class="mrv-btn mrv-btn-sm mrv-btn-ghost" style="margin-left:auto;" onclick="mrvResolveComment('${c.id}')">Resolve</button>` : ''}
+            </div>
+            <p style="margin:0.35rem 0 0; white-space:pre-wrap;">${esc(c.body)}</p>
+          </div>`).join('') : '<p class="mrv-hint">No comments yet.</p>'}
+        ${atLeast('commenter') ? `<div class="mrv-form">
+          <textarea id="mrv-doc-comment" placeholder="Comment on the whole document…" style="min-height:70px;"></textarea>
+          <div class="mrv-form-row"><button class="mrv-btn mrv-btn-sm mrv-btn-primary" onclick="mrvAddComment(null)">Post comment</button></div>
+        </div>` : ''}
+      </div>`;
+
+    document.getElementById('mrv-doc-container').innerHTML =
+      (bl.length ? html : '<p class="mrv-empty">No sections yet.</p>') + addSection + docCommentsHtml;
+
+    // Stash blocks for form prefills
+    window.__mrvBlocks = {};
+    bl.forEach(b => { window.__mrvBlocks[b.id] = b; });
+  }
+
+  /* ── inline forms (comment / suggest / edit on a block) ── */
+  window.mrvToggleForm = function (kind, blockId) {
+    const slot = document.getElementById('mrv-form-' + blockId);
+    if (slot.dataset.kind === kind && slot.innerHTML) { slot.innerHTML = ''; slot.dataset.kind = ''; return; }
+    slot.dataset.kind = kind;
+    const block = window.__mrvBlocks[blockId];
+    if (kind === 'comment') {
+      slot.innerHTML = `<div class="mrv-form">
+        <textarea id="mrv-input-${blockId}" placeholder="Add a comment…" style="min-height:70px;"></textarea>
+        <div class="mrv-form-row"><button class="mrv-btn mrv-btn-sm mrv-btn-primary" onclick="mrvAddComment('${blockId}')">Post comment</button></div>
+      </div>`;
+    } else if (kind === 'suggest') {
+      slot.innerHTML = `<div class="mrv-form">
+        <textarea id="mrv-input-${blockId}"></textarea>
+        <input id="mrv-note-${blockId}" placeholder="Why this change? (optional)" />
+        <div class="mrv-form-row"><button class="mrv-btn mrv-btn-sm mrv-btn-primary" onclick="mrvSubmitSuggestion('${blockId}')">Submit suggestion</button></div>
+      </div>`;
+      document.getElementById('mrv-input-' + blockId).value = block.content;
+    } else if (kind === 'edit') {
+      slot.innerHTML = `<div class="mrv-form">
+        <textarea id="mrv-input-${blockId}"></textarea>
+        <div class="mrv-form-row"><button class="mrv-btn mrv-btn-sm mrv-btn-primary" onclick="mrvSaveBlock('${blockId}')">Save</button></div>
+      </div>`;
+      document.getElementById('mrv-input-' + blockId).value = block.content;
+    }
+    document.getElementById('mrv-input-' + blockId).focus();
+  };
+
+  /* ── actions ── */
+  async function touchDoc() {
+    await sb().from('review_documents').update({ updated_at: new Date().toISOString() }).eq('id', docId);
+  }
+
+  window.mrvAddBlock = async function () {
+    const content = document.getElementById('mrv-add-content').value.trim();
+    if (!content) return;
+    const blocks = Object.values(window.__mrvBlocks);
+    const maxPos = blocks.reduce((m, b) => Math.max(m, b.position), 0);
+    const { error } = await sb().from('review_blocks').insert({
+      client_id: cid(), document_id: docId, position: maxPos + 1,
+      content, updated_by: Auth.getUser().id,
+    });
+    if (error) { alert('Could not add section: ' + error.message); return; }
+    await touchDoc(); mrvRenderDoc();
+  };
+
+  window.mrvSaveBlock = async function (blockId) {
+    const content = document.getElementById('mrv-input-' + blockId).value.trim();
+    if (!content) return;
+    const { error } = await sb().from('review_blocks')
+      .update({ content, updated_by: Auth.getUser().id, updated_at: new Date().toISOString() })
+      .eq('id', blockId);
+    if (error) { alert('Could not save: ' + error.message); return; }
+    await touchDoc(); mrvRenderDoc();
+  };
+
+  window.mrvDeleteBlock = async function (blockId) {
+    if (!confirm('Delete this section (and its comments/suggestions)?')) return;
+    await sb().from('review_blocks').delete().eq('id', blockId);
+    await touchDoc(); mrvRenderDoc();
+  };
+
+  window.mrvMoveBlock = async function (blockId, dir) {
+    const blocks = Object.values(window.__mrvBlocks).sort((a, b) => a.position - b.position);
+    const idx = blocks.findIndex(b => b.id === blockId);
+    const other = dir === 'up' ? blocks[idx - 1] : blocks[idx + 1];
+    if (!other) return;
+    const a = blocks[idx];
+    await Promise.all([
+      sb().from('review_blocks').update({ position: other.position }).eq('id', a.id),
+      sb().from('review_blocks').update({ position: a.position }).eq('id', other.id),
+    ]);
+    mrvRenderDoc();
+  };
+
+  window.mrvSubmitSuggestion = async function (blockId) {
+    const proposed = document.getElementById('mrv-input-' + blockId).value.trim();
+    const note = document.getElementById('mrv-note-' + blockId).value.trim();
+    if (!proposed) return;
+    const { error } = await sb().from('review_suggestions').insert({
+      client_id: cid(), document_id: docId, block_id: blockId,
+      author_id: Auth.getUser().id, proposed_content: proposed, note: note || null,
+    });
+    if (error) { alert('Could not submit suggestion: ' + error.message); return; }
+    mrvRenderDoc();
+  };
+
+  window.mrvResolveSuggestion = async function (suggestionId, accept) {
+    const { data: s, error } = await sb().from('review_suggestions')
+      .update({ status: accept ? 'accepted' : 'rejected', resolved_by: Auth.getUser().id, resolved_at: new Date().toISOString() })
+      .eq('id', suggestionId).eq('status', 'pending')
+      .select().single();
+    if (error) { alert('Could not update suggestion: ' + error.message); return; }
+    if (accept && s) {
+      await sb().from('review_blocks')
+        .update({ content: s.proposed_content, updated_by: Auth.getUser().id, updated_at: new Date().toISOString() })
+        .eq('id', s.block_id);
+      await touchDoc();
+    }
+    mrvRenderDoc();
+  };
+
+  window.mrvAddComment = async function (blockId) {
+    const el = blockId ? document.getElementById('mrv-input-' + blockId) : document.getElementById('mrv-doc-comment');
+    const body = el.value.trim();
+    if (!body) return;
+    const { error } = await sb().from('review_comments').insert({
+      client_id: cid(), document_id: docId, block_id: blockId,
+      author_id: Auth.getUser().id, body,
+    });
+    if (error) { alert('Could not post comment: ' + error.message); return; }
+    mrvRenderDoc();
+  };
+
+  window.mrvResolveComment = async function (commentId) {
+    await sb().from('review_comments')
+      .update({ resolved: true, resolved_by: Auth.getUser().id, resolved_at: new Date().toISOString() })
+      .eq('id', commentId);
+    mrvRenderDoc();
+  };
+
+  window.mrvDeleteDoc = async function () {
+    if (!confirm('Delete this document and everything in it?')) return;
+    await sb().from('review_documents').delete().eq('id', docId);
+    mrvGoList();
+  };
+
+  /* ════════════════════════════════════════════
+     PEOPLE & ACCESS (curators+)
+     ════════════════════════════════════════════ */
+  async function mrvRenderAdmin() {
+    const container = document.getElementById('mrv-admin-container');
+    container.innerHTML = '<p class="mrv-empty">Loading…</p>';
+
+    const { data: rules } = await sb().from('review_access_rules')
+      .select('*').eq('client_id', cid()).order('kind').order('value');
+
+    let membersHtml = '';
+    if (canAdminPeople) {
+      const { data: members } = await sb().from('client_users')
+        .select('*').eq('client_id', cid()).order('invited_at');
+      await loadProfiles((members || []).map(m => m.user_id));
+      membersHtml = `<div class="mrv-card">
+        <h3 style="margin:0 0 0.2rem; font-size:1rem; color:var(--navy);">Members</h3>
+        <p class="mrv-hint" style="margin:0 0 0.7rem;">Team members (owner/admin/member) always have full curate rights in this tool. Reviewers get the review role set here.</p>
+        <table class="mrv-table"><thead><tr><th>Person</th><th>Membership</th><th>Review role</th><th></th></tr></thead><tbody>
+        ${(members || []).map(m => {
+          const p = profileCache[m.user_id] || {};
+          const isReviewer = m.role === 'reviewer';
+          return `<tr>
+            <td><strong>${esc(p.display_name || '')}</strong><br/><span class="mrv-hint">${esc(p.email || m.user_id)}</span></td>
+            <td><span class="mrv-badge mrv-badge-role">${esc(m.role)}</span></td>
+            <td>${isReviewer ? `<select onchange="mrvSetReviewRole('${m.id}', this.value)">
+                ${Object.keys(ROLE_LABELS).map(r => `<option value="${r}" ${ (m.review_role || 'viewer') === r ? 'selected' : ''}>${ROLE_LABELS[r]}</option>`).join('')}
+              </select>` : '<span class="mrv-hint">Curate & accept</span>'}</td>
+            <td>${isReviewer ? `<button class="mrv-btn mrv-btn-sm mrv-btn-ghost mrv-btn-danger" onclick="mrvRemoveMember('${m.id}')">Remove</button>` : ''}</td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>`;
+    }
+
+    container.innerHTML = membersHtml + `
+      <div class="mrv-card">
+        <h3 style="margin:0 0 0.2rem; font-size:1rem; color:var(--navy);">Access rules</h3>
+        <p class="mrv-hint" style="margin:0 0 0.7rem;">
+          Anyone signing in with Google (or magic link) on a listed domain — or a listed email — gets access
+          automatically with the given role, the first time they sign in. No manual invite needed.
+        </p>
+        <table class="mrv-table"><thead><tr><th>Rule</th><th>Value</th><th>Role on first sign-in</th><th></th></tr></thead><tbody>
+        ${(rules || []).map(r => `<tr>
+          <td><span class="mrv-badge mrv-badge-role">${r.kind}</span></td>
+          <td>${r.kind === 'domain' ? '@' : ''}${esc(r.value)}</td>
+          <td>${ROLE_LABELS[r.review_role] || esc(r.review_role)}</td>
+          <td><button class="mrv-btn mrv-btn-sm mrv-btn-ghost mrv-btn-danger" onclick="mrvRemoveRule('${r.id}')">Remove</button></td>
+        </tr>`).join('')}
+        </tbody></table>
+        <div class="mrv-form" style="margin-top:0.9rem;">
+          <div class="mrv-form-row">
+            <select id="mrv-rule-kind" style="max-width:110px;">
+              <option value="domain">Domain</option>
+              <option value="email">Email</option>
+            </select>
+            <input id="mrv-rule-value" placeholder="hackthebox.eu or person@example.com" />
+            <select id="mrv-rule-role" style="max-width:170px;">
+              ${Object.keys(ROLE_LABELS).map(r => `<option value="${r}" ${r === 'commenter' ? 'selected' : ''}>${ROLE_LABELS[r]}</option>`).join('')}
+            </select>
+            <button class="mrv-btn mrv-btn-primary" onclick="mrvAddRule()">Add</button>
+          </div>
+          <p class="mrv-hint">Domains: bare domain, no @. Emails: exact address. Rules apply on first sign-in only.</p>
+        </div>
+      </div>`;
+  }
+
+  window.mrvSetReviewRole = async function (memberId, role) {
+    const { error } = await sb().from('client_users').update({ review_role: role }).eq('id', memberId);
+    if (error) alert('Could not update role: ' + error.message);
+  };
+
+  window.mrvRemoveMember = async function (memberId) {
+    if (!confirm('Remove this reviewer? They will lose access (a matching domain rule would re-add them on next sign-in).')) return;
+    const { error } = await sb().from('client_users').delete().eq('id', memberId);
+    if (error) { alert('Could not remove member: ' + error.message); return; }
+    mrvRenderAdmin();
+  };
+
+  window.mrvAddRule = async function () {
+    const kind = document.getElementById('mrv-rule-kind').value;
+    let value = document.getElementById('mrv-rule-value').value.trim().toLowerCase().replace(/^@/, '');
+    const role = document.getElementById('mrv-rule-role').value;
+    if (!value || (kind === 'email' && !value.includes('@')) || (kind === 'domain' && !value.includes('.'))) {
+      alert('Please enter a valid ' + kind + '.'); return;
+    }
+    const { error } = await sb().from('review_access_rules')
+      .insert({ client_id: cid(), kind, value, review_role: role });
+    if (error) { alert('Could not add rule: ' + error.message); return; }
+    mrvRenderAdmin();
+  };
+
+  window.mrvRemoveRule = async function (ruleId) {
+    await sb().from('review_access_rules').delete().eq('id', ruleId);
+    mrvRenderAdmin();
+  };
+
+})();
+</script>

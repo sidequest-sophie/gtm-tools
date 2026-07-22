@@ -1166,6 +1166,9 @@
         <button class="nav-item nav-sub enabled" data-tool-id="messaging">
           <span class="label">Messaging House</span>
         </button>
+        <button class="nav-item nav-sub enabled" data-tool-id="messaging-review">
+          <span class="label">Messaging Review</span>
+        </button>
 
         <button class="nav-item" disabled>
           <div class="icon">
@@ -1347,6 +1350,15 @@
                 <div class="tool-status">Live</div>
               </div>
             </div>
+            <div class="tool-card live" data-tool-id="messaging-review" onclick="loadTool('messaging-review')">
+              <div class="tool-icon">
+                <svg viewBox="0 0 24 24"><path class="wh" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path class="pk" d="M9 10l2 2 4-4"/></svg>
+              </div>
+              <div>
+                <div class="tool-name">Messaging Review</div>
+                <div class="tool-status">Live</div>
+              </div>
+            </div>
             <div class="tool-card">
               <div class="tool-icon">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
@@ -1462,6 +1474,7 @@
       contentDiv.classList.remove('tool-active');
       document.querySelector('.topbar-title').textContent = 'CMO Toolkit';
       currentActiveTool = null;
+      applyToolAccess(); // re-hide gated tool cards after restoring the welcome HTML
     }
 
     /**
@@ -1474,6 +1487,7 @@
         'branding-style': 'Branding & Style',
         'analyst-relations': 'Analyst Relations',
         'messaging': 'Messaging Houses',
+        'messaging-review': 'Messaging Review',
         'icps': 'Ideal Customer Profiles',
         'sales-enablement': 'Sales Enablement',
         'maturity-models': 'Maturity Models',
@@ -1630,6 +1644,51 @@
     document.getElementById('setupModal')?.addEventListener('click', function(e) {
       if (e.target === this) closeSetupModal();
     });
+
+    // ── Per-client tool gating ────────────────────────────
+    // Tools listed here are hidden unless the active client's tool_access
+    // explicitly enables them (all other tools default to visible).
+    const RESTRICTED_TOOLS = ['messaging-review'];
+
+    async function applyToolAccess() {
+      if (!Auth.isAuthenticated()) return;
+      try {
+        const clients = await Storage.getClientsAsync();
+        if (!clients || !clients.length) return;
+
+        // Make sure an active client is selected (external reviewers land
+        // here with no prior selection).
+        let activeId = Storage.getActiveClientId();
+        if (!clients.find(c => c.id === activeId)) {
+          activeId = clients[0].id;
+          Storage.setActiveClientId(activeId);
+        }
+        const active = clients.find(c => c.id === activeId);
+        const access = active.toolAccess || active.tool_access || {};
+        const isReviewer = active._memberRole === 'reviewer';
+
+        const allowed = (id) => {
+          if (isReviewer) return id === 'messaging-review' && access['messaging-review'] === true;
+          if (access[id] === undefined) return !RESTRICTED_TOOLS.includes(id);
+          return access[id] !== false;
+        };
+
+        document.querySelectorAll('[data-tool-id]').forEach(el => {
+          const id = el.getAttribute('data-tool-id');
+          if (id === 'client-management' || id === 'client-config') return; // admin nav is role-gated
+          el.style.display = allowed(id) ? '' : 'none';
+        });
+        // External reviewers shouldn't see "coming soon" teasers either
+        if (isReviewer) {
+          document.querySelectorAll('.tool-card:not([data-tool-id]):not(.live)').forEach(el => {
+            el.style.display = 'none';
+          });
+        }
+        return { active, isReviewer };
+      } catch (err) {
+        console.error('applyToolAccess error:', err);
+      }
+    }
 
     // ── Auth-aware bootstrap ──────────────────────────────
 
@@ -1863,10 +1922,32 @@
 
     // ── Main Init ──────────────────────────────────────────
 
+    // Run once per page load after a session is confirmed: apply tool gating,
+    // then honour deep links (/HTBMessaginghouse) and reviewer auto-open.
+    let postAuthDone = false;
+    async function postAuthSetup() {
+      if (postAuthDone) return;
+      postAuthDone = true;
+      const result = await applyToolAccess();
+      const stashedTool = sessionStorage.getItem('cl-post-login-tool');
+      if (stashedTool) sessionStorage.removeItem('cl-post-login-tool');
+      if (stashedTool || (result && result.isReviewer)) {
+        loadTool(stashedTool || 'messaging-review');
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       welcomeContent = document.querySelector('.content')?.innerHTML || '';
       setupNavigation();
       setupLoginScreen();
+
+      // Deep links: remember the requested tool across the OAuth redirect
+      // (sign-in always returns to the origin root).
+      const path = location.pathname.toLowerCase().replace(/\/+$/, '');
+      if (path === '/htbmessaginghouse' || path === '/messaging-review') {
+        sessionStorage.setItem('cl-post-login-tool', 'messaging-review');
+        history.replaceState({}, '', '/');
+      }
 
       // Initialise Auth and wait for session check
       await Auth.init();
@@ -1885,6 +1966,7 @@
           Storage.useSupabase();
           showApp();
           updateFooter();
+          postAuthSetup();
         } else {
           Storage.useLocal();
           showLogin();
@@ -1898,6 +1980,7 @@
         Storage.useSupabase();
         showApp();
         updateFooter();
+        postAuthSetup();
       } else {
         Storage.useLocal();
         showLogin();
