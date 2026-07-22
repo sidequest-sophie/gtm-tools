@@ -837,7 +837,7 @@
     const container = document.getElementById('icp-step1-scope');
     const client = Storage.getActiveClient();
     let html = `
-      <div class="icp-radio-item ${wizardState.scope === 'company' ? 'selected' : ''}" onclick="icpSetScope('company'); icpRenderStepScope();">
+      <div class="icp-radio-item ${wizardState.scope === 'company' ? 'selected' : ''}" onclick="icpSetScope('company');">
         <div class="icp-radio-circle"></div>
         <span>Company-wide</span>
       </div>
@@ -859,7 +859,7 @@
           const isSelected = wizardState.scope === 'entity' && wizardState.entityId === e.id;
           const indent = depth * 1.5;
           html += `
-            <div class="icp-radio-item ${isSelected ? 'selected' : ''}" style="margin-left:${indent}rem;${depth > 0 ? 'padding:0.55rem 0.85rem;' : ''}" onclick="icpSetScope('entity', '${esc(e.id)}'); icpRenderStepScope();">
+            <div class="icp-radio-item ${isSelected ? 'selected' : ''}" style="margin-left:${indent}rem;${depth > 0 ? 'padding:0.55rem 0.85rem;' : ''}" onclick="icpSetScope('entity', '${esc(e.id)}');">
               <div class="icp-radio-circle"></div>
               <span>${icon} ${e.name}</span>
             </div>
@@ -1085,6 +1085,7 @@
   window.icpSetScope = function (scope, entityId) {
     wizardState.scope = scope;
     wizardState.entityId = scope === 'entity' ? entityId : null;
+    icpRenderStepScope();
   };
 
   // Capture name input
