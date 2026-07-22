@@ -1420,6 +1420,7 @@
      * Load a tool's HTML and inject it into the content area
      */
     async function loadTool(toolId) {
+      if (window.__reviewerOnly && toolId !== 'messaging-review') return;
       try {
         const response = await fetch(`tools/${toolId}/${toolId}.html`);
         if (!response.ok) {
@@ -1678,10 +1679,31 @@
           if (id === 'client-management' || id === 'client-config') return; // admin nav is role-gated
           el.style.display = allowed(id) ? '' : 'none';
         });
-        // External reviewers shouldn't see "coming soon" teasers either
+
+        // The footer chip uses the legacy sync getter which can't see
+        // Supabase data — populate it from the loaded client instead.
+        const nameEl = document.getElementById('footerClientName');
+        if (nameEl && active) nameEl.textContent = active.name || 'Client';
+        const avatarEl = document.getElementById('footerAvatar');
+        if (avatarEl && active && active.logo) {
+          avatarEl.innerHTML = `<img src="${active.logo}" alt="" />`;
+        }
+
+        // External reviewers get a read-only chip (no client-config) and
+        // no teasers for tools they'll never have.
+        window.__reviewerOnly = isReviewer;
+        const chipBtn = document.getElementById('clientFooterBtn');
+        if (chipBtn) {
+          chipBtn.style.pointerEvents = isReviewer ? 'none' : '';
+          const chev = chipBtn.querySelector('.chevron-icon');
+          if (chev) chev.style.display = isReviewer ? 'none' : '';
+        }
         if (isReviewer) {
-          document.querySelectorAll('.tool-card:not([data-tool-id]):not(.live)').forEach(el => {
-            el.style.display = 'none';
+          document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => {
+            if (el.getAttribute('data-tool-id') !== 'messaging-review') el.style.display = 'none';
+          });
+          document.querySelectorAll('.tool-card').forEach(el => {
+            if (el.getAttribute('data-tool-id') !== 'messaging-review') el.style.display = 'none';
           });
         }
         return { active, isReviewer };
