@@ -596,20 +596,15 @@ function setupWelcome() {
 async function createSession() {
   if (IS_PREVIEW) return null;
   try {
-    const { data, error } = await supa
-      .from('maturity_sessions')
-      .insert({
-        model_id: MODEL.id,
-        version_id: MODEL.live_version_id || null,
-        mode: 'fast',
-        state: 'started'
-      })
-      .select('id')
-      .single();
+    const { data, error } = await supa.rpc('create_maturity_session', {
+      p_model_id: MODEL.id,
+      p_version_id: MODEL.live_version_id || null,
+      p_mode: 'fast',
+    });
     if (!error && data) {
-      SESSION_ID = data.id;
+      SESSION_ID = data;
       fireAnalytics('assessment_started');
-      return data.id;
+      return data;
     }
   } catch (err) {
     console.error('[Session] Create error:', err);
@@ -620,10 +615,10 @@ async function createSession() {
 async function updateSession(state) {
   if (!SESSION_ID || IS_PREVIEW) return;
   try {
-    await supa
-      .from('maturity_sessions')
-      .update({ state })
-      .eq('id', SESSION_ID);
+    await supa.rpc('update_maturity_session', {
+      p_session_id: SESSION_ID,
+      p_state: state,
+    });
   } catch (err) {
     console.error('[Session] Update error:', err);
   }
@@ -1191,11 +1186,7 @@ async function saveSubmission(overall, scores, leadInfo) {
   }
 
   try {
-    const { data, error } = await supa
-      .from('maturity_submissions')
-      .insert(row)
-      .select('id, report_token')
-      .single();
+    const { data, error } = await supa.rpc('create_maturity_submission', { p: row });
 
     if (error) console.error('[Assessment] Save error:', error);
     else SUBMISSION_ID = data.id;
