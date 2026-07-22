@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/HTBMessaginghouse",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/htbmessaginghouse",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/messaging-review",
+      "destination": "/index.html"
+    },
+    {
       "source": "/maturity/preview/:id",
       "destination": "/maturity/index.html"
     },

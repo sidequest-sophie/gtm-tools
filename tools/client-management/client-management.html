@@ -702,6 +702,7 @@ window.clientManagement = {
     { id: 'naming-strategy', label: 'Naming' },
     { id: 'branding-style', label: 'Branding' },
     { id: 'messaging', label: 'Messaging' },
+    { id: 'messaging-review', label: 'Msg Review', restricted: true }, // off unless explicitly enabled
     { id: 'analyst-relations', label: 'Analyst' },
     { id: 'sales-enablement', label: 'Sales' },
     { id: 'roi-calculator', label: 'ROI' },
@@ -728,13 +729,13 @@ window.clientManagement = {
     }
     if (!client.toolAccess) {
       client.toolAccess = {};
-      this.tools.forEach(t => { client.toolAccess[t.id] = true; });
+      this.tools.forEach(t => { client.toolAccess[t.id] = !t.restricted; });
       updated = true;
     }
-    // Ensure all tools exist in toolAccess
+    // Ensure all tools exist in toolAccess (restricted tools default off)
     this.tools.forEach(t => {
       if (client.toolAccess[t.id] === undefined) {
-        client.toolAccess[t.id] = true;
+        client.toolAccess[t.id] = !t.restricted;
         updated = true;
       }
     });
